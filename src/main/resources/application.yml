@@ -14,8 +14,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/db_daengdaeng_eodiga_core?&rewriteBatchedStatements=true
     username: root
-    #password: ${MYSQL_PWD}
-    password: "0000"
+    password: ${MYSQL_PWD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
