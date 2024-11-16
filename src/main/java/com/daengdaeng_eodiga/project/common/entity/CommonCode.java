@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "Common_Code")
 public class CommonCode {
+
     @Id
     @Column(name = "code_id")
     private int codeId;
