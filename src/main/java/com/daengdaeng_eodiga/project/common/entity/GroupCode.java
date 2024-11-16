@@ -13,7 +13,7 @@ public class GroupCode {
     @Column(name = "group_id")
     private Integer groupId;
 
-    private String codeName;
+    private String name;
 
     @OneToMany(mappedBy = "groupCode", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommonCode> commonCodes = new ArrayList<>();
