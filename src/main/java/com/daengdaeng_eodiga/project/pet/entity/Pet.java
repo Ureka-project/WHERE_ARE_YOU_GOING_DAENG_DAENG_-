@@ -2,7 +2,6 @@ package com.daengdaeng_eodiga.project.pet.entity;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hibernate.annotations.ColumnDefault;

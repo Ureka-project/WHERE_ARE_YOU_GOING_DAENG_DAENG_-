@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h2>회원가입</h2>
+    <form id="signupForm">
+        <div class="form-group">
+            <label for="nickname">닉네임</label>
+            <input type="text" class="form-control" id="nickname" name="nickname" required>
+        </div>
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <!-- email 값이 있을 경우 기본으로 표시 -->
+            <input type="email" class="form-control" id="email" name="email" th:value="${email}" required>
+        </div>
+        <div class="form-group">
+            <label for="gender">성별</label>
+            <select class="form-control" id="gender" name="gender" required>
+                <option value="MALE">남성</option>
+                <option value="FEMALE">여성</option>
+                <option value="OTHER">기타</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="city">도시</label>
+            <input type="text" class="form-control" id="city" name="city">
+        </div>
+        <div class="form-group">
+            <label for="cityDetail">상세주소</label>
+            <input type="text" class="form-control" id="cityDetail" name="cityDetail">
+        </div>
+        <button type="submit" class="btn btn-primary">회원가입</button>
+    </form>
+    <div id="errorMessage" style="color: red; display: none;"></div> <!-- 오류 메시지 표시 -->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#signupForm').on('submit', function(e) {
+            e.preventDefault();  // 폼 기본 동작을 막음
+
+            // 폼 데이터 수집
+            var formData = {
+                nickname: $('#nickname').val(),
+                email: $('#email').val(),
+                gender: $('#gender').val(),
+                city: $('#city').val(),
+                cityDetail: $('#cityDetail').val()
+            };
+
+            // AJAX 요청
+            $.ajax({
+                url: '/api/signup',  // 서버의 회원가입 엔드포인트
+                type: 'POST',  // POST 방식으로 전송
+                data: formData,  // 폼 데이터를 전송
+                success: function(response) {
+                    console.log( response.redirectUrl);
+                    window.location.href = response.redirectUrl;  // 서버에서 받은 리다이렉트 URL로 이동
+                },
+                error: function(xhr, status, error) {
+                    // 오류 시 오류 메시지 표시
+                    $('#errorMessage').text('회원가입에 실패했습니다. 다시 시도해주세요.').show();
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
