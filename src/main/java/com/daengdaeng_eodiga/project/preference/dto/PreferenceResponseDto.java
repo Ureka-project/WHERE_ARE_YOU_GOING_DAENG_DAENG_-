@@ -2,7 +2,6 @@ package com.daengdaeng_eodiga.project.preference.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 
