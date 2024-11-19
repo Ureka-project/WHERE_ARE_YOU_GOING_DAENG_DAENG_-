@@ -72,6 +72,29 @@ public class PreferenceService {
     }
 
     /**
+     * 선호도 조회 서비스
+     * @param userId
+     * @return List<PreferenceResponseDto>
+     */
+    @Transactional(readOnly = true)
+    public List<PreferenceResponseDto> fetchPreferences(int userId) {
+        User user = findUser(userId);
+        List<Preference> preferences = preferenceRepository.findByUser(user);
+
+        return preferences.stream()
+                .collect(Collectors.groupingBy(preference -> preference.getPreferenceType()))
+                .entrySet().stream()
+                .map(entry -> {
+                    String preferenceInfo = findGroupName(entry.getKey());
+                    Set<String> preferenceTypes = entry.getValue().stream()
+                            .map(preference -> findCommonCodeName(preference.getId().getPreferenceInfo()))
+                            .collect(Collectors.toSet());
+                    return new PreferenceResponseDto(preferenceInfo, preferenceTypes);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
      * user 조회 메소드
      * @param userId
      * @return User
@@ -80,7 +103,6 @@ public class PreferenceService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User with id [" + userId + "] not found"));
     }
-
     /**
      * 공통코드 조회 메소드
      * @param groupId
@@ -91,7 +113,6 @@ public class PreferenceService {
         return commonCodeRepository.findByGroupCode_GroupIdAndNameIn(
                 groupId, commonNames);
     }
-
     /**
      * 그룹코드 ID 조회 메소드
      * @param preferenceInfo
@@ -102,7 +123,26 @@ public class PreferenceService {
                 .orElseThrow(() -> new IllegalArgumentException("No GroupCode found for name: " + preferenceInfo));
         return groupCode.getGroupId();
     }
-
+    /**
+     * 그룹코드 이름 조회 메소드
+     * @param groupId
+     * @return String
+     */
+    private String findGroupName(String groupId) {
+        GroupCode groupCode = groupCodeRepository.findByGroupId(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("No GroupCode found for groupId: " + groupId));
+        return groupCode.getName();
+    }
+    /**
+     * 공통코드 이름 조회 메소드
+     * @param codeId
+     * @return String
+     */
+    private String findCommonCodeName(String codeId) {
+        CommonCode commonCode = commonCodeRepository.findByCodeId(codeId)
+                .orElseThrow(() -> new IllegalArgumentException("No CommonCode found for codeId: " + codeId));
+        return commonCode.getName();
+    }
     /**
      * 선호도 객체 생성 메소드
      * @param commonCodes
@@ -123,7 +163,6 @@ public class PreferenceService {
             return preference;
         }).collect(Collectors.toSet());
     }
-
     /**
      * 엔티티를 Dto로 변환하는 메소드
      * @param preferenceInfo
