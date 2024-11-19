@@ -5,11 +5,13 @@ import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.place.entity.Visited;
 import com.daengdaeng_eodiga.project.review.entity.Review;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+@Getter
 @Entity
 public class User {
     @Id
