@@ -7,10 +7,7 @@ import com.daengdaeng_eodiga.util.ApiUtil.ApiSuccess;
 import com.daengdaeng_eodiga.util.ApiUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,9 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class PreferenceController {
     private final PreferenceService preferenceService;
 
+    // TODO : header 로부터 유저정보 가져오는 걸로 변경해야 함
+    private final int hardcodedUserId = 1;
+
     @PostMapping
     public ApiSuccess<?> addPreference(@Validated @RequestBody PreferenceRequestDto preferenceRequestDto) {
-        preferenceService.registerPreference(preferenceRequestDto);
-        return ApiUtil.success("preference insert succesfully");
+        preferenceService.registerPreference(hardcodedUserId, preferenceRequestDto);
+        return ApiUtil.success("preferences insert succesfully");
+    }
+
+    @PutMapping
+    public ApiSuccess<?> updatePreference(@Validated @RequestBody PreferenceRequestDto preferenceRequestDto) {
+        preferenceService.updatePreference(hardcodedUserId, preferenceRequestDto);
+        return ApiUtil.success("preferences update succesfully");
     }
 }

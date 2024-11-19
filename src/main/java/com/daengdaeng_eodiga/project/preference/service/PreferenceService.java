@@ -13,6 +13,7 @@ import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -27,15 +28,12 @@ public class PreferenceService {
     private final GroupCodeRepository groupCodeRepository;
     private final UserRepository userRepository;
 
-    private final int hardcodedUserId = 1;
-    // TODO : header 로부터 유저정보 가져오는 걸로 변경해야 함
-
     /**
      * 선호도 등록 서비스
      * @param preferenceRequestDto
      * @return PreferenceResponseDto
      */
-    public PreferenceResponseDto registerPreference(PreferenceRequestDto preferenceRequestDto) {
+    public PreferenceResponseDto registerPreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
         User user = findUser(hardcodedUserId);
 
         List<CommonCode> commonCodes = findCommonCode(
@@ -46,7 +44,29 @@ public class PreferenceService {
             throw new IllegalArgumentException("No CommonCodes found for groupId: " + preferenceRequestDto.getPreferenceInfo() + " and names: " + preferenceRequestDto.getPreferenceTypes());
         }
         Set<Preference> preferences = createPreferences(commonCodes, hardcodedUserId, user);
+        preferenceRepository.saveAll(preferences);
+        return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
+    }
 
+    /**
+     * 선호도 갱신 서비스
+     * @param preferenceRequestDto
+     * @return PreferenceResponseDto
+     */
+    @Transactional
+    public PreferenceResponseDto updatePreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
+        User user = findUser(hardcodedUserId);
+        String groupId = findGroupId(preferenceRequestDto.getPreferenceInfo());
+
+        preferenceRepository.deleteByUserAndPreferenceType(user, groupId);
+        List<CommonCode> commonCodes = findCommonCode(
+                findGroupId(preferenceRequestDto.getPreferenceInfo()),
+                preferenceRequestDto.getPreferenceTypes());
+
+        if (commonCodes.isEmpty()) {
+            throw new IllegalArgumentException("No CommonCodes found for groupId: " + preferenceRequestDto.getPreferenceInfo() + " and names: " + preferenceRequestDto.getPreferenceTypes());
+        }
+        Set<Preference> preferences = createPreferences(commonCodes, hardcodedUserId, user);
         preferenceRepository.saveAll(preferences);
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }
