@@ -10,6 +10,6 @@ import java.util.Set;
 
 @Repository
 public interface CommonCodeRepository extends JpaRepository<CommonCode, String> {
-    List<CommonCode> findByGroupCode_GroupIdAndNameIn(String groupId, Set<String> names);
+    List<CommonCode> findByGroupCode_GroupIdAndCodeIdIn(String groupId, Set<String> codeId);
     Optional<CommonCode> findByCodeId(String codeId);
 }

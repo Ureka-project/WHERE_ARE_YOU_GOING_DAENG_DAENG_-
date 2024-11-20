@@ -18,20 +18,23 @@ public class PreferenceController {
     private final PreferenceService preferenceService;
 
     // TODO : header 로부터 유저정보 가져오는 걸로 변경해야 함
-    private final int hardcodedUserId = 2;
+    private final int hardcodedUserId = 1;
 
+    // TODO : api response 로 반환타입 통일하기
     @PostMapping
     public ApiSuccess<?> registerPreference(@Validated @RequestBody PreferenceRequestDto preferenceRequestDto) {
         preferenceService.registerPreference(hardcodedUserId, preferenceRequestDto);
         return ApiUtil.success("preferences insert succesfully");
     }
 
+    // TODO : api response 로 반환타입 통일하기
     @PutMapping
     public ApiSuccess<?> updatePreference(@Validated @RequestBody PreferenceRequestDto preferenceRequestDto) {
         preferenceService.updatePreference(hardcodedUserId, preferenceRequestDto);
         return ApiUtil.success("preferences update succesfully");
     }
 
+    // TODO : api response 로 반환타입 통일하기
     @GetMapping
     public ApiSuccess<?> fetchPreferences(){
         List<PreferenceResponseDto> preferenceResponseDtoList =  preferenceService.fetchPreferences(hardcodedUserId);
