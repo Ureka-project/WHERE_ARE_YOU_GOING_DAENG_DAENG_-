@@ -13,53 +13,53 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
-
-steps:
-  - name: Checkout
-    uses: actions/checkout@v2
-
-  - name: Configure AWS credentials
-    uses: aws-actions/configure-aws-credentials@v4
-    with:
-        role-to-assume: arn:aws:iam::975049923363:role/github-action-daengdaeng
-        aws-region: ${{ env.AWS_REGION }}
-
-  - name: Login to Amazon ECR
-    id: login-ecr
-    uses: aws-actions/amazon-ecr-login@v1
-
-  - name: Build, tag, and push image to Amazon ECR
-    id: build-image
-    env:
-      ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-
-    run: |
-      docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-      docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-      echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest"
-
-  - name: Deploy on EC2 instance
-    uses: appleboy/ssh-action@v0.1.6
-    with:
-      host: ${{ env.EC2_IP_ADDRESS }}
-      username: ubuntu
-      key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-      script: |
-        cd /home/ubuntu/Eye_of_AI_Client
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws configure set region ${{ env.AWS_REGION }}
-        ECR_REGISTRY_LOGIN=$(aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }})
-        sudo docker stop ${{ env.ECR_REPOSITORY }} || true
-        sudo docker rm ${{ env.ECR_REPOSITORY }} || true
-        sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-        sudo docker run -d --name eyeofai -p 3080:3080 ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-  - name: action-slack
-    uses: 8398a7/action-slack@v3
-    with:
-      status: ${{ job.status }}
-      author_name: Sloth Backend - dev
-      fields: repo,commit,message,author
-      mention: here #멘션할 대상 지정
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+  
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+            role-to-assume: arn:aws:iam::975049923363:role/github-action-daengdaeng
+            aws-region: ${{ env.AWS_REGION }}
+  
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+  
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+  
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+  
+      - name: Deploy on EC2 instance
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ env.EC2_IP_ADDRESS }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/Eye_of_AI_Client
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws configure set region ${{ env.AWS_REGION }}
+            ECR_REGISTRY_LOGIN=$(aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }})
+            sudo docker stop ${{ env.ECR_REPOSITORY }} || true
+            sudo docker rm ${{ env.ECR_REPOSITORY }} || true
+            sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+            sudo docker run -d --name eyeofai -p 3080:3080 ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+      - name: action-slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          author_name: Sloth Backend - dev
+          fields: repo,commit,message,author
+          mention: here #멘션할 대상 지정
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
