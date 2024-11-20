@@ -1,8 +1,11 @@
 package com.daengdaeng_eodiga.project.review.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
 @Table(name = "Review_Keyword")
 public class ReviewKeyword {
 
@@ -13,6 +16,13 @@ public class ReviewKeyword {
     @ManyToOne
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
+
+    @Builder
+    public ReviewKeyword(Review review, String keyword) {
+        this.id = new ReviewKeywordId();
+        this.id.setKeyword(keyword);
+        this.review = review;
+    }
 
 
 }
