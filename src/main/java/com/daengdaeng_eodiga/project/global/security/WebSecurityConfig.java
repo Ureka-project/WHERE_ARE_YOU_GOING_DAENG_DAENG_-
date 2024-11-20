@@ -1,4 +1,4 @@
-package com.daengdaeng_eodiga.project.Global.Security;
+package com.daengdaeng_eodiga.project.global.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;

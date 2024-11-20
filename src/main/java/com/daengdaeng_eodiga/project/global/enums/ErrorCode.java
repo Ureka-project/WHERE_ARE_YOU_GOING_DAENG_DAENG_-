@@ -1,4 +1,4 @@
-package com.daengdaeng_eodiga.project.Global.enums;
+package com.daengdaeng_eodiga.project.global.enums;
 
 import org.springframework.http.HttpStatus;
 

@@ -1,6 +1,6 @@
-package com.daengdaeng_eodiga.project.Global.exception;
+package com.daengdaeng_eodiga.project.global.exception;
 
-import com.daengdaeng_eodiga.project.Global.enums.ErrorCode;
+import com.daengdaeng_eodiga.project.global.enums.ErrorCode;
 
 public class UserNotFoundException extends BusinessException {
 	public UserNotFoundException() {

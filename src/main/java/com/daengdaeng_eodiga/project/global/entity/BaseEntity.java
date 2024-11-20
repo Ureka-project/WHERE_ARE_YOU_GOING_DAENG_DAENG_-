@@ -1,4 +1,4 @@
-package com.daengdaeng_eodiga.project.Global.entity;
+package com.daengdaeng_eodiga.project.global.entity;
 
 import java.time.LocalDateTime;
 

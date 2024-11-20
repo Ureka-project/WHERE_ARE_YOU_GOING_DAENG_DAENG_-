@@ -1,4 +1,4 @@
-package com.daengdaeng_eodiga.project.Global.dto;
+package com.daengdaeng_eodiga.project.global.dto;
 
 public record ApiErrorResponse(String error, String message) {
 	public static ApiErrorResponse error(String error, String message) {

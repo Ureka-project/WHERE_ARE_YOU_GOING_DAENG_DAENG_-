@@ -1,4 +1,4 @@
-package com.daengdaeng_eodiga.project.Global.exception;
+package com.daengdaeng_eodiga.project.global.exception;
 
 import org.springframework.http.HttpStatus;
 

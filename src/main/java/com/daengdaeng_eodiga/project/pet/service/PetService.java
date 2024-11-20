@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.daengdaeng_eodiga.project.Global.exception.PetNotFoundException;
+import com.daengdaeng_eodiga.project.global.exception.PetNotFoundException;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.pet.repository.PetRepository;
 import com.daengdaeng_eodiga.project.user.entity.User;

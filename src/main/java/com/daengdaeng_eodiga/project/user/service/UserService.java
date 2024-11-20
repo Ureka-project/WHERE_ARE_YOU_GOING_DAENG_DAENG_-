@@ -2,7 +2,7 @@ package com.daengdaeng_eodiga.project.user.service;
 
 import org.springframework.stereotype.Service;
 
-import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
+import com.daengdaeng_eodiga.project.global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 

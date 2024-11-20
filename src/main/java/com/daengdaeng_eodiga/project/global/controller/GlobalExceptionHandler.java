@@ -1,11 +1,11 @@
-package com.daengdaeng_eodiga.project.Global.controller;
+package com.daengdaeng_eodiga.project.global.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.daengdaeng_eodiga.project.Global.dto.ApiErrorResponse;
-import com.daengdaeng_eodiga.project.Global.exception.BusinessException;
+import com.daengdaeng_eodiga.project.global.dto.ApiErrorResponse;
+import com.daengdaeng_eodiga.project.global.exception.BusinessException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
