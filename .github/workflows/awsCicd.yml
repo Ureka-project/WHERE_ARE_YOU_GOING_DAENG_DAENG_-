@@ -35,8 +35,9 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
   
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker build -t daeng-daeng-ecr .
+          docker tag daeng-daeng-ecr:latest 975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest
+          docker push 975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest"
   
       - name: Deploy on EC2 instance
