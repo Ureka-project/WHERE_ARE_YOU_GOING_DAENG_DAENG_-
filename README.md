@@ -84,3 +84,8 @@
 ### 추가 기술
 - **CI/CD (GitHub Actions, Jenkins)**: 지속적 통합 및 배포 자동화.
 - **Nginx**: 웹 서버 및 리버스 프록시.
+
+
+## ERD
+![댕댕어디가](https://github.com/user-attachments/assets/7e555644-e7e4-4af0-b0d4-cbcffc8ffd54)
+
