@@ -8,7 +8,7 @@ public class CommonCode {
 
     @Id
     @Column(name = "code_id")
-    private int codeId;
+    private String codeId;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
     private GroupCode groupCode;
