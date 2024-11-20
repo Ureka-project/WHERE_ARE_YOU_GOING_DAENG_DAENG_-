@@ -4,7 +4,7 @@ on:
       - main
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REGISTRY: 975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr
+  ECR_REGISTRY: 975049923363.dkr.ecr.ap-northeast-2.amazonaws.com
   ECR_REPOSITORY: daeng-daeng-ecr
   EC2_IP_ADDRESS: 13.124.210.221
 
