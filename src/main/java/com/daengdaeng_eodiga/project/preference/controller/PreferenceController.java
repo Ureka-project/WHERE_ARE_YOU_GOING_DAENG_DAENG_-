@@ -21,7 +21,7 @@ public class PreferenceController {
     private final int hardcodedUserId = 2;
 
     @PostMapping
-    public ApiSuccess<?> addPreference(@Validated @RequestBody PreferenceRequestDto preferenceRequestDto) {
+    public ApiSuccess<?> registerPreference(@Validated @RequestBody PreferenceRequestDto preferenceRequestDto) {
         preferenceService.registerPreference(hardcodedUserId, preferenceRequestDto);
         return ApiUtil.success("preferences insert succesfully");
     }
