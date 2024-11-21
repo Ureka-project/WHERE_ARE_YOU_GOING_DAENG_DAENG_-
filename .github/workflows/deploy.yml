@@ -9,7 +9,7 @@ env:
   AWS_REGION: ap-northeast-2
   ECR_REGISTRY: 975049923363.dkr.ecr.ap-northeast-2.amazonaws.com
   ECR_REPOSITORY: daeng-daeng-ecr
-  EC2_IP_ADDRESS: 54.180.229.46
+  EC2_IP_ADDRESS: ${{ secrets.EC2_IP_ADDRESS }}
 
 jobs:
   deploy:
@@ -31,12 +31,24 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
+      - name: Get Public IP
+        id: ip
+        uses: haythem/public-ip@v1.3
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Add GitHub Actions IP
+        run: |
+          aws ec2 authorize-security-group-ingress \
+              --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+              --protocol tcp \
+              --port 22 \
+              --cidr ${{ steps.ip.outputs.ipv4 }}/32
   
       - name: Login to Amazon ECR
         id: login-ecr
@@ -54,10 +66,10 @@ jobs:
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest"
   
       - name: Deploy on EC2 instance
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ env.EC2_IP_ADDRESS }}
-          username: ubuntu
+          username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/Eye_of_AI_Client
@@ -68,7 +80,17 @@ jobs:
             sudo docker stop ${{ env.ECR_REPOSITORY }} || true
             sudo docker rm ${{ env.ECR_REPOSITORY }} || true
             sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-            sudo docker run -d --name eyeofai -p 3080:3080 ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+            sudo docker run -d --name daengdaeng -p 8080:8080 -e MYSQL_PWD=${{secrets.MYSQL_PWD}} -e SPRING_PROFILES_ACTIVE=default ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+
+      - name: Remove GitHub Actions IP
+        run: |
+          aws ec2 revoke-security-group-ingress \
+              --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+              --protocol tcp \
+              --port 22 \
+              --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      
+
       - name: action-slack
         uses: 8398a7/action-slack@v3
         with:
