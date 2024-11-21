@@ -9,7 +9,7 @@ env:
   AWS_REGION: ap-northeast-2
   ECR_REGISTRY: 975049923363.dkr.ecr.ap-northeast-2.amazonaws.com
   ECR_REPOSITORY: daeng-daeng-ecr
-  EC2_IP_ADDRESS: 54.180.229.46
+  EC2_IP_ADDRESS: ${{ secrets.EC2_IP_ADDRESS }}
 
 jobs:
   deploy:
@@ -69,7 +69,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ env.EC2_IP_ADDRESS }}
-          username: ubuntu
+          username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/Eye_of_AI_Client
