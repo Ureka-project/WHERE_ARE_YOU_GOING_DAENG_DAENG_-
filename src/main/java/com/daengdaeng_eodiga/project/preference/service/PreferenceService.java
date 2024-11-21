@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PreferenceService {
 
@@ -46,7 +47,6 @@ public class PreferenceService {
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }
 
-    @Transactional
     public PreferenceResponseDto updatePreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
         User user = findUser(hardcodedUserId);
 
@@ -63,7 +63,6 @@ public class PreferenceService {
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }
 
-    @Transactional(readOnly = true)
     public List<PreferenceResponseDto> fetchPreferences(int userId) {
         User user = findUser(userId);
         List<Preference> preferences = preferenceRepository.findByUser(user);

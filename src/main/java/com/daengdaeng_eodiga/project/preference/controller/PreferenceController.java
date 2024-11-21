@@ -21,13 +21,13 @@ public class PreferenceController {
     private final int hardcodedUserId = 3;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> registerPreference(@Validated @RequestBody PreferenceRequestDto preferenceRequestDto) {
+    public ResponseEntity<ApiResponse<?>> registerPreference(@RequestBody PreferenceRequestDto preferenceRequestDto) {
         preferenceService.registerPreference(hardcodedUserId, preferenceRequestDto);
         return ResponseEntity.ok(ApiResponse.success("preferences insert succesfully"));
     }
 
     @PutMapping
-    public ResponseEntity<ApiResponse<?>> updatePreference(@Validated @RequestBody PreferenceRequestDto preferenceRequestDto) {
+    public ResponseEntity<ApiResponse<?>> updatePreference(@RequestBody PreferenceRequestDto preferenceRequestDto) {
         preferenceService.updatePreference(hardcodedUserId, preferenceRequestDto);
         return ResponseEntity.ok(ApiResponse.success("preferences update succesfully"));
     }
