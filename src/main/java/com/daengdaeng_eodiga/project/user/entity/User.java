@@ -3,15 +3,19 @@ package com.daengdaeng_eodiga.project.user.entity;
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.place.entity.Visited;
+import com.daengdaeng_eodiga.project.preference.entity.Preference;
 import com.daengdaeng_eodiga.project.review.entity.Review;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+@Getter
 @Entity
-@Data
+@Setter
+@Table(name = "users")
 public class User {
     @Id
     @Column(name = "user_id")

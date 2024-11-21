@@ -1,9 +1,13 @@
-package com.daengdaeng_eodiga.project.user.entity;
+package com.daengdaeng_eodiga.project.preference.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 @Embeddable
+@Getter
+@Setter
 public class PreferenceId implements Serializable {
 
     @Column(name = "preference_info")
