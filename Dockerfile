@@ -2,7 +2,7 @@
 FROM openjdk:17-jdk-slim
 
 # 복사할 파일 위치 설정
-ARG JAR_FILE=target/*.jar
+ARG JAR_FILE=build/libs/*.jar
 
 # 파일 복사
 COPY ${JAR_FILE} app.jar
