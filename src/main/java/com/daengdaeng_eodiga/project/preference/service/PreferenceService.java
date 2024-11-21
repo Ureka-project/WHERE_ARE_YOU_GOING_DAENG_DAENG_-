@@ -1,5 +1,8 @@
 package com.daengdaeng_eodiga.project.preference.service;
 
+import com.daengdaeng_eodiga.project.Global.exception.CommonCodeNotFoundException;
+import com.daengdaeng_eodiga.project.Global.exception.GroupCodeNotFoundException;
+import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.common.entity.CommonCode;
 import com.daengdaeng_eodiga.project.common.entity.GroupCode;
 import com.daengdaeng_eodiga.project.common.repository.CommonCodeRepository;
@@ -28,11 +31,6 @@ public class PreferenceService {
     private final GroupCodeRepository groupCodeRepository;
     private final UserRepository userRepository;
 
-    /**
-     * 선호도 등록 서비스
-     * @param preferenceRequestDto
-     * @return PreferenceResponseDto
-     */
     public PreferenceResponseDto registerPreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
         User user = findUser(hardcodedUserId);
 
@@ -40,20 +38,14 @@ public class PreferenceService {
                 preferenceRequestDto.getPreferenceInfo(),
                 preferenceRequestDto.getPreferenceTypes());
 
-        // TODO : 예외처리 가은님 코드로 통일하기
         if (commonCodes.isEmpty()) {
-            throw new IllegalArgumentException("No CommonCodes found for groupId: " + preferenceRequestDto.getPreferenceInfo() + " and names: " + preferenceRequestDto.getPreferenceTypes());
+            throw new CommonCodeNotFoundException();
         }
         Set<Preference> preferences = createPreferences(commonCodes, hardcodedUserId, user);
         preferenceRepository.saveAll(preferences);
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }
 
-    /**
-     * 선호도 갱신 서비스
-     * @param preferenceRequestDto
-     * @return PreferenceResponseDto
-     */
     @Transactional
     public PreferenceResponseDto updatePreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
         User user = findUser(hardcodedUserId);
@@ -63,20 +55,14 @@ public class PreferenceService {
                 preferenceRequestDto.getPreferenceInfo(),
                 preferenceRequestDto.getPreferenceTypes());
 
-        // TODO : 예외처리 가은님 코드로 통일하기
         if (commonCodes.isEmpty()) {
-            throw new IllegalArgumentException("No CommonCodes found for groupId: " + preferenceRequestDto.getPreferenceInfo() + " and names: " + preferenceRequestDto.getPreferenceTypes());
+            throw new CommonCodeNotFoundException();
         }
         Set<Preference> preferences = createPreferences(commonCodes, hardcodedUserId, user);
         preferenceRepository.saveAll(preferences);
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }
 
-    /**
-     * 선호도 조회 서비스
-     * @param userId
-     * @return List<PreferenceResponseDto>
-     */
     @Transactional(readOnly = true)
     public List<PreferenceResponseDto> fetchPreferences(int userId) {
         User user = findUser(userId);
@@ -101,9 +87,8 @@ public class PreferenceService {
      * @return User
      */
     private User findUser(int userId) {
-        // TODO : 예외처리 가은님 코드로 통일하기
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User with id [" + userId + "] not found"));
+                .orElseThrow(UserNotFoundException::new);
     }
     /**
      * 공통코드 조회 메소드
@@ -112,8 +97,11 @@ public class PreferenceService {
      * @return List<CommonCode>
      */
     private List<CommonCode> findCommonCode(String groupId, Set<String> commonIds) {
-        return commonCodeRepository.findByGroupCode_GroupIdAndCodeIdIn(
-                groupId, commonIds);
+        List<CommonCode> commonCodes =  commonCodeRepository.findByGroupCode_GroupIdAndCodeIdIn(groupId, commonIds);
+        if (commonCodes.isEmpty()) {
+            throw new CommonCodeNotFoundException();
+        }
+        return commonCodes;
     }
     /**
      * 그룹코드 이름 조회 메소드
@@ -121,9 +109,8 @@ public class PreferenceService {
      * @return String
      */
     private String findGroupName(String groupId) {
-        // TODO : 예외처리 가은님 코드로 통일하기
         GroupCode groupCode = groupCodeRepository.findByGroupId(groupId)
-                .orElseThrow(() -> new IllegalArgumentException("No GroupCode found for groupId: " + groupId));
+                .orElseThrow(GroupCodeNotFoundException::new);
         return groupCode.getName();
     }
     /**
@@ -132,9 +119,8 @@ public class PreferenceService {
      * @return String
      */
     private String findCommonCodeName(String codeId) {
-        // TODO : 예외처리 가은님 코드로 통일하기
         CommonCode commonCode = commonCodeRepository.findByCodeId(codeId)
-                .orElseThrow(() -> new IllegalArgumentException("No CommonCode found for codeId: " + codeId));
+                .orElseThrow(CommonCodeNotFoundException::new);
         return commonCode.getName();
     }
     /**
