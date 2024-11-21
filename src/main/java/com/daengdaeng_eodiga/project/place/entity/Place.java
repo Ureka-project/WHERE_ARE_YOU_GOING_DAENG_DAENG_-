@@ -40,6 +40,7 @@ public class Place {
     @Column(name = "tel_number")
     private String telNumber;
 
+    @Column(name = "url", length = 500)
     private String url;
 
     @Column(name = "place_type")
