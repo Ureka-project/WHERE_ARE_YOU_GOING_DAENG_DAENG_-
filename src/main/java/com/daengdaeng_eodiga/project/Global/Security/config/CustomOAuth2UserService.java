@@ -30,12 +30,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        System.out.println("OAuth2 User: " + oAuth2User);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
 
-        // 플랫폼에 맞는 응답 객체 생성
         if (registrationId.equals("kakao")) {
             oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
         } else if (registrationId.equals("google")) {
@@ -44,7 +42,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Unsupported OAuth provider");
         }
 
-        // 이메일을 principalName으로 사용
         String email = oAuth2Response.getEmail();
         if (email == null || email.isEmpty()) {
             throw new OAuth2AuthenticationException("Principal name (email) cannot be empty");
@@ -52,7 +49,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 이메일로 유저 조회
         User existData = userRepository.findByEmail(email);
-        System.out.println("Existing User: " + existData);
 
         if (existData == null) {
             throw new OAuth2AuthenticationException(new OAuth2Error("REDIRECT_TO_SIGNUP", "REDIRECT_TO_SIGNUP: " + email, null));
@@ -63,7 +59,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userDTO.setName(existData.getNickname());
             userDTO.setEmail(existData.getEmail());
             userDTO.setRole("ROLE_USER");
-
+            System.out.println(userDTO);
             return new CustomOAuth2User(userDTO);
         }
     }

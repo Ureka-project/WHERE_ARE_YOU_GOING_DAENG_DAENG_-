@@ -17,7 +17,7 @@
         <div class="form-group">
             <label for="email">이메일</label>
             <!-- email 값이 있을 경우 기본으로 표시 -->
-            <input type="email" class="form-control" id="email" name="email" th:value="${email}" required>
+            <input type="email" class="form-control" id="email" name="email" value="${param.email}" required>
         </div>
         <div class="form-group">
             <label for="gender">성별</label>
@@ -64,9 +64,12 @@
                     console.log( response.redirectUrl);
                     window.location.href = response.redirectUrl;  // 서버에서 받은 리다이렉트 URL로 이동
                 },
-                error: function(xhr, status, error) {
-                    // 오류 시 오류 메시지 표시
-                    $('#errorMessage').text('회원가입에 실패했습니다. 다시 시도해주세요.').show();
+                error: function(xhr) {
+                    // 서버에서 보낸 에러 메시지 확인
+                    const errorMessage = xhr.responseJSON?.error || "회원가입에 실패했습니다. 다시 시도해주세요.";
+
+                    // 에러 메시지를 화면에 표시
+                    $('#errorMessage').text(errorMessage).show();
                 }
             });
         });

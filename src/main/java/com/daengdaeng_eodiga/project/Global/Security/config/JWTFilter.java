@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
+import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,17 +13,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Set;
 
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
-    public JWTFilter(JWTUtil jwtUtil) {
+    private final RedisTokenRepository redisTokenRepository;
 
+    public JWTFilter(JWTUtil jwtUtil, RedisTokenRepository redisTokenRepository) {
         this.jwtUtil = jwtUtil;
+        this.redisTokenRepository = redisTokenRepository;
     }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorization = null;
+        String accessToken = null;
         Cookie[] cookies = request.getCookies();
         String refreshToken = null;
         String requestUri = request.getRequestURI();
@@ -38,57 +43,53 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
+        String token = null;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("Authorization")) {
-                    authorization = cookie.getValue();
+                    accessToken = cookie.getValue();
                 }
-                if (cookie.getName().equals("RefreshToken")) {
+                else if (cookie.getName().equals("RefreshToken")) {
                     refreshToken = cookie.getValue();
                 }
+
             }
-        }
 
-        // 액세스 토큰이 없으면 바로 필터 체인 실행
-        if (authorization == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String token = authorization;
-
-        // 액세스 토큰이 만료되었는지 확인
-        if (jwtUtil.isExpired(token)) {
-            // 리프레시 토큰 확인
-            if (refreshToken != null && !jwtUtil.isRefreshTokenExpired(refreshToken)) {
-                // 리프레시 토큰이 유효한 경우 새 액세스 토큰 발급
-                String username = jwtUtil.getUsername(refreshToken);
-                String role = jwtUtil.getRole(refreshToken);
-                String newAccessToken = jwtUtil.createJwt(username, role, 60 * 60 * 60L); // 1시간 유효기간
-
-                // 새 토큰을 쿠키로 응답에 추가
-                Cookie accessTokenCookie = new Cookie("Authorization", newAccessToken);
-                accessTokenCookie.setHttpOnly(true);
-                accessTokenCookie.setPath("/");
-                accessTokenCookie.setMaxAge(60 * 60); // 1시간
-
-                response.addCookie(accessTokenCookie);
-                token = newAccessToken; // 새로 발급받은 액세스 토큰을 사용
-            } else {
-                // 리프레시 토큰이 만료되었거나 없는 경우
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.sendRedirect("/login"); // 로그인 페이지 경로로 변경
+            // 액세스 토큰이 없으면 바로 필터 체인 실행
+            if (accessToken == null) {
+                filterChain.doFilter(request, response);
                 return;
+            }
+
+            token = accessToken;
+            // 블랙리스트 확인
+            if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token is blacklisted.");
+                return;
+            }
+
+            // 토큰 검증 및 재발급
+            if (jwtUtil.isExpired(accessToken)&&refreshToken==null) {
+
+                if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken))  {
+                    String newAccessToken = jwtUtil.createJwt(jwtUtil.getUsername(token), jwtUtil.getRole(refreshToken), jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
+                    response.addCookie(JWTUtil.createCookie("Authorization", newAccessToken));
+                    token = newAccessToken;
+                }
+
             }
         }
 
         // 액세스 토큰이 유효하면 사용자 인증 처리
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
+        String email = jwtUtil.getEmail(token);
 
         UserOauthDto userDTO = new UserOauthDto();
         userDTO.setName(username);
         userDTO.setRole(role);
+        userDTO.setEmail(email);
 
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
         Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());

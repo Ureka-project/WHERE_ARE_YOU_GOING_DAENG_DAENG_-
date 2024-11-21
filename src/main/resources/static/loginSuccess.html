@@ -9,23 +9,18 @@
 <body>
 <div class="container mt-5">
     <h1 class="text-center">환영합니다!</h1>
-    <!-- 타임리프를 사용하여 서버에서 데이터 전달 -->
     <p id="welcomeMessage" class="text-center" th:text="'로그인 성공!'"></p>
     <div class="text-center mt-4">
         <button id="logoutBtn" class="btn btn-danger">로그아웃</button>
     </div>
+    <button id="deleteUserBtn">회원 탈퇴</button>
+
 </div>
 <script>
+    document.getElementById("deleteUserBtn").addEventListener("click", deleteUser);
     document.addEventListener("DOMContentLoaded", function () {
         const token = getCookie("Authorization");
         console.log(token);
-        if (!token) {
-            alert("로그인이 필요합니다.");
-            console.log(token);
-            console.log("ww");
-            window.location.href = "/login";
-            return;
-        }
 
         document.getElementById("logoutBtn").addEventListener("click", function () {
             fetch('/api/logout', {
@@ -43,17 +38,28 @@
         });
     });
 
-    // 쿠키에서 특정 이름의 값을 가져오는 함수
-    function getCookie(name) {
+       function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
         return null;
     }
 
-    // 쿠키에서 특정 이름의 값을 삭제하는 함수
-    function deleteCookie(name) {
-        document.cookie = name + '=; Max-Age=-99999999;';
+
+    function deleteUser() {
+        fetch('api/delete/user', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                window.location.href = "/login";
+            })
+            .catch((error) => {
+                alert("회원 탈퇴 중 문제가 발생했습니다. 다시 시도해주세요.");
+            });
     }
 </script>
 </body>
