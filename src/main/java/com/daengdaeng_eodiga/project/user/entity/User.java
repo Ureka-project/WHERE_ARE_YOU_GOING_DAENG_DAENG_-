@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @Column(name = "user_id")
