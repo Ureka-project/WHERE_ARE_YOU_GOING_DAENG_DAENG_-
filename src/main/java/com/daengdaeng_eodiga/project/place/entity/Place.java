@@ -2,9 +2,9 @@ package com.daengdaeng_eodiga.project.place.entity;
 
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
 import com.daengdaeng_eodiga.project.review.entity.Review;
-
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,9 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "Place")
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Place {
     @Id
     @Column(name = "place_id")
@@ -74,5 +77,4 @@ public class Place {
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorite = new ArrayList<>();
-
 }
