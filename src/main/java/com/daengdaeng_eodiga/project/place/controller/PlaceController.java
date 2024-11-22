@@ -2,7 +2,9 @@ package com.daengdaeng_eodiga.project.place.controller;
 
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/places")
 public class PlaceController {
+
     private final PlaceService placeService;
 
     @PostMapping("/filter")
@@ -20,7 +23,8 @@ public class PlaceController {
                 request.getCity(),
                 request.getPlaceType(),
                 request.getLatitude(),
-                request.getLongitude()
+                request.getLongitude(),
+                request.getUserId()
         );
         return ResponseEntity.ok(places);
     }
@@ -30,37 +34,30 @@ public class PlaceController {
         List<PlaceDto> places = placeService.searchPlaces(
                 request.getKeyword(),
                 request.getLatitude(),
-                request.getLongitude()
+                request.getLongitude(),
+                request.getUserId()
         );
         return ResponseEntity.ok(places);
     }
 
+    // FilterRequest 내부 클래스
+    @Getter
+    @Setter
     static class FilterRequest {
-        private String city;
-        private String placeType;
-        private Double latitude;
-        private Double longitude;
-
-        public String getCity() { return city; }
-        public void setCity(String city) { this.city = city; }
-        public String getPlaceType() { return placeType; }
-        public void setPlaceType(String placeType) { this.placeType = placeType; }
-        public Double getLatitude() { return latitude; }
-        public void setLatitude(Double latitude) { this.latitude = latitude; }
-        public Double getLongitude() { return longitude; }
-        public void setLongitude(Double longitude) { this.longitude = longitude; }
+        private String city;          // 필터 검색 도시
+        private String placeType;     // 필터 검색 장소 유형
+        private Double latitude;      // 필터 검색 기준 위도
+        private Double longitude;     // 필터 검색 기준 경도
+        private int userId;           // 필터 검색 사용자 ID
     }
 
+    // SearchRequest 내부 클래스
+    @Getter
+    @Setter
     static class SearchRequest {
-        private String keyword;
-        private Double latitude;
-        private Double longitude;
-
-        public String getKeyword() { return keyword; }
-        public void setKeyword(String keyword) { this.keyword = keyword; }
-        public Double getLatitude() { return latitude; }
-        public void setLatitude(Double latitude) { this.latitude = latitude; }
-        public Double getLongitude() { return longitude; }
-        public void setLongitude(Double longitude) { this.longitude = longitude; }
+        private String keyword;       // 키워드 검색어
+        private Double latitude;      // 키워드 검색 기준 위도
+        private Double longitude;     // 키워드 검색 기준 경도
+        private int userId;           // 키워드 검색 사용자 ID
     }
 }

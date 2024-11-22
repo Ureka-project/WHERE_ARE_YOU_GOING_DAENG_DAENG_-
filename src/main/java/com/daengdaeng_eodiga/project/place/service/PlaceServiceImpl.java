@@ -11,11 +11,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PlaceServiceImpl implements PlaceService {
+
     private final PlaceRepository placeRepository;
 
     @Override
-    public List<PlaceDto> filterPlaces(String city, String placeType, Double latitude, Double longitude) {
-        List<Object[]> results = placeRepository.findByFiltersAndLocationWithCode(city, placeType, latitude, longitude);
+    public List<PlaceDto> filterPlaces(String city, String placeType, Double latitude, Double longitude, int userId) {
+        List<Object[]> results = placeRepository.findByFiltersAndLocationWithFavorite(city, placeType, latitude, longitude, userId);
 
         return results.stream().map(result -> {
             PlaceDto dto = new PlaceDto();
@@ -34,14 +35,17 @@ public class PlaceServiceImpl implements PlaceService {
             dto.setParking((Boolean) result[12]);
             dto.setIndoor((Boolean) result[13]);
             dto.setOutdoor((Boolean) result[14]);
-            dto.setDistance((Double) result[15]); // 거리
+            dto.setDistance((Double) result[15]);
+            // Long 값을 Boolean으로 변환
+            dto.setIsFavorite((result[16] instanceof Number) && ((Number) result[16]).longValue() == 1L);
+
             return dto;
         }).collect(Collectors.toList());
     }
 
     @Override
-    public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude) {
-        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, latitude, longitude);
+    public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, int userId) {
+        List<Object[]> results = placeRepository.findByKeywordAndLocationWithFavorite(keyword, latitude, longitude, userId);
 
         return results.stream().map(result -> {
             PlaceDto dto = new PlaceDto();
@@ -60,7 +64,10 @@ public class PlaceServiceImpl implements PlaceService {
             dto.setParking((Boolean) result[12]);
             dto.setIndoor((Boolean) result[13]);
             dto.setOutdoor((Boolean) result[14]);
-            dto.setDistance((Double) result[15]); // 거리
+            dto.setDistance((Double) result[15]);
+            // Long 값을 Boolean으로 변환
+            dto.setIsFavorite((result[16] instanceof Number) && ((Number) result[16]).longValue() == 1L);
+
             return dto;
         }).collect(Collectors.toList());
     }

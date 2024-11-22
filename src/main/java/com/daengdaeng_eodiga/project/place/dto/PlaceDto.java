@@ -10,20 +10,21 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlaceDto {
-    private int placeId;
-    private String name;
-    private String city;
-    private String cityDetail;
-    private String township;
-    private Double latitude;
-    private Double longitude;
-    private String streetAddresses;
-    private String telNumber;
-    private String url;
-    private String placeType;
-    private String description;
-    private Boolean parking;
-    private Boolean indoor;
-    private Boolean outdoor;
-    private Double distance; // 거리가 필요할지도? 몰라서넣었습니다.
+    private int placeId;            // 장소 ID
+    private String name;            // 장소 이름
+    private String city;            // 도시 이름
+    private String cityDetail;      // 도시 세부정보
+    private String township;        // 읍/면/동
+    private Double latitude;        // 위도
+    private Double longitude;       // 경도
+    private String streetAddresses; // 도로명 주소
+    private String telNumber;       // 전화번호
+    private String url;             // URL
+    private String placeType;       // 장소 유형 (공통코드의 name)
+    private String description;     // 설명
+    private Boolean parking;        // 주차 가능 여부
+    private Boolean indoor;         // 실내 여부
+    private Boolean outdoor;        // 실외 여부
+    private Double distance;        // 사용자 위치로부터 거리
+    private Boolean isFavorite;     // 즐겨찾기 여부
 }
