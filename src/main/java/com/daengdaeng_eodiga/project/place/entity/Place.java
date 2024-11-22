@@ -5,9 +5,11 @@ import com.daengdaeng_eodiga.project.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.*;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @Entity
 @Table(name = "Place")
 @Getter
@@ -42,6 +44,7 @@ public class Place {
     @Column(name = "tel_number")
     private String telNumber;
 
+    @Column(name = "url", length = 500)
     private String url;
 
     @Column(name = "place_type")

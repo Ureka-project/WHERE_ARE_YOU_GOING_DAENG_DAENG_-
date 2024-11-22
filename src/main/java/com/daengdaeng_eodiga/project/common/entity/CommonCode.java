@@ -1,8 +1,10 @@
 package com.daengdaeng_eodiga.project.common.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "Common_Code")
 public class CommonCode {
 

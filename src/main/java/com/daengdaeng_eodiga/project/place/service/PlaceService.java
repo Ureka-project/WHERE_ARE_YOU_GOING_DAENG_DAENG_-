@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.place.service;
 
+
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
 
 import java.util.List;

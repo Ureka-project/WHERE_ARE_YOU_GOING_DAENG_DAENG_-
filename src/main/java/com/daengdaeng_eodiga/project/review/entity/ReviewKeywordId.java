@@ -2,9 +2,13 @@ package com.daengdaeng_eodiga.project.review.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
+@Setter
 @Embeddable
+@NoArgsConstructor
 public class ReviewKeywordId implements Serializable {
 
     private String keyword;
@@ -26,7 +30,7 @@ public class ReviewKeywordId implements Serializable {
     @Override
     public int hashCode() {
         int result = keyword.hashCode();
-        result = 31 * result + Integer.hashCode(reviewId);  // reviewId를 int로 처리
+        result = 31 * result + Integer.hashCode(reviewId);
         return result;
     }
 
