@@ -46,7 +46,7 @@ public class FavoriteService {
     }
 
     public Page<FavoriteResponseDto> fetchFavoriteList(int userId, Pageable pageable) {
-        Page<Favorite> favoritesPage = favoriteRepository.findByUser_UserId(userId, pageable);
+        Page<Favorite> favoritesPage = favoriteRepository.findByUser_UserIdOrderByUpdatedAtDesc(userId, pageable);
 
         return favoritesPage.map(favorite -> {
             Place place = placeRepository.findById(favorite.getPlace().getPlaceId())
