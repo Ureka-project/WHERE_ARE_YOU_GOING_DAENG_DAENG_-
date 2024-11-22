@@ -7,11 +7,13 @@ import com.daengdaeng_eodiga.project.preference.entity.Preference;
 import com.daengdaeng_eodiga.project.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
