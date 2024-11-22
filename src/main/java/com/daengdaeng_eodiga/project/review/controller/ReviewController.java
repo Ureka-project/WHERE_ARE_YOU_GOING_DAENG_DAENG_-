@@ -26,7 +26,6 @@ public class ReviewController {
 	private final ReviewService reviewService;
 	@PostMapping("/review")
 	public ResponseEntity<ApiResponse<?>> registerReview(@RequestBody ReviewRegisterRequest request) {
-		System.out.println(request.keywords().toString());
 		reviewService.registerReview(request, 1); //TODO : user 시큐리티 기능 완성되면 userId 주입 수정
 		return ResponseEntity.ok(ApiResponse.success(null));
 	}
