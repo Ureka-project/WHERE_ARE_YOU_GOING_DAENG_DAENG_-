@@ -1,4 +1,5 @@
 package com.daengdaeng_eodiga.project.pet.entity;
+import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Setter
 @Entity
 @Table(name = "Pet")
-public class Pet {
+public class Pet extends BaseEntity {
     @Id
     @Column(name = "pet_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
