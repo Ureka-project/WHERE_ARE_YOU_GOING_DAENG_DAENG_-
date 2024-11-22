@@ -2,9 +2,7 @@ package com.daengdaeng_eodiga.project.place.dto;
 
 public class PlaceDtoMapper {
 
-    private PlaceDtoMapper() {
-
-    }
+    private PlaceDtoMapper() {}
 
     public static PlaceDto convertToPlaceDto(Object[] result) {
         PlaceDto dto = new PlaceDto();
@@ -25,6 +23,8 @@ public class PlaceDtoMapper {
         dto.setOutdoor((Boolean) result[14]);
         dto.setDistance((Double) result[15]);
         dto.setIsFavorite((result[16] instanceof Number) && ((Number) result[16]).longValue() == 1L);
+        dto.setStartTime((String) result[17]);
+        dto.setEndTime((String) result[18]);
         return dto;
     }
 }
