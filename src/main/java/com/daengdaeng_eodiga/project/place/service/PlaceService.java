@@ -1,25 +1,12 @@
 package com.daengdaeng_eodiga.project.place.service;
 
-import org.springframework.stereotype.Service;
 
-import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
-import com.daengdaeng_eodiga.project.place.entity.Place;
-import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
-import com.daengdaeng_eodiga.project.place.repository.PlaceScoreRepository;
+import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class PlaceService {
-	private final PlaceRepository placeRepository;
-	private final PlaceScoreRepository placeScoreRepository;
+public interface PlaceService {
+    List<PlaceDto> filterPlaces(String city, String placeType, Double latitude, Double longitude, int userId);
 
-	public Place findPlace(int placeId) {
-		return placeRepository.findById(placeId).orElseThrow(()-> new PlaceNotFoundException());
-	}
-
-	public Double findPlaceScore(int placeId) {
-		return placeScoreRepository.findById(placeId).orElseThrow(()-> new PlaceNotFoundException()).getScore();
-	}
+    List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, int userId);
 }
