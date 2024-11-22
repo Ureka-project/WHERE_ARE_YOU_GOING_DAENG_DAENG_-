@@ -4,10 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum OpenHoursType {
-    ALWAYS_OPEN("연중무휴"),
     TODAY_OFF("오늘 휴무"),
-    HOURS_AVAILABLE("영업 시간"),
-    NO_INFO("정보 없음");
+    NO_INFO("시설에 문의");
 
     private final String description;
 
