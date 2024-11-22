@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.pet.controller;
 
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.pet.dto.PetDetailResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetListResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetRegisterDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetUpdateDto;
@@ -35,5 +36,17 @@ public class PetController {
     public ResponseEntity<ApiResponse<?>> fetchPetList() {
         List<PetListResponseDto> response = petService.fetchUserPetListDto(hardcodedUserId);
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/{petId}")
+    public ResponseEntity<ApiResponse<?>> fetchPetDetail(@PathVariable int petId) {
+        PetDetailResponseDto petDetail = petService.fetchPetDetail(petId);
+        return ResponseEntity.ok(ApiResponse.success(petDetail));
+    }
+
+    @DeleteMapping("/{petId}")
+    public ResponseEntity<ApiResponse<?>> deletePet(@PathVariable int petId) {
+        petService.deletePet(hardcodedUserId, petId);
+        return ResponseEntity.ok(ApiResponse.success("pet deleted succesfully"));
     }
 }

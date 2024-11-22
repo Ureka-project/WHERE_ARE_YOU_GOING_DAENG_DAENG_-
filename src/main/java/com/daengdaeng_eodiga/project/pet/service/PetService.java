@@ -7,17 +7,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.daengdaeng_eodiga.project.Global.exception.CommonCodeNotFoundException;
-import com.daengdaeng_eodiga.project.Global.exception.DateNotFoundException;
-import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
+import com.daengdaeng_eodiga.project.Global.exception.*;
 import com.daengdaeng_eodiga.project.common.repository.CommonCodeRepository;
+import com.daengdaeng_eodiga.project.pet.dto.PetDetailResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetListResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetRegisterDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetUpdateDto;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import com.daengdaeng_eodiga.project.Global.exception.PetNotFoundException;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.pet.repository.PetRepository;
 import com.daengdaeng_eodiga.project.user.entity.User;
@@ -97,11 +95,41 @@ public class PetService {
 						.petId(pet.getPetId())
 						.name(pet.getName())
 						.image(pet.getImage())
-						.species(getCommonCodeName(pet.getSpecies())) // 공통 코드 이름 변환
-						.gender(getCommonCodeName(pet.getGender()))   // 공통 코드 이름 변환
-						.size(getCommonCodeName(pet.getSize()))       // 공통 코드 이름 변환
+						.species(getCommonCodeName(pet.getSpecies()))
+						.gender(getCommonCodeName(pet.getGender()))
+						.size(getCommonCodeName(pet.getSize()))
 						.build())
 				.collect(Collectors.toList());
+	}
+
+	public PetDetailResponseDto fetchPetDetail(int petId) {
+
+		Pet pet = petRepository.findById(petId)
+				.orElseThrow(PetNotFoundException::new);
+
+		String speciesName = getCommonCodeName(pet.getSpecies());
+		String genderName = getCommonCodeName(pet.getGender());
+		String sizeName = getCommonCodeName(pet.getSize());
+
+		return PetDetailResponseDto.builder()
+				.petId(pet.getPetId())
+				.name(pet.getName())
+				.image(pet.getImage())
+				.species(speciesName)
+				.gender(genderName)
+				.birthday(new SimpleDateFormat("yyyy-MM-dd").format(pet.getBirthday()))
+				.neutering(pet.getNeutering())
+				.size(sizeName)
+				.build();
+	}
+
+	public void deletePet(int userId, int petId) {
+
+		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+		Pet pet = petRepository.findById(petId).orElseThrow(PetNotFoundException::new);
+		if (!pet.getUser().equals(user)) { throw new UserUnauthorizedException();}
+
+		petRepository.delete(pet);
 	}
 
 	/**
