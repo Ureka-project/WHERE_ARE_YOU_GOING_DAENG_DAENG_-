@@ -11,16 +11,18 @@ public class FavoriteResponseDto {
     private String streetAddresses;
     private Double latitude;
     private Double longitude;
-    private String openHours;
+    private String startTime;
+    private String endTime;
 
     @Builder
-    public FavoriteResponseDto(int favoriteId, int placeId, String name, String streetAddresses, Double latitude, Double longitude, String openHours) {
+    public FavoriteResponseDto(int favoriteId, int placeId, String name, String streetAddresses, Double latitude, Double longitude, String startTime, String endTime) {
         this.favoriteId = favoriteId;
         this.placeId = placeId;
         this.name = name;
         this.streetAddresses = streetAddresses;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.openHours = openHours;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 }
