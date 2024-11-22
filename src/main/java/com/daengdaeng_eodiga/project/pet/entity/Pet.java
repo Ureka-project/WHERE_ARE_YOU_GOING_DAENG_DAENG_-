@@ -14,7 +14,7 @@ public class Pet {
     @Id
     @Column(name = "pet_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int PetId;
+    private int petId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
