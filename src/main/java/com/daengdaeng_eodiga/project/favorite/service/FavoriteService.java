@@ -1,5 +1,8 @@
 package com.daengdaeng_eodiga.project.favorite.service;
 
+import com.daengdaeng_eodiga.project.Global.enums.DayType;
+import com.daengdaeng_eodiga.project.Global.enums.OpenHoursType;
+import com.daengdaeng_eodiga.project.Global.exception.DayTypeNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.FavoriteNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
@@ -53,7 +56,7 @@ public class FavoriteService {
     public Page<FavoriteResponseDto> fetchFavoriteList(int userId, Pageable pageable) {
         Page<Favorite> favoritesPage = favoriteRepository.findByUser_UserId(userId, pageable);
 
-        String today = getTodayDayType();
+        DayType today = getTodayDayType();
 
         return favoritesPage.map(favorite -> {
             Place place = placeRepository.findById(favorite.getPlace().getPlaceId())
@@ -73,39 +76,39 @@ public class FavoriteService {
         });
     }
 
-    private String getTodayDayType() {
+    private DayType getTodayDayType() {
         DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
         switch (dayOfWeek) {
-            case MONDAY: return "월";
-            case TUESDAY: return "화";
-            case WEDNESDAY: return "수";
-            case THURSDAY: return "목";
-            case FRIDAY: return "금";
-            case SATURDAY: return "토";
-            case SUNDAY: return "일";
-            default: throw new IllegalStateException("요일을 찾지 못하였습니다.");
+            case MONDAY: return DayType.MONDAY;
+            case TUESDAY: return DayType.TUESDAY;
+            case WEDNESDAY: return DayType.WEDNESDAY;
+            case THURSDAY: return DayType.THURSDAY;
+            case FRIDAY: return DayType.FRIDAY;
+            case SATURDAY: return DayType.SATURDAY;
+            case SUNDAY: return DayType.SUNDAY;
+            default: throw new DayTypeNotFoundException();
         }
     }
 
-    private String getOpenHours(int placeId, String today) {
+    private String getOpenHours(int placeId, DayType today) {
         List<OpeningDate> openingDates = openingDateRepository.findByPlace_PlaceId(placeId);
 
         for (OpeningDate openingDate : openingDates) {
-            if ("연중무휴".equals(openingDate.getDayType())) {
+            if (DayType.EVERYDAY.getValue().equals(openingDate.getDayType())) {
                 return openingDate.getStartTime() + " - " + openingDate.getEndTime();
             }
 
-            if (openingDate.getDayType().contains(today)) {
-                return "오늘 휴무";
+            if (openingDate.getDayType().contains(today.getValue())) {
+                return OpenHoursType.TODAY_OFF.getDescription();
             }
         }
 
         for (OpeningDate openingDate : openingDates) {
-            if (!openingDate.getDayType().contains(today)) {
+            if (!openingDate.getDayType().contains(today.getValue())) {
                 return openingDate.getStartTime() + " - " + openingDate.getEndTime();
             }
         }
 
-        return "정보 없음";
+        return OpenHoursType.NO_INFO.getDescription();
     }
 }
