@@ -7,9 +7,9 @@ public class PetUpdateDto {
     private int petId;
     private String name;
     private String image;
-    private String species; // 공통 코드 ID
-    private String gender;  // 공통 코드 ID
-    private String size;    // 공통 코드 ID
-    private String birthday; // 날짜 문자열
+    private String species;
+    private String gender;
+    private String size;
+    private String birthday;
     private Boolean neutering;
 }
