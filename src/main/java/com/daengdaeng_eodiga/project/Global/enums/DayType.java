@@ -1,5 +1,8 @@
 package com.daengdaeng_eodiga.project.Global.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum DayType {
     EVERYDAY("연중무휴"),
     MONDAY("월"),
@@ -14,9 +17,5 @@ public enum DayType {
 
     DayType(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 }

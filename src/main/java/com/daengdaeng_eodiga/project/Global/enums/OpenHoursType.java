@@ -1,5 +1,8 @@
 package com.daengdaeng_eodiga.project.Global.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum OpenHoursType {
     ALWAYS_OPEN("연중무휴"),
     TODAY_OFF("오늘 휴무"),
@@ -10,10 +13,6 @@ public enum OpenHoursType {
 
     OpenHoursType(String description) {
         this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     @Override
