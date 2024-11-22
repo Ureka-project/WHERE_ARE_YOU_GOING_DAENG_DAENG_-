@@ -1,12 +1,14 @@
 package com.daengdaeng_eodiga.project.pet.controller;
 
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.pet.dto.PetListResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetRegisterDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetUpdateDto;
 import com.daengdaeng_eodiga.project.pet.service.PetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/pets")
@@ -27,5 +29,11 @@ public class PetController {
     public ResponseEntity<ApiResponse<?>> updatePet(@RequestBody PetUpdateDto updateDto) {
         petService.updatePet(updateDto);
         return ResponseEntity.ok(ApiResponse.success("pet updated succesfully"));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<?>> fetchPetList() {
+        List<PetListResponseDto> response = petService.fetchUserPetListDto(hardcodedUserId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

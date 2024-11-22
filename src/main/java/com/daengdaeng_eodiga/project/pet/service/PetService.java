@@ -5,10 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.daengdaeng_eodiga.project.Global.exception.CommonCodeNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.DateNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.common.repository.CommonCodeRepository;
+import com.daengdaeng_eodiga.project.pet.dto.PetListResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetRegisterDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetUpdateDto;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
@@ -28,6 +31,12 @@ public class PetService {
 	private final UserRepository userRepository;
 	private final CommonCodeRepository commonCodeRepository;
 
+	/**
+	 * 반려동물 조회 메소드.
+	 * List<Pet>타입을 반환
+	 * @param user
+	 * @return Pet
+	 */
 	public List<Pet> fetchUserPets(User user) {
 		return petRepository.findAllByUser(user);
 	}
@@ -71,6 +80,39 @@ public class PetService {
 		pet.setNeutering(updateDto.getNeutering());
 
 		petRepository.save(pet);
+	}
+
+	/**
+	 * 유저페이지에서의 반려동물 목록 조회 메소드.
+	 * @param userId
+	 * @return PetListResponseDto
+	 */
+	public List<PetListResponseDto> fetchUserPetListDto(int userId) {
+		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+		List<Pet> pets = petRepository.findAllByUser(user);
+
+		return pets.stream()
+				.map(pet -> PetListResponseDto.builder()
+						.petId(pet.getPetId())
+						.name(pet.getName())
+						.image(pet.getImage())
+						.species(getCommonCodeName(pet.getSpecies())) // 공통 코드 이름 변환
+						.gender(getCommonCodeName(pet.getGender()))   // 공통 코드 이름 변환
+						.size(getCommonCodeName(pet.getSize()))       // 공통 코드 이름 변환
+						.build())
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * 공통 코드를 이름으로 변환하는 메소드
+	 * @param codeId
+	 * @return CommonName
+	 */
+	private String getCommonCodeName(String codeId) {
+		return commonCodeRepository.findByCodeId(codeId)
+				.map(commonCode -> commonCode.getName())
+				.orElseThrow(CommonCodeNotFoundException::new);
 	}
 
 	/**
