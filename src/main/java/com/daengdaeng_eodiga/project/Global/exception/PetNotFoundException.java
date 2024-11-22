@@ -4,6 +4,6 @@ import com.daengdaeng_eodiga.project.Global.enums.ErrorCode;
 
 public class PetNotFoundException extends BusinessException {
 	public PetNotFoundException() {
-		super(ErrorCode.PLACE_NOT_FOUND.getErrorCode(), ErrorCode.PLACE_NOT_FOUND.getMessage());
+		super(ErrorCode.PET_NOT_FOUND.getErrorCode(), ErrorCode.PET_NOT_FOUND.getMessage());
 	}
 }
