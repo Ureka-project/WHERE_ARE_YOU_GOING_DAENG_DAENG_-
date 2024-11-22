@@ -4,14 +4,11 @@ import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import com.daengdaeng_eodiga.project.place.entity.Place;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Entity
-@Builder
 @Getter
-@AllArgsConstructor
 @Table(name = "Favorite")
 public class Favorite extends BaseEntity {
     @Id
@@ -26,6 +23,12 @@ public class Favorite extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
+
+    @Builder
+    public Favorite(User user, Place place) {
+        this.user = user;
+        this.place = place;
+    }
 
     public Favorite() {}
 }
