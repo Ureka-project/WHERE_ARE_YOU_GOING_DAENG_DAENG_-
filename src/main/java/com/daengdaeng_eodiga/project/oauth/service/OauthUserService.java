@@ -44,7 +44,7 @@ public class OauthUserService {
         System.out.println(email);
         User user =userRepository.findByEmail(email);
         if (user!=null) {
-            userRepository. deleteById((long) user.getUserId());
+            userRepository. deleteById(user.getUserId());
             return true;
         }
         return false;

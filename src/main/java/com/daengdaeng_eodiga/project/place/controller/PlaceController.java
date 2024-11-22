@@ -1,14 +1,19 @@
 package com.daengdaeng_eodiga.project.place.controller;
 
+import com.daengdaeng_eodiga.project.Global.Geo.GeoService;
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +21,7 @@ import java.util.List;
 public class PlaceController {
 
     private final PlaceService placeService;
-
+    private final GeoService geoService;
     @PostMapping("/filter")
     public ResponseEntity<List<PlaceDto>> filterPlaces(@RequestBody FilterRequest request) {
         List<PlaceDto> places = placeService.filterPlaces(
@@ -59,5 +64,15 @@ public class PlaceController {
         private Double latitude;      // 키워드 검색 기준 위도
         private Double longitude;     // 키워드 검색 기준 경도
         private int userId;           // 키워드 검색 사용자 ID
+    }
+
+
+    @GetMapping("/api/location")
+    public ResponseEntity<List<PlaceDto>> getLocation(@RequestParam double latitude, @RequestParam double longitude) {
+        List<PlaceDto> places = new ArrayList<>();
+        Map<String, String> MyRegionInfo = geoService.getRegionInfo(latitude, longitude);
+
+
+        return  ResponseEntity.ok(places);
     }
 }

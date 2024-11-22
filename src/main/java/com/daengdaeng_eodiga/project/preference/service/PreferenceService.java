@@ -33,7 +33,7 @@ public class PreferenceService {
     private final UserRepository userRepository;
 
     public PreferenceResponseDto registerPreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
-        User user = findUser((long) hardcodedUserId);
+        User user = findUser( hardcodedUserId);
 
         List<CommonCode> commonCodes = findCommonCode(
                 preferenceRequestDto.getPreferenceInfo(),
@@ -47,7 +47,7 @@ public class PreferenceService {
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }
 
-    public PreferenceResponseDto updatePreference(long hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
+    public PreferenceResponseDto updatePreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
         User user = findUser(hardcodedUserId);
 
         preferenceRepository.deleteByUserAndPreferenceType(user, preferenceRequestDto.getPreferenceInfo());
@@ -63,7 +63,7 @@ public class PreferenceService {
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }
 
-    public List<PreferenceResponseDto> fetchPreferences(long userId) {
+    public List<PreferenceResponseDto> fetchPreferences(int userId) {
         User user = findUser(userId);
         List<Preference> preferences = preferenceRepository.findByUser(user);
 
@@ -85,7 +85,7 @@ public class PreferenceService {
      * @param userId
      * @return User
      */
-    private User findUser(Long userId) {
+    private User findUser(int userId) {
         return userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
     }
