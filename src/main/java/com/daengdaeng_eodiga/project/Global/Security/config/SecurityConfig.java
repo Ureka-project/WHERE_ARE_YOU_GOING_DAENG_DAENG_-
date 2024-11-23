@@ -36,8 +36,8 @@ public class SecurityConfig {
         //HTTP Basic 인증 방식 disable
         http
                 .httpBasic((auth) -> auth.disable());
-        http
-                .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository), UsernamePasswordAuthenticationFilter.class);
+        //http
+        //        .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository), UsernamePasswordAuthenticationFilter.class);
 
 
         //oauth2
@@ -52,7 +52,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/api/login", "/api/signup", "/static/**", "/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
+                        .requestMatchers("/","/api/login","/api/v1/places/location", "/api/signup", "/static/**", "/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
                         .anyRequest().authenticated())
                 .formLogin((formLogin) -> formLogin
                         .loginPage("/login")

@@ -1,20 +1,23 @@
 package com.daengdaeng_eodiga.project.Global.Geo;
-
+import com.daengdaeng_eodiga.project.Global.Geo.dto.KakaoGeoApiDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+@RequiredArgsConstructor
 @Service
 public class GeoService {
-    private static final String KAKAO_API_URL = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json";
-    private static final String KAKAO_API_KEY = "KakaoAK {YOUR_REST_API_KEY}";
+    private static final String KAKAO_API_URL = "https://dapi.kakao.com/v2/local/geo/coord2address.json";
+    private static final String KAKAO_API_KEY = "KakaoAK 91be30bd77f971e11d2e95354debb20c";
 
-    public Map<String, String> getRegionInfo(double latitude, double longitude) {
+
+    public String getRegionInfo(double latitude, double longitude) {
         // API 호출 URL 생성
         String url = KAKAO_API_URL + "?x=" + longitude + "&y=" + latitude;
 
@@ -26,22 +29,22 @@ public class GeoService {
 
         // REST 요청
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
-
+        ResponseEntity<KakaoGeoApiDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, KakaoGeoApiDto.class);
         // 결과 파싱
         if (response.getBody() != null) {
-            Map<String, Object> firstRegion = (Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) response.getBody())
-                    .get("documents"))
-                    .get(0); // 첫 번째 결과
-
-            Map<String, String> result = new HashMap<>();
-            result.put("region_1depth_name", firstRegion.get("region_1depth_name").toString()); // 도
-            result.put("region_2depth_name", firstRegion.get("region_2depth_name").toString()); // 시/군/구
-            result.put("region_3depth_name", firstRegion.get("region_3depth_name").toString()); // 읍/면/동
+            String result = getMaps(response);
 
             return result;
         }
 
         return null;
     }
+
+    private static String getMaps(ResponseEntity<KakaoGeoApiDto> response) {
+        List<KakaoGeoApiDto.Document> addressInfoList = Objects.requireNonNull(response.getBody()).getDocuments();
+        String ret=addressInfoList.get(0).getAddress() != null? addressInfoList.get(0).getAddress().toString() : "";
+        return ret;
+    }
+
+
 }

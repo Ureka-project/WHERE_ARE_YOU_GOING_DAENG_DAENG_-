@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "Place")
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Place {
