@@ -40,4 +40,10 @@ public class PlaceController {
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
+
+    @GetMapping("/{placeId}")
+    public ResponseEntity<ApiResponse<PlaceDto>> getPlaceDetails(@PathVariable int placeId) {
+        PlaceDto placeDetails = placeService.getPlaceDetails(placeId);
+        return ResponseEntity.ok(ApiResponse.success(placeDetails));
+    }
 }

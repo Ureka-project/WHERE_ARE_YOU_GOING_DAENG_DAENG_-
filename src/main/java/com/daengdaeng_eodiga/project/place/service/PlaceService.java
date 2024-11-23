@@ -8,6 +8,7 @@ import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceScoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,17 @@ public class PlaceService {
     public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, int userId) {
         List<Object[]> results = placeRepository.findByKeywordAndLocationWithFavorite(keyword, latitude, longitude, userId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
+    }
+
+    public PlaceDto getPlaceDetails(int placeId) {
+
+        List<Object[]> results = placeRepository.findPlaceDetailsById(placeId);
+
+        if (results.isEmpty()) {
+            throw new PlaceNotFoundException();
+        }
+
+        return PlaceDtoMapper.convertToPlaceDto(results.get(0));
     }
 
     public Place findPlace(int placeId) {
