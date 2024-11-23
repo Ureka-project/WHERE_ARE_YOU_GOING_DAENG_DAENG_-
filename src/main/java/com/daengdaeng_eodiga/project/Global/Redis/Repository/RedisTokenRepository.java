@@ -19,26 +19,11 @@ public class RedisTokenRepository {
     }
 
     public void saveToken(String refreshToken, long expiration,String email) {
-        try {
-            System.out.println("[DEBUG] saveToken 호출됨");
-            System.out.println("[DEBUG] 입력값 - email: " + email + ", refreshToken: " + refreshToken + ", expiration: " + expiration);
-
-            // 만료 시간 확인
             if (expiration <= 0) {
                 throw new IllegalArgumentException("유효하지 않은 만료 시간: " + expiration);
             }
-
-            // Redis 저장
             redisTemplate.opsForValue().set("refreshToken:" +refreshToken, email, expiration, TimeUnit.MILLISECONDS);
-            System.out.println("[DEBUG] Redis에 저장 완료 - Key: refreshToken:" + refreshToken + ", Value: " + email);
             String storedToken =  redisTemplate.opsForValue().get("refreshToken:" + refreshToken);
-            System.out.println("Stored refresh token: " + storedToken);
-
-        } catch (Exception e) {
-            // 예외 발생 시 로그 출력
-            System.err.println("[ERROR] saveToken 처리 중 예외 발생");
-            e.printStackTrace();
-        }
     }
 
 
@@ -51,14 +36,7 @@ public class RedisTokenRepository {
     }
 
     public void addToBlacklist(String token, long expiration, String email) {
-        try {
-
-                redisTemplate.opsForValue().set("blacklist:" + token, email, expiration, TimeUnit.MILLISECONDS);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Redis 블랙리스트 추가 중 오류 발생: " + e.getMessage());
-        }
+        redisTemplate.opsForValue().set("blacklist:" + token, email, expiration, TimeUnit.MILLISECONDS);
     }
 
     public boolean isBlacklisted(String token) {

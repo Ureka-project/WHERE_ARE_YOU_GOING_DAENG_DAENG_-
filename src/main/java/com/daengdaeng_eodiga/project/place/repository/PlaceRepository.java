@@ -41,5 +41,23 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
                                                         @Param("latitude") Double latitude,
                                                         @Param("longitude") Double longitude,
                                                         @Param("userId") int userId);
+    @Query(value =
+            "SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude, " +
+                    "p.post_code, p.street_addresses, p.tel_number, p.url, p.place_type, p.description, " +
+                    "p.weight_limit, p.parking, p.indoor, p.outdoor, " +
+                    "COALESCE(ps.score, 5) AS score, " +
+                    "GROUP_CONCAT(rk.keyword) AS keywords, " +
+                    "COUNT(DISTINCT  " +
+                    "r.review_id) AS review_count " +  // review 카운트를 추가
+                    "FROM place p " +
+                    "LEFT JOIN review r ON p.place_id = r.place_id " +
+                    "LEFT JOIN review_keyword rk ON rk.review_id = r.review_id " +
+                    "LEFT JOIN place_score ps ON ps.place_id = p.place_id " +
+                    "GROUP BY p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude, " +
+                    "p.post_code, p.street_addresses, p.tel_number, p.url, p.place_type, p.description, " +
+                    "p.weight_limit, p.parking, p.indoor, p.outdoor",
+            nativeQuery = true)
+    List<Object[]> findPlaceRecommendationsWithKeywords();
 
 }
+

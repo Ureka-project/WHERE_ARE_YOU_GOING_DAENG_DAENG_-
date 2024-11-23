@@ -10,4 +10,5 @@ public class SignUpForm
     private String gender;
     private String city;
     private String cityDetail;
+
 }

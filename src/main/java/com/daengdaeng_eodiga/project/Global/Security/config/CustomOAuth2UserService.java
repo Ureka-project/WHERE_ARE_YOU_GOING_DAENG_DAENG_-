@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -30,7 +32,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
-
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
 
@@ -47,19 +48,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Principal name (email) cannot be empty");
         }
 
-        // 이메일로 유저 조회
-        User existData = userRepository.findByEmail(email);
+        Optional<User> existData = userRepository.findByEmail(email);
 
-        if (existData == null) {
+        if (!existData.isPresent()) {
             throw new OAuth2AuthenticationException(new OAuth2Error("REDIRECT_TO_SIGNUP", "REDIRECT_TO_SIGNUP: " + email, null));
 
         } else {
-            // 기존 유저 정보 반환
+            User user = existData.get();
             UserOauthDto userDTO = new UserOauthDto();
-            userDTO.setName(existData.getNickname());
-            userDTO.setEmail(existData.getEmail());
-            userDTO.setRole("ROLE_USER");
-            System.out.println(userDTO);
+            userDTO.setEmail(user.getEmail());
+            userDTO.setName(user.getEmail());
             return new CustomOAuth2User(userDTO);
         }
     }

@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
+import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 @Component
     public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -29,12 +31,11 @@ import java.util.Iterator;
 
         @Override
         public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-            // OAuth2User
             CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
             String username = customUserDetails.getName();
             String email=customUserDetails.getEmail();
 
-            // 사용자 권한 가져오기
+
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
             GrantedAuthority auth = iterator.next();
@@ -42,15 +43,18 @@ import java.util.Iterator;
 
 
 
-            User user = userRepository.findByEmail(email);  // 이메일을 기준으로 사용자 조회
+            Optional<User> Quser = userRepository.findByEmail(email);
+            User user = new User();
+            if (Quser.isPresent()) {
+                 user = Quser.get();
+            }
+            String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L);
+            String newRefreshToken = jwtUtil.createRefreshToken(email,24 * 60 * 60 * 1000L);
 
-            String accessToken = jwtUtil.createJwt(username,role,email, 60 * 60 * 60L);
-            String newRefreshToken = jwtUtil.createRefreshToken(username,role,email,24 * 60 * 60 * 1000L); // 24시간 유효기간
-
-            response.addCookie(JWTUtil.createCookie("RefreshToken", newRefreshToken));
-            response.addCookie(JWTUtil.createCookie("Authorization", accessToken));
+            response.addCookie(jwtUtil.createCookie("RefreshToken", newRefreshToken));
+            response.addCookie(jwtUtil.createCookie("Authorization", accessToken));
             redisTokenRepository.saveToken(newRefreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
-            response.sendRedirect("/api/loginSuccess");
+            response.sendRedirect("/api/v1/loginSuccess");
         }
 
 

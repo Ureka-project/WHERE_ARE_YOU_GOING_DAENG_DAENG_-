@@ -36,6 +36,7 @@
             <input type="text" class="form-control" id="cityDetail" name="cityDetail">
         </div>
         <button type="submit" class="btn btn-primary">회원가입</button>
+        <button type="submit" class="btn btn-primary">회원수정</button>
     </form>
     <div id="errorMessage" style="color: red; display: none;"></div> <!-- 오류 메시지 표시 -->
 </div>
@@ -57,7 +58,7 @@
 
             // AJAX 요청
             $.ajax({
-                url: '/api/signup',  // 서버의 회원가입 엔드포인트
+                url: '/api/v1/signup',  // 서버의 회원가입 엔드포인트
                 type: 'POST',  // POST 방식으로 전송
                 data: formData,  // 폼 데이터를 전송
                 success: function(response) {
@@ -74,6 +75,7 @@
             });
         });
     });
+
 </script>
 </body>
 </html>

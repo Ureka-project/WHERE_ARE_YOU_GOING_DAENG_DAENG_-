@@ -1,29 +1,27 @@
 package com.daengdaeng_eodiga.project.place.controller;
 
 import com.daengdaeng_eodiga.project.Global.Geo.GeoService;
+import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.place.dto.FilterRequest;
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
+import com.daengdaeng_eodiga.project.place.dto.SearchRequest;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/places")
+@RequestMapping("/api/v1/places")
 public class PlaceController {
 
     private final PlaceService placeService;
     private final GeoService geoService;
     @PostMapping("/filter")
-    public ResponseEntity<List<PlaceDto>> filterPlaces(@RequestBody FilterRequest request) {
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(@RequestBody FilterRequest request) {
         List<PlaceDto> places = placeService.filterPlaces(
                 request.getCity(),
                 request.getPlaceType(),
@@ -31,48 +29,23 @@ public class PlaceController {
                 request.getLongitude(),
                 request.getUserId()
         );
-        return ResponseEntity.ok(places);
+        return ResponseEntity.ok(ApiResponse.success(places));
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<PlaceDto>> searchPlaces(@RequestBody SearchRequest request) {
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(@RequestBody SearchRequest request) {
         List<PlaceDto> places = placeService.searchPlaces(
                 request.getKeyword(),
                 request.getLatitude(),
                 request.getLongitude(),
                 request.getUserId()
         );
-        return ResponseEntity.ok(places);
+        return ResponseEntity.ok(ApiResponse.success(places));
     }
-
-    // FilterRequest 내부 클래스
-    @Getter
-    @Setter
-    static class FilterRequest {
-        private String city;          // 필터 검색 도시
-        private String placeType;     // 필터 검색 장소 유형
-        private Double latitude;      // 필터 검색 기준 위도
-        private Double longitude;     // 필터 검색 기준 경도
-        private int userId;           // 필터 검색 사용자 ID
-    }
-
-    // SearchRequest 내부 클래스
-    @Getter
-    @Setter
-    static class SearchRequest {
-        private String keyword;       // 키워드 검색어
-        private Double latitude;      // 키워드 검색 기준 위도
-        private Double longitude;     // 키워드 검색 기준 경도
-        private int userId;           // 키워드 검색 사용자 ID
-    }
-
-
-    @GetMapping("/api/location")
-    public ResponseEntity<List<PlaceDto>> getLocation(@RequestParam double latitude, @RequestParam double longitude) {
-        List<PlaceDto> places = new ArrayList<>();
-        Map<String, String> MyRegionInfo = geoService.getRegionInfo(latitude, longitude);
-
-
-        return  ResponseEntity.ok(places);
+    @GetMapping("/location")
+    public ResponseEntity<List<PlaceDto>>  getLocation(@RequestParam double latitude, @RequestParam double longitude) {
+        String MyPlace =geoService.getRegionInfo(latitude, longitude);
+        List<PlaceDto>RetPalce =placeService.RecommendPlaces(MyPlace,latitude,longitude);
+        return ResponseEntity.ok(RetPalce);
     }
 }

@@ -14,11 +14,9 @@ public class RedisConfig {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
 
-        // Key와 Value의 Serializer를 StringRedisSerializer로 설정
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
 
-        // Optional: HashKey와 HashValue도 설정 (필요할 경우)
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
 

@@ -37,11 +37,7 @@ public class JWTFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (requestUri.matches("^\\/oauth2(?:\\/.*)?$")) {
 
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         String token = null;
         if (cookies != null) {
@@ -55,40 +51,32 @@ public class JWTFilter extends OncePerRequestFilter {
 
             }
 
-            // 액세스 토큰이 없으면 바로 필터 체인 실행
             if (accessToken == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
             token = accessToken;
-            // 블랙리스트 확인
             if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token is blacklisted.");
+                filterChain.doFilter(request, response);
                 return;
             }
-
-            // 토큰 검증 및 재발급
-            if (jwtUtil.isExpired(accessToken)&&refreshToken==null) {
-
-                if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken))  {
-                    String newAccessToken = jwtUtil.createJwt(jwtUtil.getUsername(token), jwtUtil.getRole(refreshToken), jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
-                    response.addCookie(JWTUtil.createCookie("Authorization", newAccessToken));
-                    token = newAccessToken;
-                }
-
+            else if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken))  {
+                String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
+                response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken));
+                token = newAccessToken;
+            }
+            else
+            {
+                filterChain.doFilter(request, response);
+                return;
             }
         }
 
-        // 액세스 토큰이 유효하면 사용자 인증 처리
-        String username = jwtUtil.getUsername(token);
-        String role = jwtUtil.getRole(token);
+
         String email = jwtUtil.getEmail(token);
 
         UserOauthDto userDTO = new UserOauthDto();
-        userDTO.setName(username);
-        userDTO.setRole(role);
         userDTO.setEmail(email);
 
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.daengdaeng_eodiga.project.review.entity.Review;
 
+import java.util.List;
+
 
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
@@ -85,4 +87,8 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at"
 		+ "	   ORDER BY r.created_at desc; ", nativeQuery = true)
 	Page<Object[]> findAllByUserOrderByLatest(int userId, Pageable pageable);
+
+
+	@Query("SELECT rk.id.keyword FROM ReviewKeyword rk WHERE rk.review.reviewId = :reviewId")
+	List<String> findKeywordsByReviewId(int reviewId);
 }
