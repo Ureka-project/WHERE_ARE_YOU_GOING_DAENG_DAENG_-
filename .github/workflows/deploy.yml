@@ -33,23 +33,19 @@ jobs:
         with:
           redis-version: 6
 
-      - name: Set environment variables
-        run: |
-          export MYSQL_PWD="mysecretpassword"
-          export GOOGLE_OAUTH_ID="google-client-id-example"
-          export GOOGLE_OAUTH_SECRET="google-oauth-secret-example"
-          export KAKAO_OAUTH_ID="kakao-oauth-id-example"
-          export KAKAO_OAUTH_SECRET="kakao-oauth-secret-example"
-          export KAKAO_REST_API_KEY="kakao-rest-api-key-example"
-          export MYSQL_DOMAIN="mysql.example.com"
-          export REDIS_DOMAIN="redis.example.com"
-          export REDIS_PWD="redis-password-example"
-          export SECURITY_SECRET="security-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-example"
-
-
-
       - name: Build with Gradle
         run: ./gradlew clean build --info
+        env:
+          MYSQL_PWD : mysecretpassword
+          GOOGLE_OAUTH_ID : google-client-id-example
+          GOOGLE_OAUTH_SECRET : google-oauth-secret-example
+          KAKAO_OAUTH_ID : kakao-oauth-id-example
+          KAKAO_OAUTH_SECRET : kakao-oauth-secret-example
+          KAKAO_REST_API_KEY : kakao-rest-api-key-example
+          MYSQL_DOMAIN : mysql.example.com
+          REDIS_DOMAIN : redis.example.com
+          REDIS_PWD : redis-password-example
+          SECURITY_SECRET : testSecretKey20230327testSecretKey20230327testSecretKey20230327
 
       - name: Get Public IP
         id: ip
