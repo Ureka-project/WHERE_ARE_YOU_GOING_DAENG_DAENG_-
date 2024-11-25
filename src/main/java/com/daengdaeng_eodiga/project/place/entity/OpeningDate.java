@@ -1,8 +1,10 @@
 package com.daengdaeng_eodiga.project.place.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "opening_date")
 public class OpeningDate {
     @Id

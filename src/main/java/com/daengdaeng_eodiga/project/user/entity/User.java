@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.user.entity;
 
+import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.place.entity.Visited;
@@ -7,16 +8,12 @@ import com.daengdaeng_eodiga.project.preference.entity.Preference;
 import com.daengdaeng_eodiga.project.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Entity
-@Setter
 @Table(name = "users")
-public class User {
+public class User extends BaseEntity {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,10 +34,6 @@ public class User {
     @Column(name = "city_detail")
     private String cityDetail;
 
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
@@ -55,6 +48,5 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Visited> visitieds = new ArrayList<>();
-
 
 }
