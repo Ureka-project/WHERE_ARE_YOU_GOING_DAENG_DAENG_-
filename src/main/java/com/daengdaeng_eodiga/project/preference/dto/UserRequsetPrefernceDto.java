@@ -13,6 +13,6 @@ public class UserRequsetPrefernceDto
     private String preferenceTypes;
 
     public UserRequsetPrefernceDto(String preferenceType) {
-        this.preferenceTypes = preferenceType;  // List의 단일 항목을 Set으로 변환
+        this.preferenceTypes = preferenceType;
     }
 }

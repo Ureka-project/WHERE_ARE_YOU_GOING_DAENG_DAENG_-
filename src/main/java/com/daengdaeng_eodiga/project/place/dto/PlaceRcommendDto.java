@@ -63,4 +63,5 @@ public class PlaceRcommendDto {
         this.keywords =keywords;
         this.reviewCount = reviewCount;
     }
+
 }

@@ -68,6 +68,7 @@ public class JWTUtil {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60 * 60 * 60);
         cookie.setPath("/");
+        cookie.setSecure(true);
         cookie.setHttpOnly(true);
         return cookie;
     }

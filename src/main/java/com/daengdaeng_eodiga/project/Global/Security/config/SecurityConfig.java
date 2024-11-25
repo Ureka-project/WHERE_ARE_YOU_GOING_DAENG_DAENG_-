@@ -29,36 +29,31 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        //csrf disable
         http
                 .csrf((auth) -> auth.disable());
 
-        //HTTP Basic 인증 방식 disable
         http
                 .httpBasic((auth) -> auth.disable());
-        //http
-        //        .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository), UsernamePasswordAuthenticationFilter.class);
+        http
+           .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository), UsernamePasswordAuthenticationFilter.class);
 
-
-        //oauth2
         http
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler)
-                        .failureHandler(new CustomAuthenticationFailureHandler())// OAuth2 로그인 실패 처리 핸들러
+                        .failureHandler(new CustomAuthenticationFailureHandler())
                 );
 
-        //경로별 인가 작업
+
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/","/api/login","/api/v1/places/location", "/api/signup", "/static/**", "/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
+                        .requestMatchers("/","/login", "/api/v1/signup", "/static/**", "/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
                         .anyRequest().authenticated())
                 .formLogin((formLogin) -> formLogin
                         .loginPage("/login")
                         .permitAll());
 
-        //세션 설정 : STATELESS
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

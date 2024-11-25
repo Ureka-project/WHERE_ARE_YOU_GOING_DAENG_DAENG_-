@@ -32,15 +32,7 @@ import java.util.Optional;
         @Override
         public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
             CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
-            String username = customUserDetails.getName();
             String email=customUserDetails.getEmail();
-
-
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-            Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-            GrantedAuthority auth = iterator.next();
-            String role = auth.getAuthority();
-
 
 
             Optional<User> Quser = userRepository.findByEmail(email);
