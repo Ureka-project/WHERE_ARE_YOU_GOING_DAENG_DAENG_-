@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.visit.dto.PetsAtVisitTime;
 import com.daengdaeng_eodiga.project.visit.dto.VisitRequest;
 import com.daengdaeng_eodiga.project.visit.dto.VisitResponse;
 import com.daengdaeng_eodiga.project.visit.service.VisitService;
@@ -35,6 +36,13 @@ public class VisitController {
 	@GetMapping("/place/{placeId}")
 	public ResponseEntity<ApiResponse<List<VisitResponse>>> fetchPlaceVisits(@PathVariable int placeId) {
 		List<VisitResponse> response = visitService.fetchVisitsByPlace(placeId);
+		return ResponseEntity.ok(ApiResponse.success(response));
+
+	}
+	@GetMapping("/user")
+	public ResponseEntity<ApiResponse<List<PetsAtVisitTime>>> fetchUserVisits() {
+		//TODO: 시큐리티 기능 완료되면 userId를 받아와서 사용
+		List<PetsAtVisitTime> response = visitService.fetchVisitsByUser(1);
 		return ResponseEntity.ok(ApiResponse.success(response));
 
 	}

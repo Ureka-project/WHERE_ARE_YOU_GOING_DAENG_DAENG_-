@@ -2,7 +2,9 @@ package com.daengdaeng_eodiga.project.visit.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,7 +84,10 @@ public class VisitService {
 					LocalDate date = entry.getKey();
 					List<LocalDateTime> times = entry.getValue();
 					List<PetsAtVisitTime> petsAtVisitTimes = times.stream()
-							.map(time -> new PetsAtVisitTime(time, visitMapAtTime.get(time)))
+							.map(time -> {
+								List<PetResponse> petResponses = visitMapAtTime.get(time);
+								return new PetsAtVisitTime(time, petResponses, place.getPlaceId(), null,place.getName());
+							})
 						.sorted(Comparator.comparing(petsAtVisitTime -> petsAtVisitTime.visitAt()))
 						.toList();
 					return new VisitResponse(date, petsAtVisitTimes);
@@ -90,6 +95,29 @@ public class VisitService {
 			.sorted(Comparator.comparing(visitResponse -> visitResponse.visitDate())).toList();
 
 		return visitResponses;
+	}
+
+	public List<PetsAtVisitTime> fetchVisitsByUser(int userId) {
+		LocalDateTime startDateTime = LocalDateTime.now();
+		List<VisitInfo> visitInfos = visitRepository.findVisitInfoByUserId(userId,startDateTime);
+
+		Map<Integer,List<PetResponse>> pets = new HashMap<>();
+		Map<Integer,Integer> places = new HashMap<>();
+		Map<Integer,String> placeNames = new HashMap<>();
+		Map<Integer,LocalDateTime> visitTimes = new HashMap<>();
+		visitInfos.forEach(visitInfo -> {
+			int visitId = visitInfo.getVisitId();
+			List<PetResponse> petResponse = pets.getOrDefault(visitId, new ArrayList<>());
+			petResponse.add(new PetResponse(visitInfo.getPetId(), visitInfo.getPetName(), visitInfo.getPetImg()));
+			pets.put(visitId, petResponse);
+			places.put(visitId, visitInfo.getPlaceId());
+			placeNames.put(visitId, visitInfo.getPlaceName());
+			visitTimes.put(visitId, visitInfo.getVisitAt());
+		});
+		return visitTimes.keySet().stream()
+			.map(visitId -> new PetsAtVisitTime(visitTimes.get(visitId), pets.get(visitId), places.get(visitId), visitId,placeNames.get(visitId)))
+			.sorted(Comparator.comparing(PetsAtVisitTime::visitAt).reversed())
+			.toList();
 	}
 
 	public void findVisitPet(int placeId, LocalDateTime visitAt, List<Integer> petIds) {

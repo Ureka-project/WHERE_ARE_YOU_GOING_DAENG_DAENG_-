@@ -7,5 +7,9 @@ public interface VisitInfo {
 	int getPetId();
 	String getPetImg();
 	String getPetName();
+	int getPlaceId();
+	String getPlaceName();
+
+	int getVisitId();
 
 }
