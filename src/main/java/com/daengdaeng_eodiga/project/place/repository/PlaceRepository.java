@@ -74,4 +74,21 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
                                                         @Param("latitude") Double latitude,
                                                         @Param("longitude") Double longitude,
                                                         @Param("userId") int userId);
+
+
+    @Query(value = "SELECT p.place_id, p.name, p.city, p.city_detail, p.township, " +
+            "p.latitude, p.longitude, p.street_addresses, p.tel_number, p.url, " +
+            "c.name AS place_type, p.description, p.parking, p.indoor, p.outdoor, " +
+            "NULL AS distance, " +
+            "CASE WHEN EXISTS (SELECT 1 FROM favorite f WHERE f.place_id = p.place_id) THEN 1 ELSE 0 END AS is_favorite, " +
+            "o.start_time, o.end_time, " +
+            "COUNT(f.favorite_id) AS favorite_count " +
+            "FROM place p " +
+            "LEFT JOIN favorite f ON p.place_id = f.place_id " +
+            "LEFT JOIN opening_date o ON o.place_id = p.place_id " +
+            "LEFT JOIN common_code c ON p.place_type = c.code_id " +
+            "GROUP BY p.place_id, o.start_time, o.end_time " +
+            "ORDER BY favorite_count DESC " +
+            "LIMIT 3", nativeQuery = true)
+    List<Object[]> findTopFavoritePlaces();
 }

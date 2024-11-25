@@ -48,4 +48,10 @@ public class PlaceController {
         PlaceDto placeDetails = placeService.getPlaceDetails(placeId);
         return ResponseEntity.ok(ApiResponse.success(placeDetails));
     }
+
+    @GetMapping("/topfavorites")
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopFavoritePlaces() {
+        List<PlaceDto> topFavoritePlaces = placeService.getTopFavoritePlaces();
+        return ResponseEntity.ok(ApiResponse.success(topFavoritePlaces));
+    }
 }
