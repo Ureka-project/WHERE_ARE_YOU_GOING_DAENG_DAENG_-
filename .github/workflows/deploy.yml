@@ -30,16 +30,16 @@ jobs:
 
       - name: Set environment variables
         run: |
-          export MYSQL_PWD=${{ secrets.MYSQL_PWD }}
-          export GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }}
-          export GOOGLE_OAUTH_SECRET=${{ secrets.GOOGLE_OAUTH_SECRET }}
-          export KAKAO_OAUTH_ID=${{ secrets.KAKAO_OAUTH_ID }}
-          export KAKAO_OAUTH_SECRET=${{ secrets.KAKAO_OAUTH_SECRET }}
-          export KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}
-          export MYSQL_DOMAIN=${{ secrets.MYSQL_DOMAIN }}
-          export REDIS_DOMAIN=${{ secrets.REDIS_DOMAIN }}
-          export REDIS_PWD=${{ secrets.REDIS_PWD }}
-          export SECURITY_SECRET=${{ secrets.SECURITY_SECRET }}
+          export MYSQL_PWD="mysecretpassword"
+          export GOOGLE_OAUTH_ID="google-client-id-example"
+          export GOOGLE_OAUTH_SECRET="google-oauth-secret-example"
+          export KAKAO_OAUTH_ID="kakao-oauth-id-example"
+          export KAKAO_OAUTH_SECRET="kakao-oauth-secret-example"
+          export KAKAO_REST_API_KEY="kakao-rest-api-key-example"
+          export MYSQL_DOMAIN="mysql.example.com"
+          export REDIS_DOMAIN="redis.example.com"
+          export REDIS_PWD="redis-password-example"
+          export SECURITY_SECRET="security-token-example"
 
 
       - name: Build with Gradle
