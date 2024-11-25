@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+
 @Setter
 @Embeddable
 @NoArgsConstructor
@@ -24,14 +25,13 @@ public class ReviewKeywordId implements Serializable {
         ReviewKeywordId that = (ReviewKeywordId) o;
 
         if (reviewId != that.reviewId) return false;
-        return keyword.equals(that.keyword);
+        return keyword != null ? keyword.equals(that.keyword) : that.keyword == null;
     }
 
     @Override
     public int hashCode() {
-        int result = keyword.hashCode();
+        int result = keyword != null ? keyword.hashCode() : 0;
         result = 31 * result + Integer.hashCode(reviewId);
         return result;
     }
-
 }

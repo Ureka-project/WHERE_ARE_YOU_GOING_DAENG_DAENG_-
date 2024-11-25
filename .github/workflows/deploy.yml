@@ -80,6 +80,20 @@ jobs:
             sudo docker stop ${{ env.ECR_REPOSITORY }} || true
             sudo docker rm ${{ env.ECR_REPOSITORY }} || true
             sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+            sudo docker run -d --name daengdaeng -p 8080:8080 \
+            -e MYSQL_PWD=${{secrets.MYSQL_PWD}} \
+            -e SPRING_PROFILES_ACTIVE=default \
+            -e GOOGLE_OAUTH_ID=${{secrets.GOOGLE_OAUTH_ID}} \
+            -e GOOGLE_OAUTH_SECRET=${{secrets.GOOGLE_OAUTH_SECRET}} \
+            -e KAKAO_OAUTH_ID=${{secrets.KAKAO_OAUTH_ID}} \
+            -e KAKAO_OAUTH_SECRET=${{secrets.KAKAO_OAUTH_SECRET}} \
+            -e KAKAO_REST_API_KEY=${{secrets.KAKAO_REST_API_KEY}} \
+            -e MYSQL_DOMAIN=${{secrets.MYSQL_DOMAIN}} \
+            -e REDIS_DOMAIN=${{secrets.REDIS_DOMAIN}} \
+            -e REDIS_PWD=${{secrets.REDIS_PWD}} \
+            -e SECURITY_SECRET=${{secrets.SECURITY_SECRET}} \
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+
             sudo docker run -d --name daengdaeng -p 8080:8080 -e MYSQL_PWD=${{secrets.MYSQL_PWD}} -e SPRING_PROFILES_ACTIVE=default ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Remove GitHub Actions IP
