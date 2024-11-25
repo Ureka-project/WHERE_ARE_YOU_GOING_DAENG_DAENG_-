@@ -33,7 +33,7 @@ public class PreferenceService {
     private final UserRepository userRepository;
 
     public PreferenceResponseDto registerPreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
-        User user = findUser(hardcodedUserId);
+        User user = findUser( hardcodedUserId);
 
         List<CommonCode> commonCodes = findCommonCode(
                 preferenceRequestDto.getPreferenceInfo(),
@@ -58,7 +58,7 @@ public class PreferenceService {
         if (commonCodes.isEmpty()) {
             throw new CommonCodeNotFoundException();
         }
-        Set<Preference> preferences = createPreferences(commonCodes, hardcodedUserId, user);
+        Set<Preference> preferences = createPreferences(commonCodes, (int) hardcodedUserId, user);
         preferenceRepository.saveAll(preferences);
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }

@@ -1,6 +1,8 @@
 package com.daengdaeng_eodiga.project.review.controller;
 
+import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +27,8 @@ public class ReviewController {
 
 	private final ReviewService reviewService;
 	@PostMapping("/review")
-	public ResponseEntity<ApiResponse<?>> registerReview(@RequestBody ReviewRegisterRequest request) {
-		reviewService.registerReview(request, 1); //TODO : user 시큐리티 기능 완성되면 userId 주입 수정
+	public ResponseEntity<ApiResponse<?>> registerReview(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody ReviewRegisterRequest request) {
+		reviewService.registerReview(request, customOAuth2User.getUserDTO().getUserid()); //TODO : user 시큐리티 기능 완성되면 userId 주입 수정
 		return ResponseEntity.ok(ApiResponse.success(null));
 	}
 
