@@ -19,16 +19,26 @@ public class PlaceDtoMapper {
             dto.setUrl(result[9] != null ? result[9].toString() : null);
             dto.setPlaceType(result[10] != null ? result[10].toString() : null);
             dto.setDescription(result[11] != null ? result[11].toString() : null);
-            dto.setParking(result[12] != null && (Boolean.parseBoolean(result[12].toString()) || result[12].toString().equals("1")));
-            dto.setIndoor(result[13] != null && (Boolean.parseBoolean(result[13].toString()) || result[13].toString().equals("1")));
-            dto.setOutdoor(result[14] != null && (Boolean.parseBoolean(result[14].toString()) || result[14].toString().equals("1")));
+            dto.setParking(result[12] != null && parseBoolean(result[12]));
+            dto.setIndoor(result[13] != null && parseBoolean(result[13]));
+            dto.setOutdoor(result[14] != null && parseBoolean(result[14]));
             dto.setDistance(result[15] != null ? ((Number) result[15]).doubleValue() : null);
-            dto.setIsFavorite(result[16] != null && Integer.parseInt(result[16].toString()) == 1);
+            dto.setIsFavorite(result[16] != null && parseIntegerToBoolean(result[16]));
             dto.setStartTime(result[17] != null ? result[17].toString() : null);
             dto.setEndTime(result[18] != null ? result[18].toString() : null);
+            dto.setFavoriteCount(result.length > 19 && result[19] != null ? ((Number) result[19]).intValue() : 0);
+            dto.setPlaceScore(result.length > 20 && result[20] != null ? ((Number) result[20]).doubleValue() : null);
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to map result to PlaceDto. Ensure data types are correct.", e);
         }
         return dto;
+    }
+
+    private static boolean parseBoolean(Object value) {
+        return Boolean.parseBoolean(value.toString()) || "1".equals(value.toString());
+    }
+
+    private static boolean parseIntegerToBoolean(Object value) {
+        return Integer.parseInt(value.toString()) == 1;
     }
 }

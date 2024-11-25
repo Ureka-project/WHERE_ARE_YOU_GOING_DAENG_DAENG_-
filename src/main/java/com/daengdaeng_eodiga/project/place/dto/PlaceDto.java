@@ -30,4 +30,5 @@ public class PlaceDto {
     private String startTime;
     private String endTime;
     private int favoriteCount;
+    private Double placeScore;
 }

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,5 +54,15 @@ public class PlaceController {
     public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopFavoritePlaces() {
         List<PlaceDto> topFavoritePlaces = placeService.getTopFavoritePlaces();
         return ResponseEntity.ok(ApiResponse.success(topFavoritePlaces));
+    }
+
+    @PostMapping("/topscore")
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopScoredPlacesWithinRadius(@RequestBody Map<String, Object> request) {
+        Double latitude = (Double) request.get("latitude");
+        Double longitude = (Double) request.get("longitude");
+
+        List<PlaceDto> places = placeService.getTopScoredPlacesWithinRadius(latitude, longitude);
+
+        return ResponseEntity.ok(ApiResponse.success(places));
     }
 }
