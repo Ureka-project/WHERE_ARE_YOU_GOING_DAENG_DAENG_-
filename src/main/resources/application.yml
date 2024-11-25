@@ -28,14 +28,14 @@ spring:
           google:
             client-id: ${GOOGLE_OAUTH_ID}
             client-secret: ${GOOGLE_OAUTH_SECRET}
-            redirect-uri: "http://localhost:8080/login/oauth2/code/google"
+            redirect-uri: "http://${DOMAIN}:8080/login/oauth2/code/google"
             scope:
               - profile
               - email
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
             client-secret: ${KAKAO_OAUTH_SECRET}
-            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
+            redirect-uri: "http://${DOMAIN}:8080/login/oauth2/code/kakao"
             authorization-grant-type: authorization_code
             client-authentication-method: POST
             scope: profile_nickname, profile_image, account_email
@@ -60,5 +60,5 @@ spring:
 
   kakao:
     api:
-      url: "https://dapi.kakao.com/v2/local/geo/coord2address.json"
+      url: "https://dapi.kakao.com/v2/${DOMAIN}/geo/coord2address.json"
       key: ${KAKAO_REST_API_KEY}
