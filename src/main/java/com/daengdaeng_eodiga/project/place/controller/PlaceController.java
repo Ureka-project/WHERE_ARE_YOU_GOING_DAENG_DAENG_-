@@ -22,6 +22,7 @@ public class PlaceController {
     public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(@RequestBody FilterRequest request) {
         List<PlaceDto> places = placeService.filterPlaces(
                 request.getCity(),
+                request.getCityDetail(),
                 request.getPlaceType(),
                 request.getLatitude(),
                 request.getLongitude(),
@@ -29,6 +30,7 @@ public class PlaceController {
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
+
 
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(@RequestBody SearchRequest request) {
