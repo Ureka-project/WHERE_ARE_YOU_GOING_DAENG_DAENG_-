@@ -45,6 +45,7 @@ jobs:
           MYSQL_DOMAIN : mysql.example.com
           REDIS_DOMAIN : redis.example.com
           REDIS_PWD : redis-password-example
+          DOMAIN : localhost
           SECURITY_SECRET : testSecretKey20230327testSecretKey20230327testSecretKey20230327
 
       - name: Get Public IP
@@ -108,6 +109,7 @@ jobs:
             -e REDIS_DOMAIN=${{secrets.REDIS_DOMAIN}} \
             -e REDIS_PWD=${{secrets.REDIS_PWD}} \
             -e SECURITY_SECRET=${{secrets.SECURITY_SECRET}} \
+            -e DOMAIN=${{ env.EC2_IP_ADDRESS }} \
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
             sudo docker run -d --name daengdaeng -p 8080:8080 -e MYSQL_PWD=${{secrets.MYSQL_PWD}} -e SPRING_PROFILES_ACTIVE=default ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
