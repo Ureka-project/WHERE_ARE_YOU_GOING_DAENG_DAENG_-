@@ -39,8 +39,10 @@ jobs:
           export MYSQL_DOMAIN="mysql.example.com"
           export REDIS_DOMAIN="redis.example.com"
           export REDIS_PWD="redis-password-example"
+
           export SECURITY_SECRET="security-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesec
 urity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-examplesecurity-token-example"
+
 
 
       - name: Build with Gradle
