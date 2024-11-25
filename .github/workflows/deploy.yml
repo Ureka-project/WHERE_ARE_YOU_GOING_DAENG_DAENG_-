@@ -28,6 +28,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Set environment variables
+        run: |
+          export MYSQL_PWD=${{ secrets.MYSQL_PWD }}
+          export GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }}
+          export GOOGLE_OAUTH_SECRET=${{ secrets.GOOGLE_OAUTH_SECRET }}
+          export KAKAO_OAUTH_ID=${{ secrets.KAKAO_OAUTH_ID }}
+          export KAKAO_OAUTH_SECRET=${{ secrets.KAKAO_OAUTH_SECRET }}
+          export KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}
+          export MYSQL_DOMAIN=${{ secrets.MYSQL_DOMAIN }}
+          export REDIS_DOMAIN=${{ secrets.REDIS_DOMAIN }}
+          export REDIS_PWD=${{ secrets.REDIS_PWD }}
+          export SECURITY_SECRET=${{ secrets.SECURITY_SECRET }}
+
+
       - name: Build with Gradle
         run: ./gradlew clean build
 
