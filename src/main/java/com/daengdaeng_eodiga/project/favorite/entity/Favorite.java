@@ -1,14 +1,16 @@
 package com.daengdaeng_eodiga.project.favorite.entity;
+
+import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import com.daengdaeng_eodiga.project.place.entity.Place;
 import com.daengdaeng_eodiga.project.user.entity.User;
-
 import jakarta.persistence.*;
-
-import java.util.Date;
+import lombok.Builder;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "Favorite")
-public class Favorite {
+public class Favorite extends BaseEntity {
     @Id
     @Column(name = "favorite_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +24,11 @@ public class Favorite {
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at")
-    private Date createdAt;
+    @Builder
+    public Favorite(User user, Place place) {
+        this.user = user;
+        this.place = place;
+    }
 
+    public Favorite() {}
 }
