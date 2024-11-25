@@ -65,4 +65,12 @@ public class PlaceService {
                 .collect(Collectors.toList());
     }
 
+    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
+        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude, userId);
+        return results.stream()
+                .map(PlaceDtoMapper::convertToPlaceDto)
+                .collect(Collectors.toList());
+    }
+
+
 }

@@ -2,6 +2,7 @@ package com.daengdaeng_eodiga.project.place.controller;
 
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.place.dto.FilterRequest;
+import com.daengdaeng_eodiga.project.place.dto.NearestRequest;
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
 import com.daengdaeng_eodiga.project.place.dto.SearchRequest;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
@@ -63,6 +64,16 @@ public class PlaceController {
 
         List<PlaceDto> places = placeService.getTopScoredPlacesWithinRadius(latitude, longitude);
 
+        return ResponseEntity.ok(ApiResponse.success(places));
+    }
+
+    @PostMapping("/nearest")
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getNearestPlaces(@RequestBody NearestRequest request) {
+        List<PlaceDto> places = placeService.getNearestPlaces(
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getUserId()
+        );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 }
