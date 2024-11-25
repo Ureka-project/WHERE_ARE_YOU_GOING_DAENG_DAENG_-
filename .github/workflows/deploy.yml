@@ -112,8 +112,6 @@ jobs:
             -e DOMAIN=${{ env.EC2_IP_ADDRESS }} \
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
-            sudo docker run -d --name daengdaeng -p 8080:8080 -e MYSQL_PWD=${{secrets.MYSQL_PWD}} -e SPRING_PROFILES_ACTIVE=default ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-
       - name: Remove GitHub Actions IP
         run: |
           aws ec2 revoke-security-group-ingress \
