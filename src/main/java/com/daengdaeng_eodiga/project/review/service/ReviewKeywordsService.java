@@ -23,4 +23,8 @@ public class ReviewKeywordsService {
 		reviewKeywordRepository.saveAll(keywordsEntity);
 	}
 
+	public List<String> fetchBestReviewKeywordsTop3(int placeId) {
+		return reviewKeywordRepository.findKeywordsByPlaceIdTop3(placeId);
+	}
+
 }

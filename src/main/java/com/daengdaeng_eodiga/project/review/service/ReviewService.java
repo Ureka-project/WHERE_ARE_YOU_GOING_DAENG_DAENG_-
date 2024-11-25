@@ -79,7 +79,8 @@ public class ReviewService {
 			reviewsPage = reviewRepository.findAllByPlaceOrderByLowScore(place.getPlaceId(), pageable);
 		}
 		List<ReviewDto> reviews = getReviewDto(reviewsPage);
-		ReviewsResponse response = new ReviewsResponse(reviews,reviewsPage.getTotalElements(),reviewsPage.getNumber(),reviewsPage.getSize(),reviewsPage.isFirst(),reviewsPage.isLast(),orderType,score);
+		List<String> keywords = reviewKeywordsService.fetchBestReviewKeywordsTop3(placeId);
+		ReviewsResponse response = new ReviewsResponse(reviews,reviewsPage.getTotalElements(),reviewsPage.getNumber(),reviewsPage.getSize(),reviewsPage.isFirst(),reviewsPage.isLast(),orderType,score,keywords);
 
 		return response;
 	}
@@ -89,7 +90,7 @@ public class ReviewService {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<Object[]> reviewsPage = reviewRepository.findAllByUserOrderByLatest(user.getUserId(),pageable);
 		List<ReviewDto> reviews = getReviewDto(reviewsPage);
-		ReviewsResponse response = new ReviewsResponse(reviews,reviewsPage.getTotalElements(),reviewsPage.getNumber(),reviewsPage.getSize(),reviewsPage.isFirst(),reviewsPage.isLast(),OrderType.LATEST,null);
+		ReviewsResponse response = new ReviewsResponse(reviews,reviewsPage.getTotalElements(),reviewsPage.getNumber(),reviewsPage.getSize(),reviewsPage.isFirst(),reviewsPage.isLast(),OrderType.LATEST,null,null);
 		return response;
 	}
 
