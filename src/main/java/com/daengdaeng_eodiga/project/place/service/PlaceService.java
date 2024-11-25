@@ -8,6 +8,7 @@ import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceScoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,14 +19,26 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final PlaceScoreRepository placeScoreRepository;
 
-    public List<PlaceDto> filterPlaces(String city, String placeType, Double latitude, Double longitude, int userId) {
-        List<Object[]> results = placeRepository.findByFiltersAndLocationWithFavorite(city, placeType, latitude, longitude, userId);
+    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeType, Double latitude, Double longitude, int userId) {
+        List<Object[]> results = placeRepository.findByFiltersAndLocationWithFavorite(city, cityDetail, placeType, latitude, longitude, userId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
+
 
     public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, int userId) {
         List<Object[]> results = placeRepository.findByKeywordAndLocationWithFavorite(keyword, latitude, longitude, userId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
+    }
+
+    public PlaceDto getPlaceDetails(int placeId) {
+
+        List<Object[]> results = placeRepository.findPlaceDetailsById(placeId);
+
+        if (results.isEmpty()) {
+            throw new PlaceNotFoundException();
+        }
+
+        return PlaceDtoMapper.convertToPlaceDto(results.get(0));
     }
 
     public Place findPlace(int placeId) {
@@ -35,4 +48,29 @@ public class PlaceService {
     public Double findPlaceScore(int placeId) {
         return placeScoreRepository.findById(placeId).orElseThrow(PlaceNotFoundException::new).getScore();
     }
+
+    public List<PlaceDto> getTopFavoritePlaces() {
+        List<Object[]> results = placeRepository.findTopFavoritePlaces();
+        return results.stream()
+                .map(PlaceDtoMapper::convertToPlaceDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<PlaceDto> getTopScoredPlacesWithinRadius(Double latitude, Double longitude) {
+        List<Object[]> results = placeRepository.findTopScoredPlacesWithinRadius(latitude, longitude);
+
+
+        return results.stream()
+                .map(PlaceDtoMapper::convertToPlaceDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
+        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude, userId);
+        return results.stream()
+                .map(PlaceDtoMapper::convertToPlaceDto)
+                .collect(Collectors.toList());
+    }
+
+
 }

@@ -27,4 +27,8 @@ public class PlaceDto {
     private Boolean outdoor;
     private Double distance;
     private Boolean isFavorite;
+    private String startTime;
+    private String endTime;
+    private int favoriteCount;
+    private Double placeScore;
 }
