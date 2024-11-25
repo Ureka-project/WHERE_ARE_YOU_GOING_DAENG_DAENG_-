@@ -27,9 +27,14 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: 6
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build --info
 
       - name: Get Public IP
         id: ip
