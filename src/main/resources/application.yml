@@ -7,12 +7,12 @@ spring:
         jdbc:
           time_zone: UTC
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     defer-datasource-initialization: true
     show-sql: true
 
   datasource:
-    url: jdbc:mysql://localhost:3306/db_daengdaeng_eodiga_core?&rewriteBatchedStatements=true
+    url: jdbc:mysql://${MYSQL_DOMAIN}:3306/db_daengdaeng_eodiga_core?&rewriteBatchedStatements=true
     username: root
     password: ${MYSQL_PWD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -54,7 +54,7 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: ${REDIS_DOMAIN}
       port: 6379
       password: ${REDIS_PWD}
 
