@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.pet.controller;
 
+import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.pet.dto.PetDetailResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetListResponseDto;
@@ -8,6 +9,7 @@ import com.daengdaeng_eodiga.project.pet.dto.PetUpdateDto;
 import com.daengdaeng_eodiga.project.pet.service.PetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,12 +19,10 @@ import java.util.List;
 public class PetController {
     private final PetService petService;
 
-    // TODO : header 로부터 유저정보 가져오는 걸로 변경해야 함
-    private final int hardcodedUserId = 3;
-
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> registerPet(@RequestBody PetRegisterDto requestDto) {
-        petService.registerPet(hardcodedUserId, requestDto);
+    public ResponseEntity<ApiResponse<?>> registerPet(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody PetRegisterDto requestDto) {
+        int userId = customOAuth2User.getUserDTO().getUserid();
+        petService.registerPet(userId, requestDto);
         return ResponseEntity.ok(ApiResponse.success("pet inserted succesfully"));
     }
 
@@ -33,8 +33,9 @@ public class PetController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<?>> fetchPetList() {
-        List<PetListResponseDto> response = petService.fetchUserPetListDto(hardcodedUserId);
+    public ResponseEntity<ApiResponse<?>> fetchPetList(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        int userId = customOAuth2User.getUserDTO().getUserid();
+        List<PetListResponseDto> response = petService.fetchUserPetListDto(userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -45,8 +46,9 @@ public class PetController {
     }
 
     @DeleteMapping("/{petId}")
-    public ResponseEntity<ApiResponse<?>> deletePet(@PathVariable int petId) {
-        petService.deletePet(hardcodedUserId, petId);
+    public ResponseEntity<ApiResponse<?>> deletePet(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @PathVariable int petId) {
+        int userId = customOAuth2User.getUserDTO().getUserid();
+        petService.deletePet(userId, petId);
         return ResponseEntity.ok(ApiResponse.success("pet deleted succesfully"));
     }
 }

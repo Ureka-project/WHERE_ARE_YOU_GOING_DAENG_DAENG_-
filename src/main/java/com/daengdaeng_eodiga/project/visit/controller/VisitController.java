@@ -3,6 +3,7 @@ package com.daengdaeng_eodiga.project.visit.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.visit.dto.PetsAtVisitTime;
 import com.daengdaeng_eodiga.project.visit.dto.VisitRequest;
@@ -26,9 +28,9 @@ public class VisitController {
 	private final VisitService visitService;
 
 	@PostMapping("")
-	public ResponseEntity<ApiResponse<?>> registerVisits(@RequestBody VisitRequest request) {
-		//TODO: 시큐리티 기능 완료되면 userId를 받아와서 사용
-		visitService.registerVisit(1, request.placeId(), request.petIds(), request.visitAt());
+	public ResponseEntity<ApiResponse<?>> registerVisits(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,@RequestBody VisitRequest request) {
+		int userId = customOAuth2User.getUserDTO().getUserid();
+		visitService.registerVisit(userId, request.placeId(), request.petIds(), request.visitAt());
 		return ResponseEntity.ok(ApiResponse.success(null));
 
 	}
@@ -40,9 +42,9 @@ public class VisitController {
 
 	}
 	@GetMapping("/user")
-	public ResponseEntity<ApiResponse<List<PetsAtVisitTime>>> fetchUserVisits() {
-		//TODO: 시큐리티 기능 완료되면 userId를 받아와서 사용
-		List<PetsAtVisitTime> response = visitService.fetchVisitsByUser(1);
+	public ResponseEntity<ApiResponse<List<PetsAtVisitTime>>> fetchUserVisits(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+		int userId = customOAuth2User.getUserDTO().getUserid();
+		List<PetsAtVisitTime> response = visitService.fetchVisitsByUser(userId);
 		return ResponseEntity.ok(ApiResponse.success(response));
 
 	}
