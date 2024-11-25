@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,13 +39,24 @@ public class PetService {
 	public List<Pet> fetchUserPets(User user) {
 		return petRepository.findAllByUser(user);
 	}
+	public Pet findPet(int petId) {
+		return petRepository.findById(petId).orElseThrow(PetNotFoundException::new);
+	}
 	public List<Pet> confirmUserPet(User user, Set<Integer> pets) {
 		List<Pet> userPets = fetchUserPets(user);
-		List<Integer> userPetIds = userPets.stream().map(Pet::getPetId).toList();
-		pets.stream().filter(pet -> !userPetIds.contains(pet)).findAny().ifPresent(pet -> {
-			throw new PetNotFoundException();
-		});
-		return userPets;
+		Map<Integer, Pet> userPetMap = userPets.stream()
+			.collect(Collectors.toMap(Pet::getPetId, pet -> pet));
+
+		List<Pet> confirmPets = pets.stream()
+			.map(petId -> {
+				Pet pet = userPetMap.get(petId);
+				if (pet == null) {
+					throw new PetNotFoundException();
+				}
+				return pet;
+			})
+			.toList();
+		return confirmPets;
 	}
 
 	public void registerPet(int userId, PetRegisterDto requestDto) {
