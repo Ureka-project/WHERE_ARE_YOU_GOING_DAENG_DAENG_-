@@ -1,6 +1,8 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
+import com.daengdaeng_eodiga.project.user.repository.UserRepository;
+import com.daengdaeng_eodiga.project.user.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,13 +19,15 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final JWTUtil jwtUtil;
     private final RedisTokenRepository redisTokenRepository;
+    private final UserService userService;
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
-    RedisTokenRepository redisTokenRepository) {
+    RedisTokenRepository redisTokenRepository,UserService userService) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
         this.jwtUtil = jwtUtil;
         this.redisTokenRepository = redisTokenRepository;
+        this.userService = userService;
     }
 
     @Bean
@@ -35,7 +39,7 @@ public class SecurityConfig {
         http
                 .httpBasic((auth) -> auth.disable());
         http
-           .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository), UsernamePasswordAuthenticationFilter.class);
+           .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .oauth2Login((oauth2) -> oauth2

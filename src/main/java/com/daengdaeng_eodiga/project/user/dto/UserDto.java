@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 public class UserDto {
-    private int userId;
+    private Integer userId;
     private String nickname;
     private String gender;
     private String email;
