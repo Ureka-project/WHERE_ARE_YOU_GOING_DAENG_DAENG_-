@@ -11,6 +11,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Set;
-
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -32,6 +34,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("doFilterInternal - JWTFilter : " + request.getRequestURI()+ " "+request.getMethod()+" cookies : "+request.getCookies());
         String accessToken = null;
         Cookie[] cookies = request.getCookies();
         String refreshToken = null;
@@ -56,6 +59,8 @@ public class JWTFilter extends OncePerRequestFilter {
             }
 
         }
+        log.info("accessToken : "+accessToken);
+        log.info("refreshToken : "+refreshToken);
         if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
@@ -63,6 +68,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         token = accessToken;
         if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
+            log.info("refreshToken is null and blacklisted");
             filterChain.doFilter(request, response);
             return;
         }
@@ -70,9 +76,11 @@ public class JWTFilter extends OncePerRequestFilter {
             String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
             response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken));
             token = newAccessToken;
+            log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
         }
         else
         {
+            log.info("token is not valid");
             filterChain.doFilter(request, response);
             return;
         }

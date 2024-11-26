@@ -4,6 +4,8 @@ import io.jsonwebtoken.*;
 
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -16,7 +18,7 @@ import java.time.*;
 import java.util.Date;
 import java.util.TimeZone;
 
-
+@Slf4j
 @Component
 public class JWTUtil {
 
@@ -27,8 +29,9 @@ public class JWTUtil {
     }
 
     public String getEmail(String token) {
-
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
+        String email = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
+        log.info("jwt - getEmail : " + email);
+        return email;
     }
 
     public Boolean isExpired(String token) {
@@ -42,12 +45,13 @@ public class JWTUtil {
                     .getExpiration()
                     .before(new Date());
         } catch (ExpiredJwtException e) {
+            log.info("jwt - isExpired : " + e.getMessage());
             return true;
         }
     }
 
     public String createJwt(String email, Long expiredMs) {
-
+        log.info("jwt - createJwt email: " + email);
         return Jwts.builder()
                 .claim("email", email)
                 .issuedAt(new Date(System.currentTimeMillis()))
