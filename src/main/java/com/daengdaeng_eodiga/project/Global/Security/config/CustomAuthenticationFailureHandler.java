@@ -17,10 +17,10 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         String email = null;
         if (errorMessage != null) {
             if (errorMessage.startsWith("REDIRECT_TO_SIGNUP:")) {
-                email = errorMessage.substring("REDIRECT_TO_SIGNUP:".length()); // 이메일을 추출
+                email = errorMessage.substring("REDIRECT_TO_SIGNUP:".length());
             }
             else if (errorMessage.startsWith("User not found for email: ")) {
-                email = errorMessage.substring("User not found for email: ".length()); // 이메일을 추출
+                email = errorMessage.substring("User not found for email: ".length());
             }
         }
 

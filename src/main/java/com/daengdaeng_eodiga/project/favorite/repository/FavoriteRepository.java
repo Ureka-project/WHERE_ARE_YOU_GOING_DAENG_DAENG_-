@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favorite, Integer> {
-    Page<Favorite> findByUser_UserId(int userId, Pageable pageable);
+    Page<Favorite> findByUser_UserIdOrderByUpdatedAtDesc(int userId, Pageable pageable);
 }
