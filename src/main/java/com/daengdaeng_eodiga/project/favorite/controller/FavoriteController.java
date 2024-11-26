@@ -22,19 +22,19 @@ public class FavoriteController {
     int userId = 4;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> registerFavorite(@RequestBody FavoriteRequestDto favoriteRequestDto) {
+    public ResponseEntity<ApiResponse<String>> registerFavorite(@RequestBody FavoriteRequestDto favoriteRequestDto) {
         favoriteService.registerFavorite(userId, favoriteRequestDto);
         return ResponseEntity.ok(ApiResponse.success("favorite inserted succesfully"));
     }
 
     @DeleteMapping("/{favoriteId}")
-    public ResponseEntity<ApiResponse<?>> deleteFavorite(@PathVariable Integer favoriteId) {
+    public ResponseEntity<ApiResponse<String>> deleteFavorite(@PathVariable Integer favoriteId) {
         favoriteService.deleteFavorite(favoriteId);
         return ResponseEntity.ok(ApiResponse.success("favorite deleted succesfully"));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<?>> fetchFavoriteList(
+    public ResponseEntity<ApiResponse<Page<FavoriteResponseDto>>> fetchFavoriteList(
             @RequestParam int page,
             @RequestParam int size
     ) {
