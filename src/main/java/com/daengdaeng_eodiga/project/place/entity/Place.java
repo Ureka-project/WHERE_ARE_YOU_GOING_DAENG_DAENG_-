@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.place.entity;
 
+import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
 import com.daengdaeng_eodiga.project.review.entity.Review;
 import jakarta.persistence.*;
@@ -15,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Place {
+public class Place extends BaseEntity {
     @Id
     @Column(name = "place_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
