@@ -38,7 +38,7 @@ public class PlaceRcommendDto {
     private Double score;
     private Map<String,Integer> keywords;
     private Long  reviewCount;
-    public PlaceRcommendDto(int placeId, String name, String city, String cityDetail, String township,
+    public PlaceRcommendDto(Integer placeId, String name, String city, String cityDetail, String township,
                             Double latitude, Double longitude, String postCode, String streetAddresses,
                             String telNumber, String url, String placeType, String description, String weightLimit,
                             Boolean parking, Boolean indoor, Boolean outdoor,Double score,  Map<String,Integer> keywords,Long  reviewCount) {

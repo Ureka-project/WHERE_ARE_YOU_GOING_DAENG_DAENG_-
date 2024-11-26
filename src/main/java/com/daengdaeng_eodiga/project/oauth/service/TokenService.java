@@ -25,8 +25,8 @@ public class TokenService {
         String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L); // 60*60*60L은 1시간
         String refreshToken = jwtUtil.createRefreshToken(email, 24 * 60 * 60 * 1000L); // 1일
 
-        Cookie accessTokenCookie = jwtUtil.createCookie("Authorization", accessToken);
-        Cookie refreshTokenCookie = jwtUtil.createCookie("RefreshToken", refreshToken);
+        Cookie accessTokenCookie = jwtUtil.createCookie("Authorization", accessToken,60 * 60 * 60);
+        Cookie refreshTokenCookie = jwtUtil.createCookie("RefreshToken", refreshToken,24 * 60 * 60 * 1000);
 
         redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, email);
 
