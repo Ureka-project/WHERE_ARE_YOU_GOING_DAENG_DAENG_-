@@ -21,7 +21,7 @@ public class NotificationService {
 
     public List<NotiResponseDto> fetchUnreadNotifications(int userId) {
 
-        List<Notification> unreadNotifications = notificationRepository.findByUser_UserIdAndReadingFalse(userId);
+        List<Notification> unreadNotifications = notificationRepository.findByUser_UserIdAndReadingFalseOrderByCreatedAtDesc(userId);
         List<NotiResponseDto> notificationDtos = unreadNotifications.stream()
                 .map(notification -> NotiResponseDto.builder()
                         .notificationId(notification.getNotificationId())
