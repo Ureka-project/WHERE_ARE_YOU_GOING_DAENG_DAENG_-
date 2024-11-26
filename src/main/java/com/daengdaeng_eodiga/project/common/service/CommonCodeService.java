@@ -1,0 +1,23 @@
+package com.daengdaeng_eodiga.project.common.service;
+
+import com.daengdaeng_eodiga.project.Global.exception.CommonCodeNotFoundException;
+import com.daengdaeng_eodiga.project.common.repository.CommonCodeRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class CommonCodeService {
+    private final CommonCodeRepository commonCodeRepository;
+
+    /**
+     * 공통 코드를 이름으로 변환하는 메소드
+     * @param codeId
+     * @return CommonName
+     */
+    public String getCommonCodeName(String codeId) {
+        return commonCodeRepository.findByCodeId(codeId)
+                .map(commonCode -> commonCode.getName())
+                .orElseThrow(CommonCodeNotFoundException::new);
+    }
+}
