@@ -45,6 +45,7 @@ public class JWTUtil {
                     .getExpiration()
                     .before(new Date());
         } catch (ExpiredJwtException e) {
+            log.info("jwt - isExpired : " + e.getMessage());
             return true;
         }
     }
