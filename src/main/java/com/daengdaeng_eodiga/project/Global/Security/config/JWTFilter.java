@@ -49,33 +49,32 @@ public class JWTFilter extends OncePerRequestFilter {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("Authorization")) {
                     accessToken = cookie.getValue();
-                }
-                else if (cookie.getName().equals("RefreshToken")) {
+                } else if (cookie.getName().equals("RefreshToken")) {
                     refreshToken = cookie.getValue();
                 }
 
             }
+        }
 
-            if (accessToken == null) {
-                filterChain.doFilter(request, response);
-                return;
-            }
+        if (accessToken == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            token = accessToken;
-            if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-            else if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken))  {
-                String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
-                response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken));
-                token = newAccessToken;
-            }
-            else
-            {
-                filterChain.doFilter(request, response);
-                return;
-            }
+        token = accessToken;
+        if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        else if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken))  {
+            String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
+            response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60 * 60 * 60));
+            token = newAccessToken;
+        }
+        else
+        {
+            filterChain.doFilter(request, response);
+            return;
         }
 
 
