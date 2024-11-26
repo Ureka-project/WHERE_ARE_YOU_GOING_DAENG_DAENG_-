@@ -28,7 +28,7 @@ spring:
           google:
             client-id: ${GOOGLE_OAUTH_ID}
             client-secret: ${GOOGLE_OAUTH_SECRET}
-            redirect-uri: http://ec2-54-180-234-13.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google
+            redirect-uri: https://ec2-54-180-234-13.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google
             scope:
               - profile
               - email
@@ -62,3 +62,9 @@ spring:
     api:
       url: "https://dapi.kakao.com/v2/${DOMAIN}/geo/coord2address.json"
       key: ${KAKAO_REST_API_KEY}
+
+logging:
+  level:
+    org:
+    springframework:
+      security: DEBUG
