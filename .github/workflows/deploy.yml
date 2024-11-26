@@ -109,7 +109,7 @@ jobs:
             -e REDIS_DOMAIN=${{secrets.REDIS_DOMAIN}} \
             -e REDIS_PWD=${{secrets.REDIS_PWD}} \
             -e SECURITY_SECRET=${{secrets.SECURITY_SECRET}} \
-            -e DOMAIN=${{secrets.EC2_IP_ADDRESS}} \
+            -e DOMAIN=${{secrets.EC2_DNS_ADDRESS}} \
             975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest
 
       - name: Remove GitHub Actions IP

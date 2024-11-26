@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.daengdaeng_eodiga.project.Global.exception.*;
 import com.daengdaeng_eodiga.project.common.repository.CommonCodeRepository;
+import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.pet.dto.PetDetailResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetListResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetRegisterDto;
@@ -28,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class PetService {
 	private final PetRepository petRepository;
 	private final UserRepository userRepository;
-	private final CommonCodeRepository commonCodeRepository;
+	private final CommonCodeService commonCodeService;
 
 	/**
 	 * 반려동물 조회 메소드.
@@ -107,9 +108,9 @@ public class PetService {
 						.petId(pet.getPetId())
 						.name(pet.getName())
 						.image(pet.getImage())
-						.species(getCommonCodeName(pet.getSpecies()))
-						.gender(getCommonCodeName(pet.getGender()))
-						.size(getCommonCodeName(pet.getSize()))
+						.species(commonCodeService.getCommonCodeName(pet.getSpecies()))
+						.gender(commonCodeService.getCommonCodeName(pet.getGender()))
+						.size(commonCodeService.getCommonCodeName(pet.getSize()))
 						.build())
 				.collect(Collectors.toList());
 	}
@@ -119,9 +120,9 @@ public class PetService {
 		Pet pet = petRepository.findById(petId)
 				.orElseThrow(PetNotFoundException::new);
 
-		String speciesName = getCommonCodeName(pet.getSpecies());
-		String genderName = getCommonCodeName(pet.getGender());
-		String sizeName = getCommonCodeName(pet.getSize());
+		String speciesName = commonCodeService.getCommonCodeName(pet.getSpecies());
+		String genderName = commonCodeService.getCommonCodeName(pet.getGender());
+		String sizeName = commonCodeService.getCommonCodeName(pet.getSize());
 
 		return PetDetailResponseDto.builder()
 				.petId(pet.getPetId())
@@ -144,16 +145,7 @@ public class PetService {
 		petRepository.delete(pet);
 	}
 
-	/**
-	 * 공통 코드를 이름으로 변환하는 메소드
-	 * @param codeId
-	 * @return CommonName
-	 */
-	private String getCommonCodeName(String codeId) {
-		return commonCodeRepository.findByCodeId(codeId)
-				.map(commonCode -> commonCode.getName())
-				.orElseThrow(CommonCodeNotFoundException::new);
-	}
+
 
 	/**
 	 * 날짜 변환 메소드
