@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.favorite.controller;
 
+import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.favorite.dto.FavoriteRequestDto;
 import com.daengdaeng_eodiga.project.favorite.dto.FavoriteResponseDto;
@@ -7,6 +8,7 @@ import com.daengdaeng_eodiga.project.favorite.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -18,11 +20,9 @@ public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
-    // TODO : 추후에 유저 ID 변경하기
-    int userId = 4;
-
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> registerFavorite(@RequestBody FavoriteRequestDto favoriteRequestDto) {
+    public ResponseEntity<ApiResponse<?>> registerFavorite(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody FavoriteRequestDto favoriteRequestDto) {
+        int userId = customOAuth2User.getUserDTO().getUserid();
         favoriteService.registerFavorite(userId, favoriteRequestDto);
         return ResponseEntity.ok(ApiResponse.success("favorite inserted succesfully"));
     }
@@ -34,10 +34,8 @@ public class FavoriteController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<?>> fetchFavoriteList(
-            @RequestParam int page,
-            @RequestParam int size
-    ) {
+    public ResponseEntity<ApiResponse<?>> fetchFavoriteList(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestParam int page, @RequestParam int size) {
+        int userId = customOAuth2User.getUserDTO().getUserid();
         Pageable pageable = PageRequest.of(page, size);
         Page<FavoriteResponseDto> response = favoriteService.fetchFavoriteList(userId, pageable);
         return ResponseEntity.ok(ApiResponse.success(response));

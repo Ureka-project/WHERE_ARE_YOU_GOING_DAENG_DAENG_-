@@ -27,9 +27,26 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: 6
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build --info
+        env:
+          MYSQL_PWD : mysecretpassword
+          GOOGLE_OAUTH_ID : google-client-id-example
+          GOOGLE_OAUTH_SECRET : google-oauth-secret-example
+          KAKAO_OAUTH_ID : kakao-oauth-id-example
+          KAKAO_OAUTH_SECRET : kakao-oauth-secret-example
+          KAKAO_REST_API_KEY : kakao-rest-api-key-example
+          MYSQL_DOMAIN : mysql.example.com
+          REDIS_DOMAIN : redis.example.com
+          REDIS_PWD : redis-password-example
+          DOMAIN : localhost
+          SECURITY_SECRET : testSecretKey20230327testSecretKey20230327testSecretKey20230327
 
       - name: Get Public IP
         id: ip
@@ -80,7 +97,20 @@ jobs:
             sudo docker stop ${{ env.ECR_REPOSITORY }} || true
             sudo docker rm ${{ env.ECR_REPOSITORY }} || true
             sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
-            sudo docker run -d --name daengdaeng -p 8080:8080 -e MYSQL_PWD=${{secrets.MYSQL_PWD}} -e SPRING_PROFILES_ACTIVE=default ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+            sudo docker run -d --name daengdaeng -p 8080:8080 \
+            -e MYSQL_PWD=${{secrets.MYSQL_PWD}} \
+            -e SPRING_PROFILES_ACTIVE=default \
+            -e GOOGLE_OAUTH_ID=${{secrets.GOOGLE_OAUTH_ID}} \
+            -e GOOGLE_OAUTH_SECRET=${{secrets.GOOGLE_OAUTH_SECRET}} \
+            -e KAKAO_OAUTH_ID=${{secrets.KAKAO_OAUTH_ID}} \
+            -e KAKAO_OAUTH_SECRET=${{secrets.KAKAO_OAUTH_SECRET}} \
+            -e KAKAO_REST_API_KEY=${{secrets.KAKAO_REST_API_KEY}} \
+            -e MYSQL_DOMAIN=${{secrets.MYSQL_DOMAIN}} \
+            -e REDIS_DOMAIN=${{secrets.REDIS_DOMAIN}} \
+            -e REDIS_PWD=${{secrets.REDIS_PWD}} \
+            -e SECURITY_SECRET=${{secrets.SECURITY_SECRET}} \
+            -e DOMAIN=${{secrets.EC2_IP_ADDRESS}} \
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Remove GitHub Actions IP
         run: |
