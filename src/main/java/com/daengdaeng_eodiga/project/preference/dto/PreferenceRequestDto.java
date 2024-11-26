@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.preference.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.antlr.v4.runtime.misc.NotNull;
 

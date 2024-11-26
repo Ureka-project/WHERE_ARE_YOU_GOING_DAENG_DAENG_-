@@ -39,7 +39,7 @@ public class Review extends BaseEntity {
     private User user;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
-    private List<ReviewKeyword> reviewKeywords;
+    private List<ReviewKeyword> reviewKeywords=new ArrayList<>();
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewMedia> reviewMedias = new ArrayList<>();

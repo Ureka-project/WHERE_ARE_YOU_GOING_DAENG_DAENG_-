@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class FilterRequest {
     private String city;
+    private String cityDetail;
     private String placeType;
     private Double latitude;
     private Double longitude;
