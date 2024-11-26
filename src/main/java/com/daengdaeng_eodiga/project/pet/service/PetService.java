@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.daengdaeng_eodiga.project.Global.exception.*;
-import com.daengdaeng_eodiga.project.common.repository.CommonCodeRepository;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.pet.dto.PetDetailResponseDto;
 import com.daengdaeng_eodiga.project.pet.dto.PetListResponseDto;
