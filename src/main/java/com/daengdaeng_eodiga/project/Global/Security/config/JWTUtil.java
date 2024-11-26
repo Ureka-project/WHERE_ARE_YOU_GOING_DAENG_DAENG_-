@@ -72,8 +72,10 @@ public class JWTUtil {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60 * 60 * 60);
         cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
+        //TODO :  서버 테스트 동안만 주석
+
+        // cookie.setSecure(true);
+        // cookie.setHttpOnly(true);
         return cookie;
     }
     public  Cookie deletAcessCookie(String key, String value) {
