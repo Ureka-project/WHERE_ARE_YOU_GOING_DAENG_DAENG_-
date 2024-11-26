@@ -68,9 +68,9 @@ public class JWTUtil {
                 .compact();
     }
 
-    public  Cookie createCookie(String key, String value) {
+    public  Cookie createCookie(String key, String value,int expiredMs) {
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60 * 60 * 60);
+        cookie.setMaxAge(expiredMs);
         cookie.setPath("/");
         cookie.setSecure(true);
         cookie.setHttpOnly(true);

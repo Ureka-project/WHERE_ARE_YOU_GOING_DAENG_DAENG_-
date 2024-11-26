@@ -74,7 +74,7 @@ public class JWTFilter extends OncePerRequestFilter {
         }
         else if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken))  {
             String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
-            response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken));
+            response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60*60*60));
             token = newAccessToken;
             log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
         }
