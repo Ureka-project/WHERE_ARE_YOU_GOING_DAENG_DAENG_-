@@ -28,8 +28,8 @@ public class TokenService {
         String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L); // 60*60*60L은 1시간
         String refreshToken = jwtUtil.createRefreshToken(email, 24 * 60 * 60 * 1000L); // 1일
 
-        Cookie accessTokenCookie = jwtUtil.createCookie("Authorization", accessToken,60 * 60 * 60);
-        Cookie refreshTokenCookie = jwtUtil.createCookie("RefreshToken", refreshToken,24 * 60 * 60 * 1000);
+        Cookie accessTokenCookie = jwtUtil.createCookie("Authorization", accessToken,60 * 60 * 60,response);
+        Cookie refreshTokenCookie = jwtUtil.createCookie("RefreshToken", refreshToken,24 * 60 * 60 * 1000,response);
 
         redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, email);
 
@@ -41,8 +41,8 @@ public class TokenService {
 
         public ResponseEntity<ApiResponse<?>> deleteCookie(String email,String RefreshToken,HttpServletResponse response) {
 
-            Cookie RefreshCookie = jwtUtil.deletRefreshCookie("RefreshToken", null);
-            Cookie accessCookie = jwtUtil.deletAcessCookie("Authorization", null);
+            Cookie RefreshCookie = jwtUtil.deletRefreshCookie("RefreshToken", null,response);
+            Cookie accessCookie = jwtUtil.deletAcessCookie("Authorization", null,response);
             response.addCookie(RefreshCookie);
             response.addCookie(accessCookie);
             redisTokenRepository.deleteToken(RefreshToken);

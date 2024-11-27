@@ -34,23 +34,23 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
-
         if (registrationId.equals("kakao")) {
             oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
+
         } else if (registrationId.equals("google")) {
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
-        } else {
-            throw new OAuth2AuthenticationException("Unsupported OAuth provider");
         }
 
         String email = oAuth2Response.getEmail();
-        if (email == null || email.isEmpty()) {
-            throw new OAuth2AuthenticationException("Principal name (email) cannot be empty");
-        }
+
 
         Optional<User> existData = userRepository.findByEmail(email);
-
-        if (!existData.isPresent()) {
+        System.out.println(oAuth2Response.getName());
+        System.out.println(oAuth2User);
+        System.out.println(existData);
+        System.out.println(email);
+        System.out.println(oAuth2Response);
+        if (existData.isEmpty()) {
             throw new OAuth2AuthenticationException(new OAuth2Error("REDIRECT_TO_SIGNUP", "REDIRECT_TO_SIGNUP: " + email, null));
 
         } else {

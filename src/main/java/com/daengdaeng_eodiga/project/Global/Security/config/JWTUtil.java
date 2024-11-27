@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -68,29 +69,42 @@ public class JWTUtil {
                 .compact();
     }
 
-    public  Cookie createCookie(String key, String value,int expiredMs) {
+    public  Cookie createCookie(String key, String value, int expiredMs, HttpServletResponse response) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(expiredMs);
         cookie.setPath("/");
-        //TODO :  서버 테스트 동안만 주석
-
-        // cookie.setSecure(true);
-        // cookie.setHttpOnly(true);
+        String cookieWithSameSite = String.format(
+                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                key, value, expiredMs, "/"
+        );
+        response.addHeader("Set-Cookie", cookieWithSameSite);
         return cookie;
     }
-    public  Cookie deletAcessCookie(String key, String value) {
-        Cookie accessTokenCookie = new Cookie("Authorization", null);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(0);
-        return accessTokenCookie;
+    public  Cookie deletAcessCookie(String key, String value, HttpServletResponse response) {
+        Cookie cookie = new Cookie(key, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        //cookie.setHttpOnly(true);
+        String cookieWithSameSite = String.format(
+                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                key, null, 0, "/"
+        );
+        response.addHeader("Set-Cookie", cookieWithSameSite);  // 헤더에 Set-Cookie 추가
+        return cookie;
     }
-    public Cookie deletRefreshCookie(String key, String value) {
-        Cookie refreshTokenCookie = new Cookie("RefreshToken", null);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(0);
-        return refreshTokenCookie;
+    public Cookie deletRefreshCookie(String key, String value,HttpServletResponse response) {
+        Cookie cookie = new Cookie(key, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        //cookie.setHttpOnly(true);
+        String cookieWithSameSite = String.format(
+                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                key, null, 0, "/"
+        );
+        response.addHeader("Set-Cookie", cookieWithSameSite);  // 헤더에 Set-Cookie 추가
+        return cookie;
     }
 
 
