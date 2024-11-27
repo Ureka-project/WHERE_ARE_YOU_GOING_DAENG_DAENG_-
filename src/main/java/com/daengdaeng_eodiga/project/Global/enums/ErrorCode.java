@@ -22,7 +22,8 @@ public enum ErrorCode {
 	USER_FAILED_SAVE(HttpStatus.INTERNAL_SERVER_ERROR, "유저 저장에 실패했습니다."),
 	USER_FAILED_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "유저 삭제에 실패했습니다."),
 	USER_FAILED_ADJUST(HttpStatus.INTERNAL_SERVER_ERROR, "유저 수정에 실패했습니다."),
-	NOTI_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알립입니다.");
+	NOTI_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림입니다."),
+	BANNER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 배너입니다.");
 	private final HttpStatus errorCode;
 	private final String message;
 

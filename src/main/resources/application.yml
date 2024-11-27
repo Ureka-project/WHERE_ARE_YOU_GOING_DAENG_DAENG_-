@@ -68,3 +68,16 @@ logging:
     org:
     springframework:
       security: DEBUG
+
+
+cloud:
+  aws:
+    region: ap-northeast-2
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key:  ${AWS_SECRET_KEY}
+  s3:
+    bucket: ${AWS_S3_BUCKET}
+    url: ${AWS_S3_URL}
+  stack:
+    auto: false
