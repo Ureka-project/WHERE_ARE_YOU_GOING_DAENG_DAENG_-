@@ -74,8 +74,8 @@ public class JWTUtil {
         cookie.setPath("/");
         //TODO :  서버 테스트 동안만 주석
 
-        // cookie.setSecure(true);
-        // cookie.setHttpOnly(true);
+         cookie.setSecure(true);
+         cookie.setHttpOnly(true);
         return cookie;
     }
     public  Cookie deletAcessCookie(String key, String value) {

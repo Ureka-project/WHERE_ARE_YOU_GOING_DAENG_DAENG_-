@@ -39,14 +39,14 @@ public class OuathController {
 
     @GetMapping("/signup")
     public void showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
-        String targetUrl = "/signupPage.html";
+        String targetUrl = "https://where-are-you-going-daeng-daeng-fe.vercel.app/user-register";
         response.addHeader("email",email);
         response.sendRedirect(targetUrl);
     }
 
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/loginSuccess.html");
+        response.sendRedirect("https://where-are-you-going-daeng-daeng-fe.vercel.app/");
     }
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@ModelAttribute SignUpForm signUpForm, HttpServletResponse response) {
@@ -82,7 +82,7 @@ public class OuathController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PostMapping("/user/adjust")
+    @PutMapping("/user/adjust")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@ModelAttribute SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerOrUpdateUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(response));
