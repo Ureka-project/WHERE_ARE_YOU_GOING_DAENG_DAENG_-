@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class PetUpdateDto {
-    private int petId;
     private String name;
     private String image;
     private String species;
