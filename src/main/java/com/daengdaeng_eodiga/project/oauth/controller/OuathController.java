@@ -41,8 +41,8 @@ public class OuathController {
 
     @GetMapping("/signup")
     public void showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
-        response.sendRedirect("http://localhost:5173/user-register");
-        response.setHeader("email", email);
+        //TODO : 연동 끝난 후, 쿠키에 저장
+        response.sendRedirect("http://localhost:5173/user-register?email=" + email);
     }
 
     @GetMapping("/loginSuccess")
