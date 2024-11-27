@@ -40,15 +40,14 @@ public class OuathController {
     private final TokenService tokenService;
 
     @GetMapping("/signup")
-    public ResponseEntity<ApiResponse<OauthResponse>> showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
-        OauthResponse oauthResponse = new OauthResponse(email, OauthResult.NEED_SIGNUP);
-        return ResponseEntity.ok(ApiResponse.success(oauthResponse));
+    public void showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
+        response.sendRedirect("http://localhost:5173/user-register");
+        response.setHeader("email", email);
     }
 
     @GetMapping("/loginSuccess")
-    public ResponseEntity<ApiResponse<?>> loginSuccess(HttpServletResponse response) throws IOException {
-        OauthResponse oauthResponse = new OauthResponse(null, OauthResult.LOGIN_SUCCESS);
-        return ResponseEntity.ok(ApiResponse.success(oauthResponse));
+    public void loginSuccess(HttpServletResponse response) throws IOException {
+        response.sendRedirect("http://localhost:5173");
     }
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
