@@ -4,6 +4,9 @@ package com.daengdaeng_eodiga.project.oauth.service;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.oauth.OauthResult;
+import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +35,8 @@ public class TokenService {
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
-
-        return ResponseEntity.ok(ApiResponse.success(response));
+        OauthResponse oauthResponse = new OauthResponse(null,OauthResult.LOGIN_SUCCESS);
+        return ResponseEntity.ok(ApiResponse.success(oauthResponse));
     }
 
         public ResponseEntity<ApiResponse<?>> deleteCookie(String email,String RefreshToken,HttpServletResponse response) {

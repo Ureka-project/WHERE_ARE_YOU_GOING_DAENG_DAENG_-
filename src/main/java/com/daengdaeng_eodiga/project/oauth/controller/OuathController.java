@@ -6,6 +6,8 @@ import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepositor
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.UserUnauthorizedException;
+import com.daengdaeng_eodiga.project.oauth.OauthResult;
+import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
 import com.daengdaeng_eodiga.project.oauth.dto.SignUpForm;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import com.daengdaeng_eodiga.project.oauth.service.OauthUserService;
@@ -38,18 +40,18 @@ public class OuathController {
     private final TokenService tokenService;
 
     @GetMapping("/signup")
-    public void showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
-        String targetUrl = "/signupPage.html";
-        response.addHeader("email",email);
-        response.sendRedirect(targetUrl);
+    public ResponseEntity<ApiResponse<OauthResponse>> showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
+        OauthResponse oauthResponse = new OauthResponse(email, OauthResult.NEED_SIGNUP);
+        return ResponseEntity.ok(ApiResponse.success(oauthResponse));
     }
 
     @GetMapping("/loginSuccess")
-    public void loginSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/loginSuccess.html");
+    public ResponseEntity<ApiResponse<?>> loginSuccess(HttpServletResponse response) throws IOException {
+        OauthResponse oauthResponse = new OauthResponse(null, OauthResult.LOGIN_SUCCESS);
+        return ResponseEntity.ok(ApiResponse.success(oauthResponse));
     }
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@ModelAttribute SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerOrUpdateUser(signUpForm);
         return tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response);
         }
@@ -83,7 +85,7 @@ public class OuathController {
     }
 
     @PostMapping("/user/adjust")
-    public ResponseEntity<ApiResponse<?>> AdjustUser(@ModelAttribute SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerOrUpdateUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
