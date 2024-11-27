@@ -33,7 +33,7 @@ public class TokenService {
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
 
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
         public ResponseEntity<ApiResponse<?>> deleteCookie(String email,String RefreshToken,HttpServletResponse response) {

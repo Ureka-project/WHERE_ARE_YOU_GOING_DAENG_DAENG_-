@@ -39,17 +39,19 @@ public class OuathController {
 
     @GetMapping("/signup")
     public void showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
-        String targetUrl = "https://where-are-you-going-daeng-daeng-fe.vercel.app/user-register";
+        //String targetUrl = "https://where-are-you-going-daeng-daeng-fe.vercel.app/user-register";
+        String targetUrl = "/signupPage.html";
         response.addHeader("email",email);
         response.sendRedirect(targetUrl);
     }
 
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("https://where-are-you-going-daeng-daeng-fe.vercel.app/");
+        //response.sendRedirect("https://where-are-you-going-daeng-daeng-fe.vercel.app/");
+        response.sendRedirect("/loginSuccess.html");
     }
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@ModelAttribute SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<?> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerOrUpdateUser(signUpForm);
         return tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response);
         }
@@ -83,7 +85,7 @@ public class OuathController {
     }
 
     @PutMapping("/user/adjust")
-    public ResponseEntity<ApiResponse<?>> AdjustUser(@ModelAttribute SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerOrUpdateUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(response));
     }

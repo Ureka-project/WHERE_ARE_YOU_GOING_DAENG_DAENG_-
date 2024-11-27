@@ -28,7 +28,6 @@ public class OauthUserService {
         Optional<User> existingUserOpt = userRepository.findByEmail(userDTO.getEmail());
 
         User user;
-        try {
             if (existingUserOpt.isPresent()) {
                 user = existingUserOpt.get();
                 user.setNickname(userDTO.getNickname());
@@ -43,12 +42,7 @@ public class OauthUserService {
                 user.setCity(userDTO.getCity());
                 user.setCityDetail(userDTO.getCityDetail());
             }
-
             userRepository.save(user);
-
-        } catch (Exception e) {
-            throw new UserFailedSaveException();
-        }
     }
     public void deleteUserByName(String email) {
         Optional<User> user = userRepository.findByEmail(email);
