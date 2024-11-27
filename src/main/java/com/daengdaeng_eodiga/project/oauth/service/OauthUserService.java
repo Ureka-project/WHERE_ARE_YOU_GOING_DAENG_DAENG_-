@@ -28,27 +28,23 @@ public class OauthUserService {
         Optional<User> existingUserOpt = userRepository.findByEmail(userDTO.getEmail());
 
         User user;
-        try {
-            if (existingUserOpt.isPresent()) {
-                user = existingUserOpt.get();
-                user.setNickname(userDTO.getNickname());
-                user.setGender(userDTO.getGender());
-                user.setCity(userDTO.getCity());
-                user.setCityDetail(userDTO.getCityDetail());
-            } else {
-                user = new User();
-                user.setNickname(userDTO.getNickname());
-                user.setEmail(userDTO.getEmail());
-                user.setGender(userDTO.getGender());
-                user.setCity(userDTO.getCity());
-                user.setCityDetail(userDTO.getCityDetail());
-            }
-
-            userRepository.save(user);
-
-        } catch (Exception e) {
-            throw new UserFailedSaveException();
+        if (existingUserOpt.isPresent()) {
+            user = existingUserOpt.get();
+            user.setNickname(userDTO.getNickname());
+            user.setGender(userDTO.getGender());
+            user.setCity(userDTO.getCity());
+            user.setCityDetail(userDTO.getCityDetail());
+        } else {
+            user = new User();
+            user.setNickname(userDTO.getNickname());
+            user.setEmail(userDTO.getEmail());
+            user.setGender(userDTO.getGender());
+            user.setCity(userDTO.getCity());
+            user.setCityDetail(userDTO.getCityDetail());
         }
+
+        userRepository.save(user);
+
     }
     public void deleteUserByName(String email) {
         Optional<User> user = userRepository.findByEmail(email);

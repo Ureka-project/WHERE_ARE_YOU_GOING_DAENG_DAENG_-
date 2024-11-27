@@ -94,8 +94,8 @@ jobs:
             aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws configure set region ${{ env.AWS_REGION }}
             ECR_REGISTRY_LOGIN=$(aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }})
-            sudo docker stop ${{ env.ECR_REPOSITORY }} || true
-            sudo docker rm ${{ env.ECR_REPOSITORY }} || true
+            sudo docker rm $(sudo docker ps --filter "ancestor=975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest" --format "{{.ID}}")
+            sudo docker rm $(sudo docker ps -a --filter "ancestor=975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest" --format "{{.ID}}")
             sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
             sudo docker run -d --name daengdaeng -p 8080:8080 --net host \
             -e MYSQL_PWD=${{secrets.MYSQL_PWD}} \
