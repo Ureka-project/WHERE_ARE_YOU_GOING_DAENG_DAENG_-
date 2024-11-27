@@ -24,11 +24,9 @@ public class Event extends BaseEntity {
     private String eventDescription;
 
     @Column(name = "start_date")
-//    @Temporal(TemporalType.TIMESTAMP)
     private LocalDate  startDate;
 
     @Column(name = "end_date")
-//    @Temporal(TemporalType.TIMESTAMP)
     private LocalDate endDate;
 
     @Column(name = "place")
