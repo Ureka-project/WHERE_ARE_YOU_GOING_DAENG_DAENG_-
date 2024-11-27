@@ -47,6 +47,10 @@ jobs:
           REDIS_PWD : redis-password-example
           DOMAIN : localhost
           SECURITY_SECRET : testSecretKey20230327testSecretKey20230327testSecretKey20230327
+          AWS_ACCESS_KEY : AWS-ACCESS-KEY
+          AWS_SECRET_KEY : AWS-SECRET-KEY
+          AWS_S3_BUCKET : AWS-S3-BUCKET
+          AWS_S3_URL : AWS-S3-URL
 
       - name: Get Public IP
         id: ip
@@ -110,6 +114,10 @@ jobs:
             -e REDIS_PWD=${{secrets.REDIS_PWD}} \
             -e SECURITY_SECRET=${{secrets.SECURITY_SECRET}} \
             -e DOMAIN=${{secrets.EC2_DNS_ADDRESS}} \
+            -e AWS_ACCESS_KEY=${{secrets.AWS_ACCESS_KEY_ID}} \
+            -e AWS_SECRET_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} \
+            -e AWS_S3_BUCKET=${{secrets.AWS_S3_BUCKET}} \
+            -e AWS_S3_URL=${{secrets.AWS_S3_URL}} \
             975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest
 
       - name: Remove GitHub Actions IP
