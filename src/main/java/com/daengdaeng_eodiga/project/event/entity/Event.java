@@ -1,12 +1,17 @@
 package com.daengdaeng_eodiga.project.event.entity;
 
+import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
+@ToString
+@Getter
 @Table(name = "event")
-public class Event {
+public class Event extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,17 +24,16 @@ public class Event {
     private String eventDescription;
 
     @Column(name = "start_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date  startDate;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDate  startDate;
 
     @Column(name = "end_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endDate;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDate endDate;
 
     @Column(name = "place")
     private String place;
 
     @Column(name = "event_image")
     private String eventImage;
-
 }
