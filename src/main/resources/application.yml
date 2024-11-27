@@ -28,7 +28,7 @@ spring:
           google:
             client-id: ${GOOGLE_OAUTH_ID}
             client-secret: ${GOOGLE_OAUTH_SECRET}
-            redirect-uri: https://ec2-54-180-234-13.ap-northeast-2.compute.amazonaws.com:8080/login/oauth2/code/google
+            redirect-uri: ${DOMAIN}/login/oauth2/code/google
             scope:
               - profile
               - email

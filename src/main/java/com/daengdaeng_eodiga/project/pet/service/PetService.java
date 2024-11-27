@@ -77,8 +77,8 @@ public class PetService {
 		petRepository.save(pet);
 	}
 
-	public void updatePet(PetUpdateDto updateDto) {
-		Pet pet = petRepository.findById(updateDto.getPetId())
+	public void updatePet(int petId, PetUpdateDto updateDto) {
+		Pet pet = petRepository.findById(petId)
 				.orElseThrow(PetNotFoundException::new);
 
 		pet.setName(updateDto.getName());
