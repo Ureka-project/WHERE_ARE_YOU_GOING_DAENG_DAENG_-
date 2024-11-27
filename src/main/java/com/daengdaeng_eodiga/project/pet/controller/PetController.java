@@ -26,9 +26,9 @@ public class PetController {
         return ResponseEntity.ok(ApiResponse.success("pet inserted succesfully"));
     }
 
-    @PutMapping
-    public ResponseEntity<ApiResponse<String>> updatePet(@RequestBody PetUpdateDto updateDto) {
-        petService.updatePet(updateDto);
+    @PutMapping("/{petId}")
+    public ResponseEntity<ApiResponse<String>> updatePet(@PathVariable int petId, @RequestBody PetUpdateDto updateDto) {
+        petService.updatePet(petId, updateDto);
         return ResponseEntity.ok(ApiResponse.success("pet updated succesfully"));
     }
 
