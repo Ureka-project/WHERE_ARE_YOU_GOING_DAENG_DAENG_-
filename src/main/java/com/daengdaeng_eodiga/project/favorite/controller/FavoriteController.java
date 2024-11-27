@@ -21,10 +21,10 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> registerFavorite(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody FavoriteRequestDto favoriteRequestDto) {
+    public ResponseEntity<ApiResponse<FavoriteResponseDto>> registerFavorite(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody FavoriteRequestDto favoriteRequestDto) {
         int userId = customOAuth2User.getUserDTO().getUserid();
-        favoriteService.registerFavorite(userId, favoriteRequestDto);
-        return ResponseEntity.ok(ApiResponse.success("favorite inserted succesfully"));
+        FavoriteResponseDto response = favoriteService.registerFavorite(userId, favoriteRequestDto);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @DeleteMapping("/{favoriteId}")
