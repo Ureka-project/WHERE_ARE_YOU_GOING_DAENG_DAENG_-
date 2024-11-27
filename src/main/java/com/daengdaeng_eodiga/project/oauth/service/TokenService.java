@@ -4,6 +4,9 @@ package com.daengdaeng_eodiga.project.oauth.service;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.oauth.OauthResult;
+import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
@@ -25,21 +28,21 @@ public class TokenService {
         String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L); // 60*60*60L은 1시간
         String refreshToken = jwtUtil.createRefreshToken(email, 24 * 60 * 60 * 1000L); // 1일
 
-        Cookie accessTokenCookie = jwtUtil.createCookie("Authorization", accessToken,60 * 60 * 60);
-        Cookie refreshTokenCookie = jwtUtil.createCookie("RefreshToken", refreshToken,24 * 60 * 60 * 1000);
+        Cookie accessTokenCookie = jwtUtil.createCookie("Authorization", accessToken,60 * 60 * 60,response);
+        Cookie refreshTokenCookie = jwtUtil.createCookie("RefreshToken", refreshToken,24 * 60 * 60 * 1000,response);
 
         redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, email);
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
-
-        return ResponseEntity.ok(ApiResponse.success(null));
+        OauthResponse oauthResponse = new OauthResponse(null,OauthResult.LOGIN_SUCCESS);
+        return ResponseEntity.ok(ApiResponse.success(oauthResponse));
     }
 
         public ResponseEntity<ApiResponse<?>> deleteCookie(String email,String RefreshToken,HttpServletResponse response) {
 
-            Cookie RefreshCookie = jwtUtil.deletRefreshCookie("RefreshToken", null);
-            Cookie accessCookie = jwtUtil.deletAcessCookie("Authorization", null);
+            Cookie RefreshCookie = jwtUtil.deletRefreshCookie("RefreshToken", null,response);
+            Cookie accessCookie = jwtUtil.deletAcessCookie("Authorization", null,response);
             response.addCookie(RefreshCookie);
             response.addCookie(accessCookie);
             redisTokenRepository.deleteToken(RefreshToken);

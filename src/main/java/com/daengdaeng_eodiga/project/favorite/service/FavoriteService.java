@@ -26,7 +26,7 @@ public class FavoriteService {
     private final UserRepository userRepository;
     private final OpeningDateRepository openingDateRepository;
 
-    public void registerFavorite(int userId, FavoriteRequestDto favoriteRequestDto) {
+    public FavoriteResponseDto registerFavorite(int userId, FavoriteRequestDto favoriteRequestDto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Place place = placeRepository.findById(favoriteRequestDto.getPlaceId()).orElseThrow(PlaceNotFoundException::new);
 
@@ -34,8 +34,9 @@ public class FavoriteService {
                 .user(user)
                 .place(place)
                 .build();
-
         favoriteRepository.save(favorite);
+        
+        return makeFavoriteResponseDto(place, favorite);
     }
 
     public void deleteFavorite(int favoriteId) {
@@ -52,25 +53,35 @@ public class FavoriteService {
             Place place = placeRepository.findById(favorite.getPlace().getPlaceId())
                     .orElseThrow(PlaceNotFoundException::new);
 
-            OpeningDate openingDate = openingDateRepository.findByPlace_PlaceId(place.getPlaceId())
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(OpeningDateNotFoundException::new);
-
-            String startTime = openingDate != null ? openingDate.getStartTime() : OpenHoursType.NO_INFO.getDescription();
-            String endTime = openingDate != null ? openingDate.getEndTime() : OpenHoursType.NO_INFO.getDescription();
-
-            return FavoriteResponseDto.builder()
-                    .favoriteId(favorite.getFavoriteId())
-                    .placeId(place.getPlaceId())
-                    .name(place.getName())
-                    .streetAddresses(place.getStreetAddresses())
-                    .latitude(place.getLatitude())
-                    .longitude(place.getLongitude())
-                    .startTime(startTime)
-                    .endTime(endTime)
-                    .build();
+            return makeFavoriteResponseDto(place, favorite);
         });
     }
 
+    /**
+     * 즐겨찾기 응답 dto 생성 메소드
+     * @param place
+     * @param favorite
+     * @return FavoriteResponseDto
+     */
+    private FavoriteResponseDto makeFavoriteResponseDto(Place place, Favorite favorite) {
+        
+        OpeningDate openingDate = openingDateRepository.findByPlace_PlaceId(place.getPlaceId())
+                .stream()
+                .findFirst()
+                .orElseThrow(OpeningDateNotFoundException::new);
+
+        String startTime = openingDate != null ? openingDate.getStartTime() : OpenHoursType.NO_INFO.getDescription();
+        String endTime = openingDate != null ? openingDate.getEndTime() : OpenHoursType.NO_INFO.getDescription();
+
+        return FavoriteResponseDto.builder()
+                .favoriteId(favorite.getFavoriteId())
+                .placeId(place.getPlaceId())
+                .name(place.getName())
+                .streetAddresses(place.getStreetAddresses())
+                .latitude(place.getLatitude())
+                .longitude(place.getLongitude())
+                .startTime(startTime)
+                .endTime(endTime)
+                .build();
+    }
 }
