@@ -60,9 +60,10 @@
             $.ajax({
                 url: '/api/v1/signup',  // 서버의 회원가입 엔드포인트
                 type: 'POST',  // POST 방식으로 전송
-                data: formData,  // 폼 데이터를 전송
+                contentType: 'application/json',  // JSON 형식으로 전송
+                data: JSON.stringify(formData),  // formData를 JSON으로 변환하여 전송
                 success: function(response) {
-                    console.log( response.redirectUrl);
+                    console.log(response.redirectUrl);
                     window.location.href = response.redirectUrl;  // 서버에서 받은 리다이렉트 URL로 이동
                 },
                 error: function(xhr) {
