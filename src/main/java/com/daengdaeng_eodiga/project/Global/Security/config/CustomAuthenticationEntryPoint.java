@@ -12,6 +12,6 @@ import java.io.IOException;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-        response.sendRedirect("https://api.daengdaeng-where.link/login");
+        response.sendRedirect("https://api.daengdaeng-where.link/");
     }
 }

@@ -83,7 +83,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/","https://api.daengdaeng-where.link/login", "/api/v1/signup", "/static/**",
+                        .requestMatchers("/","/api/v1/loginSuccess","https://api.daengdaeng-where.link/login", "/api/v1/signup", "/static/**",
                                 "/favicon.ico","/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
                         .anyRequest().authenticated())
                 .formLogin((formLogin) -> formLogin
