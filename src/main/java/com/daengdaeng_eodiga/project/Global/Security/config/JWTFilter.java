@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
+import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
@@ -65,18 +66,19 @@ public class JWTFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
         token = accessToken;
-        if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken)&&jwtUtil.isExpired(token))  {
+        if( jwtUtil.isJwtValid(refreshToken)== Jwtexception.mismatch ||jwtUtil.isJwtValid(token)== Jwtexception.mismatch)
+        {
+            filterChain.doFilter(request, response);
+        }
+        else if (!redisTokenRepository.isBlacklisted(refreshToken) && jwtUtil.isJwtValid(refreshToken)== Jwtexception.normal
+                &&jwtUtil.isJwtValid(token)== Jwtexception.expired)
+        {
             String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
             response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60*60*60,response));
             token = newAccessToken;
             response.addHeader("Authorization",token);
             log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
-        }
-        else if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
-            log.info("refreshToken is null and blacklisted");
-            filterChain.doFilter(request, response);
         }
      
 

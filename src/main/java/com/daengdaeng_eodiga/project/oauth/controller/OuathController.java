@@ -40,9 +40,9 @@ public class OuathController {
     private final TokenService tokenService;
 
     @GetMapping("/signup")
-    public void showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
+    public void showSignUpForm(@RequestParam String email,@RequestParam String provider, HttpServletResponse response) throws IOException {
         //TODO : 연동 끝난 후, 쿠키에 저장
-        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email);
+        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email+"&provider=" + provider);
     }
 
     @GetMapping("/loginSuccess")

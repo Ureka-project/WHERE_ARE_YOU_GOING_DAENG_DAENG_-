@@ -12,6 +12,7 @@ import com.daengdaeng_eodiga.project.oauth.dto.SignUpForm;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -41,6 +42,7 @@ public class OauthUserService {
             user.setGender(userDTO.getGender());
             user.setCity(userDTO.getCity());
             user.setCityDetail(userDTO.getCityDetail());
+            user.setOauthProvider(userDTO.getOauthProvider());
         }
 
         userRepository.save(user);

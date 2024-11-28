@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
+import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
 import io.jsonwebtoken.*;
 
 import io.jsonwebtoken.security.Keys;
@@ -35,19 +36,20 @@ public class JWTUtil {
         return email;
     }
 
-    public Boolean isExpired(String token) {
-
+    public Jwtexception isJwtValid(String token) {
         try {
-            return Jwts.parser()
+             Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()
-                    .getExpiration()
-                    .before(new Date());
+                    .getExpiration();
+             return Jwtexception.normal;
         } catch (ExpiredJwtException e) {
-            log.info("jwt - isExpired : " + e.getMessage());
-            return true;
+            return Jwtexception.expired;
+        }
+        catch (JwtException e) {
+            return  Jwtexception.mismatch;
         }
     }
 
