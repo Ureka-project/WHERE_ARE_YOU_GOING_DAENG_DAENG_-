@@ -7,7 +7,9 @@ import com.daengdaeng_eodiga.project.place.dto.FilterRequest;
 import com.daengdaeng_eodiga.project.place.dto.NearestRequest;
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
 import com.daengdaeng_eodiga.project.place.dto.SearchRequest;
+import com.daengdaeng_eodiga.project.place.service.OpenAiService;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +25,7 @@ public class PlaceController {
 
     private final PlaceService placeService;
     private final GeoService geoService;
+    private final OpenAiService openAiService;
 
     @PostMapping("/filter")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(@RequestBody FilterRequest request) {
@@ -36,7 +39,6 @@ public class PlaceController {
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
-
 
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(@RequestBody SearchRequest request) {
@@ -85,7 +87,13 @@ public class PlaceController {
     public ResponseEntity<ApiResponse<List<PlaceDto>>> RecommendPlaces(double latitude, double longitude,
                                                                        @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
         return ResponseEntity.ok(ApiResponse.success(placeService.
-                RecommendPlaces(geoService.getRegionInfo(latitude,longitude),latitude,longitude,customOAuth2User.getUserDTO().getEmail()
-        )));
+                RecommendPlaces(geoService.getRegionInfo(latitude, longitude), latitude, longitude, customOAuth2User.getUserDTO().getEmail()
+                )));
+    }
+
+    @PostMapping("/{placeId}/reviews/summary")
+    public ResponseEntity<ApiResponse<String>> createReviewSummary(@PathVariable int placeId) {
+        placeService.generateReviewSummary(placeId);
+        return ResponseEntity.ok(ApiResponse.success("리뷰 요약이 성공적으로 생성되었습니다!"));
     }
 }

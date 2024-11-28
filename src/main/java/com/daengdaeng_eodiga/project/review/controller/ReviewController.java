@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 
 	private final ReviewService reviewService;
+
 	@PostMapping("/review")
 	public ResponseEntity<ApiResponse<?>> registerReview(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody ReviewRegisterRequest request) {
 		int userId = customOAuth2User.getUserDTO().getUserid();

@@ -91,4 +91,6 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
 	@Query("SELECT rk.id.keyword FROM ReviewKeyword rk WHERE rk.review.reviewId = :reviewId")
 	List<String> findKeywordsByReviewId(int reviewId);
+
+	List<Review> findByPlace_PlaceId(int placeId);
 }

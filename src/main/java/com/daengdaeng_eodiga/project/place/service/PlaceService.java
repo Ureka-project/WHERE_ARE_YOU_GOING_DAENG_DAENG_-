@@ -6,15 +6,20 @@ import com.daengdaeng_eodiga.project.place.dto.PlaceDtoMapper;
 import com.daengdaeng_eodiga.project.place.dto.PlaceRcommendDto;
 import com.daengdaeng_eodiga.project.place.dto.PlaceWithScore;
 import com.daengdaeng_eodiga.project.place.entity.Place;
+import com.daengdaeng_eodiga.project.place.entity.ReviewSummary;
 import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceScoreRepository;
 import com.daengdaeng_eodiga.project.preference.dto.UserRequsetPrefernceDto;
 import com.daengdaeng_eodiga.project.preference.repository.PreferenceRepository;
+import com.daengdaeng_eodiga.project.review.entity.Review;
+import com.daengdaeng_eodiga.project.review.repository.ReviewRepository;
+import com.daengdaeng_eodiga.project.review.repository.ReviewSummaryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import java.util.List;
@@ -30,6 +35,9 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final PlaceScoreRepository placeScoreRepository;
     private final PreferenceRepository preferenceRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewSummaryRepository reviewSummaryRepository;
+    private final OpenAiService openAiService;
 
     public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeType, Double latitude, Double longitude, int userId) {
         List<Object[]> results = placeRepository.findByFiltersAndLocationWithFavorite(city, cityDetail, placeType, latitude, longitude, userId);
@@ -206,6 +214,38 @@ public class PlaceService {
             }
         }
         return score;
+    }
+
+
+    public void generateReviewSummary(int placeId) {
+
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new PlaceNotFoundException("Place not found with id: " + placeId));
+
+
+        String reviewsContent = reviewRepository.findByPlace_PlaceId(placeId).stream()
+                .map(Review::getContent)
+                .reduce("", (acc, content) -> acc + " " + content);
+
+
+        String pros = openAiService.summarizePros(reviewsContent);
+        String cons = openAiService.summarizeCons(reviewsContent);
+
+
+        ReviewSummary existingSummary = reviewSummaryRepository.findById(placeId).orElse(null);
+        if (existingSummary == null) {
+            ReviewSummary newSummary = new ReviewSummary();
+            newSummary.setPlace(place);
+            newSummary.setGoodSummary(pros);
+            newSummary.setBadSummary(cons);
+            newSummary.setUpdateDate(LocalDateTime.now());
+            reviewSummaryRepository.save(newSummary);
+        } else {
+            existingSummary.setGoodSummary(pros);
+            existingSummary.setBadSummary(cons);
+            existingSummary.setUpdateDate(LocalDateTime.now());
+            reviewSummaryRepository.save(existingSummary);
+        }
     }
 
 }

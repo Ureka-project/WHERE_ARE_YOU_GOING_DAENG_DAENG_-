@@ -1,20 +1,24 @@
 package com.daengdaeng_eodiga.project.place.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-
-
+@Getter
+@Setter
 @Entity
 @Table(name = "review_summary")
 public class ReviewSummary {
 
     @Id
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id", nullable = false, referencedColumnName = "place_id")
-    private Place place;
+    @Column(name = "place_id", nullable = false)
+    private Integer placeId;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "place_id", nullable = false)
+    private Place place;
 
     @Column(name = "good_summary", length = 255)
     private String goodSummary;
@@ -23,6 +27,15 @@ public class ReviewSummary {
     private String badSummary;
 
     @Column(name = "update_date")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updateDate;
+
+    public ReviewSummary() {}
+
+    public ReviewSummary(Place place, String goodSummary, String badSummary, LocalDateTime updateDate) {
+        this.place = place;
+        this.goodSummary = goodSummary;
+        this.badSummary = badSummary;
+        this.updateDate = updateDate;
+    }
+
 }
