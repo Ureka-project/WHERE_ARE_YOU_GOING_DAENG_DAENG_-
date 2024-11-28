@@ -74,7 +74,7 @@ public class JWTUtil {
         cookie.setMaxAge(expiredMs);
         cookie.setPath("/");
         String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, value, expiredMs, "/"
         );
         response.addHeader("Set-Cookie", cookieWithSameSite);
@@ -85,25 +85,22 @@ public class JWTUtil {
         cookie.setMaxAge(0);
         cookie.setPath("/");
         cookie.setSecure(true);
-        //cookie.setHttpOnly(true);
         String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, null, 0, "/"
         );
-        response.addHeader("Set-Cookie", cookieWithSameSite);  // 헤더에 Set-Cookie 추가
+        response.addHeader("Set-Cookie", cookieWithSameSite);
         return cookie;
     }
     public Cookie deletRefreshCookie(String key, String value,HttpServletResponse response) {
         Cookie cookie = new Cookie(key, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-        cookie.setSecure(true);
-        //cookie.setHttpOnly(true);
         String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, null, 0, "/"
         );
-        response.addHeader("Set-Cookie", cookieWithSameSite);  // 헤더에 Set-Cookie 추가
+        response.addHeader("Set-Cookie", cookieWithSameSite);
         return cookie;
     }
 
