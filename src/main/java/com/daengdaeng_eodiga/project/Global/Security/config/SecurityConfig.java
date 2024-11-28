@@ -88,7 +88,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .formLogin((formLogin) -> formLogin
                         .loginPage("https://api.daengdaeng-where.link/login")
-                        .permitAll());
+                        .permitAll())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 커스텀 EntryPoint 등록
+                );
 
         http
                 .sessionManagement((session) -> session
