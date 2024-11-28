@@ -152,7 +152,7 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
             "LEFT JOIN common_code c ON p.place_type = c.code_id " +
             "WHERE (:city IS NULL OR p.city LIKE CONCAT('%', :city, '%')) " +
             "AND (:cityDetail IS NULL OR p.city_detail LIKE CONCAT('%', :cityDetail, '%')) " +
-            "AND (:placeType IS NULL OR c.name = :placeType) " +
+            "AND (:placeType IS NULL OR :placeType = '' OR c.name = :placeType) " +
             "ORDER BY distance ASC " +
             "LIMIT 30", nativeQuery = true)
     List<Object[]> findByFiltersAndLocation(
@@ -161,6 +161,8 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
             @Param("placeType") String placeType,
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude);
+
+
 
     @Query(value = "SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude, " +
             "p.street_addresses, p.tel_number, p.url, c.name AS place_type, p.description, " +
