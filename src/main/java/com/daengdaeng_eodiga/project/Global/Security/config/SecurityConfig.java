@@ -62,6 +62,7 @@ public class SecurityConfig {
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(Collections.singletonList("*"));
+                    config.setExposedHeaders(List.of("Set-Cookie"));
                     config.setMaxAge(3600L);
                     return config;
                 }
