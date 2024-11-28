@@ -70,6 +70,10 @@ public class SecurityConfig {
                     }
                 }));
         http
+            .authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/api/v1/**","/api/v1/loginSuccess","https://api.daengdaeng-where.link/login", "/static/**",
+                    "/favicon.ico","/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
+                .anyRequest().authenticated())
            .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
 
         http
@@ -82,10 +86,6 @@ public class SecurityConfig {
 
 
         http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/","/api/v1/loginSuccess","https://api.daengdaeng-where.link/login", "/api/v1/signup", "/static/**",
-                                "/favicon.ico","/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
-                        .anyRequest().authenticated())
                 .formLogin((formLogin) -> formLogin
                         .loginPage("https://api.daengdaeng-where.link/login")
                         .permitAll())
