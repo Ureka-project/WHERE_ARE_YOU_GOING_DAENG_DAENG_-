@@ -60,12 +60,11 @@ public class SecurityConfig {
                         CorsConfiguration config = new CorsConfiguration();
                         config.setAllowedOrigins(List.of(
                                 "https://where-are-you-going-daeng-daeng-fe.vercel.app",
-                                "http://localhost:5173"
+                                "https://localhost:5173"
                         ));
-                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                        config.setAllowCredentials(true); // 쿠키 포함 허용
-                        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
-                        config.setExposedHeaders(List.of("Set-Cookie"));
+                        config.setAllowedMethods(List.of("*"));  // 모든 HTTP 메서드 허용
+                        config.setAllowedHeaders(List.of("*"));  // 모든 헤더 허용
+                        config.setAllowCredentials(true);
                         config.setMaxAge(3600L);
                         return config;
                     }
