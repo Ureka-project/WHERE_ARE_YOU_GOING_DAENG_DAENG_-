@@ -70,44 +70,32 @@ public class JWTUtil {
     }
 
     public Cookie createCookie(String key, String value, int expiredMs, HttpServletResponse response) {
-        String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
-                key, value, expiredMs, "/"
-        );
-
-        response.addHeader("Set-Cookie", cookieWithSameSite); // Set-Cookie 헤더만 추가
-        return null; // 쿠키 객체는 반환하지 않음
+            Cookie cookie = new Cookie(key, value);
+            cookie.setMaxAge(expiredMs);
+            cookie.setPath("/");
+            cookie.setSecure(true);
+            cookie.setDomain("localhost");
+        return cookie;
     }
 
     public  Cookie deletAcessCookie(String key, String value, HttpServletResponse response) {
         Cookie cookie = new Cookie(key, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-        cookie.setSecure(false); // 로컬 테스트 환경에서는 Secure 비활성화
+        cookie.setSecure(true);
         cookie.setDomain("localhost");
         response.addCookie(cookie);
-
-        String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
-                key, value, 0, "/"
-        );
-        response.addHeader("Set-Cookie", cookieWithSameSite);
         return cookie;
     }
     public Cookie deletRefreshCookie(String key, String value,HttpServletResponse response) {
         Cookie cookie = new Cookie(key, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-        cookie.setSecure(false);
-        String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
-                key, null, 0, "/"
-        );
-        response.addHeader("Set-Cookie", cookieWithSameSite);
+        cookie.setSecure(true);
+        cookie.setDomain("localhost");
+        response.addCookie(cookie);
         return cookie;
     }
-
-
 
     public long getExpiration(String token) {
         try {
