@@ -87,10 +87,10 @@ public class SecurityConfig {
                                 "/favicon.ico","/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
                         .anyRequest().authenticated())
                 .formLogin((formLogin) -> formLogin
-                        .loginPage("/login")
-                        .permitAll());
-                //.exceptionHandling(exception -> exception
-                //        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 커스텀 EntryPoint 등록
+                        .loginPage("https://api.daengdaeng-where.link/login")
+                        .permitAll())
+                .exceptionHandling(exception -> exception
+                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
 
 
         http
