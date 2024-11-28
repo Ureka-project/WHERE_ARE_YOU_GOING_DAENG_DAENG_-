@@ -74,7 +74,7 @@ public class JWTUtil {
         cookie.setMaxAge(expiredMs);
         cookie.setPath("/");
         String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, value, expiredMs, "/"
         );
         response.addHeader("Set-Cookie", cookieWithSameSite);
@@ -85,7 +85,6 @@ public class JWTUtil {
         cookie.setMaxAge(0);
         cookie.setPath("/");
         cookie.setSecure(true);
-        //cookie.setHttpOnly(true);
         String cookieWithSameSite = String.format(
                 "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, null, 0, "/"
@@ -97,7 +96,6 @@ public class JWTUtil {
         Cookie cookie = new Cookie(key, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-        //cookie.setHttpOnly(true);
         String cookieWithSameSite = String.format(
                 "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, null, 0, "/"
