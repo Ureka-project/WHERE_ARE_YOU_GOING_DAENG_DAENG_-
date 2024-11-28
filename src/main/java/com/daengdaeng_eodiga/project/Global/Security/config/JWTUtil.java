@@ -69,21 +69,25 @@ public class JWTUtil {
                 .compact();
     }
 
-    public  Cookie createCookie(String key, String value, int expiredMs, HttpServletResponse response) {
+    public Cookie createCookie(String key, String value, int expiredMs, HttpServletResponse response) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(expiredMs);
         cookie.setPath("/");
         cookie.setSecure(false);
+        cookie.setHttpOnly(true);
         cookie.setDomain("localhost");
+
         response.addCookie(cookie);
 
         String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
-                key, value, expiredMs, "/"
+                "%s=%s; Max-Age=%d; Path=%s; Domain=%s; SameSite=None",
+                key, value, expiredMs, "/", "localhost"
         );
         response.addHeader("Set-Cookie", cookieWithSameSite);
+
         return cookie;
     }
+
     public  Cookie deletAcessCookie(String key, String value, HttpServletResponse response) {
         Cookie cookie = new Cookie(key, null);
         cookie.setMaxAge(0);
