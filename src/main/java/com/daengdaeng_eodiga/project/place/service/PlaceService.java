@@ -39,14 +39,15 @@ public class PlaceService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final OpenAiService openAiService;
 
-    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeType, Double latitude, Double longitude, int userId) {
-        List<Object[]> results = placeRepository.findByFiltersAndLocationWithFavorite(city, cityDetail, placeType, latitude, longitude, userId);
+    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeType, Double latitude, Double longitude) {
+        List<Object[]> results = placeRepository.findByFiltersAndLocation(city, cityDetail, placeType, latitude, longitude);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
 
-    public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, int userId) {
-        List<Object[]> results = placeRepository.findByKeywordAndLocationWithFavorite(keyword, latitude, longitude, userId);
+
+    public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude) {
+        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, latitude, longitude);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
@@ -78,18 +79,12 @@ public class PlaceService {
 
     public List<PlaceDto> getTopScoredPlacesWithinRadius(Double latitude, Double longitude) {
         List<Object[]> results = placeRepository.findTopScoredPlacesWithinRadius(latitude, longitude);
-
-
-        return results.stream()
-                .map(PlaceDtoMapper::convertToPlaceDto)
-                .collect(Collectors.toList());
+        return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
-    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
-        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude, userId);
-        return results.stream()
-                .map(PlaceDtoMapper::convertToPlaceDto)
-                .collect(Collectors.toList());
+    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude) {
+        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude);
+        return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
 

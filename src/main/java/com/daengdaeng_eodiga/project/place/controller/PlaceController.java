@@ -34,8 +34,7 @@ public class PlaceController {
                 request.getCityDetail(),
                 request.getPlaceType(),
                 request.getLatitude(),
-                request.getLongitude(),
-                request.getUserId()
+                request.getLongitude()
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
@@ -45,8 +44,7 @@ public class PlaceController {
         List<PlaceDto> places = placeService.searchPlaces(
                 request.getKeyword(),
                 request.getLatitude(),
-                request.getLongitude(),
-                request.getUserId()
+                request.getLongitude()
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
@@ -74,12 +72,11 @@ public class PlaceController {
     }
 
     @PostMapping("/nearest")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> getNearestPlaces(@RequestBody NearestRequest request) {
-        List<PlaceDto> places = placeService.getNearestPlaces(
-                request.getLatitude(),
-                request.getLongitude(),
-                request.getUserId()
-        );
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getNearestPlaces(@RequestBody Map<String, Object> request) {
+        Double latitude = (Double) request.get("latitude");
+        Double longitude = (Double) request.get("longitude");
+
+        List<PlaceDto> places = placeService.getNearestPlaces(latitude, longitude);
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
