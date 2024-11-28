@@ -71,11 +71,11 @@ public class JWTUtil {
 
     public Cookie createCookie(String key, String value, int expiredMs, HttpServletResponse response) {
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(expiredMs);  // 쿠키의 만료 시간 설정
-        cookie.setPath("/");  // 모든 경로에서 쿠키를 사용할 수 있도록 설정
-        cookie.setSecure(true);  // HTTPS로만 전송되도록 설정 (보안을 강화)
-        cookie.setHttpOnly(true);  // JavaScript에서 쿠키에 접근할 수 없도록 설정
-        cookie.setDomain("daengdaeng-where.link");  // 두 도메인(api, www) 모두에서 쿠키를 공유하도록 설정
+        cookie.setMaxAge(expiredMs);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setDomain("daengdaeng-where.link");
 
         return cookie;
     }
