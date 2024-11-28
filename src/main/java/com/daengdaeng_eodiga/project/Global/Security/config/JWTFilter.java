@@ -59,8 +59,6 @@ public class JWTFilter extends OncePerRequestFilter {
             }
 
         }
-        //accessToken =request.getHeader("Authorization");
-        //refreshToken=request.getHeader("RefreshToken");
         log.info("accessToken : "+accessToken);
         log.info("refreshToken : "+refreshToken);
         if (accessToken == null) {
