@@ -25,8 +25,8 @@ public class TokenService {
 
     public ResponseEntity<ApiResponse<?>> generateTokensAndSetCookies(String email, HttpServletResponse response) {
 
-        String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L); // 60*60*60L은 1시간
-        String refreshToken = jwtUtil.createRefreshToken(email, 24 * 60 * 60 * 1000L); // 1일
+        String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L);
+        String refreshToken = jwtUtil.createRefreshToken(email, 24 * 60 * 60 * 1000L);
 
         Cookie accessTokenCookie = jwtUtil.createCookie("Authorization", accessToken,60 * 60 * 60,response);
         Cookie refreshTokenCookie = jwtUtil.createCookie("RefreshToken", refreshToken,24 * 60 * 60 * 1000,response);
