@@ -90,8 +90,8 @@ public class SecurityConfig {
                         .loginPage("https://api.daengdaeng-where.link/login")
                         .permitAll())
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 커스텀 EntryPoint 등록
-                );
+                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+
 
         http
                 .sessionManagement((session) -> session
@@ -100,8 +100,4 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public DefaultAuthorizationCodeTokenResponseClient customAuthorizationCodeTokenResponseClient() {
-        return new DefaultAuthorizationCodeTokenResponseClient();
-    }
 }
