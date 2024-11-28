@@ -59,7 +59,7 @@ public class SecurityConfig {
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
                         config.setAllowedOrigins(List.of(
-                                "https://where-are-you-going-daeng-daeng-fe.vercel.app",
+                                "https://api.daengdaeng-where.link",
                                 "https://localhost:5173"
                         ));
                         config.setAllowedMethods(List.of("*"));  // 모든 HTTP 메서드 허용
