@@ -73,12 +73,12 @@ public class JWTUtil {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(expiredMs);
         cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setDomain("where-are-you-going-daeng-daeng-fe.vercel.app");
+        cookie.setSecure(false);
+        cookie.setDomain("localhost");
         response.addCookie(cookie);
 
         String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, value, expiredMs, "/"
         );
         response.addHeader("Set-Cookie", cookieWithSameSite);
@@ -88,12 +88,12 @@ public class JWTUtil {
         Cookie cookie = new Cookie(key, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setDomain("where-are-you-going-daeng-daeng-fe.vercel.app");
+        cookie.setSecure(false); // 로컬 테스트 환경에서는 Secure 비활성화
+        cookie.setDomain("localhost");
         response.addCookie(cookie);
 
         String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; Secure; HttpOnly; SameSite=None",
+                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, value, 0, "/"
         );
         response.addHeader("Set-Cookie", cookieWithSameSite);
@@ -103,6 +103,7 @@ public class JWTUtil {
         Cookie cookie = new Cookie(key, null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
+        cookie.setSecure(false);
         String cookieWithSameSite = String.format(
                 "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
                 key, null, 0, "/"
