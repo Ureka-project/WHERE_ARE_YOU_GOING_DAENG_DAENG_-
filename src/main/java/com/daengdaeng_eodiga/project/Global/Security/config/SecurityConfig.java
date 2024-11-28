@@ -28,14 +28,20 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final RedisTokenRepository redisTokenRepository;
     private final UserService userService;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
-    RedisTokenRepository redisTokenRepository,UserService userService) {
+    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler
+    ) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
         this.jwtUtil = jwtUtil;
         this.redisTokenRepository = redisTokenRepository;
         this.userService = userService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
+
     }
 
     @Bean
@@ -56,6 +62,7 @@ public class SecurityConfig {
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowCredentials(true);
                     config.setAllowedHeaders(Collections.singletonList("*"));
+                    config.setExposedHeaders(List.of("Set-Cookie"));
                     config.setMaxAge(3600L);
                     return config;
                 }

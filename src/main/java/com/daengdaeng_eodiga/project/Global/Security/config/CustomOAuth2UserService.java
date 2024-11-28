@@ -45,11 +45,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 
         Optional<User> existData = userRepository.findByEmail(email);
-        System.out.println(oAuth2Response.getName());
-        System.out.println(oAuth2User);
-        System.out.println(existData);
-        System.out.println(email);
-        System.out.println(oAuth2Response);
         if (existData.isEmpty()) {
             throw new OAuth2AuthenticationException(new OAuth2Error("REDIRECT_TO_SIGNUP", "REDIRECT_TO_SIGNUP: " + email, null));
 

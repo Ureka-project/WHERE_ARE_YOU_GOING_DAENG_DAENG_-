@@ -70,33 +70,35 @@ public class JWTFilter extends OncePerRequestFilter {
         if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
             log.info("refreshToken is null and blacklisted");
             filterChain.doFilter(request, response);
-            return;
-        }
+        return;
+    }
         else if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken)&&jwtUtil.isExpired(token))  {
-            String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
-            response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60*60*60,response));
-            token = newAccessToken;
-            log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
+        String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
+        response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60*60*60,response));
+        token = newAccessToken;
+        log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
+    }
+        else if(!jwtUtil.isExpired(refreshToken)&&!jwtUtil.isExpired(token))
+        {
+            String email = jwtUtil.getEmail(token);
+            UserOauthDto userDTO = new UserOauthDto();
+            User user= userService.findUserId(email);
+
+            userDTO.setUserid(user.getUserId());
+            userDTO.setEmail(user.getEmail());
+            CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+            Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+
+            filterChain.doFilter(request, response);
         }
         else
         {
             log.info("token is not valid");
             filterChain.doFilter(request, response);
-            return;
         }
 
 
-        String email = jwtUtil.getEmail(token);
-        UserOauthDto userDTO = new UserOauthDto();
-        User user= userService.findUserId(email);
-
-        userDTO.setUserid(user.getUserId());
-        userDTO.setEmail(user.getEmail());
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        filterChain.doFilter(request, response);
     }
 
 
