@@ -48,7 +48,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
         String token = null;
-        if (cookies != null) {
+        /*if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("Authorization")) {
                     accessToken = cookie.getValue();
@@ -58,7 +58,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
             }
 
-        }
+        }*/
+        accessToken =request.getHeader("Authorization");
+        refreshToken=request.getHeader("RefreshToken");
         log.info("accessToken : "+accessToken);
         log.info("refreshToken : "+refreshToken);
         if (accessToken == null) {
@@ -67,38 +69,30 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         token = accessToken;
-        if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
+        if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken)&&jwtUtil.isExpired(token))  {
+            String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
+            response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60*60*60,response));
+            token = newAccessToken;
+            response.addHeader("Authorization",token);
+            log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
+        }
+        else if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
             log.info("refreshToken is null and blacklisted");
             filterChain.doFilter(request, response);
-        return;
-    }
-        else if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken)&&jwtUtil.isExpired(token))  {
-        String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
-        response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60*60*60,response));
-        token = newAccessToken;
-        log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
-    }
-        else if(!jwtUtil.isExpired(refreshToken)&&!jwtUtil.isExpired(token))
-        {
-            String email = jwtUtil.getEmail(token);
-            UserOauthDto userDTO = new UserOauthDto();
-            User user= userService.findUserId(email);
-
-            userDTO.setUserid(user.getUserId());
-            userDTO.setEmail(user.getEmail());
-            CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
-            Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            filterChain.doFilter(request, response);
-        }
-        else
-        {
-            log.info("token is not valid");
-            filterChain.doFilter(request, response);
         }
 
 
+        String email = jwtUtil.getEmail(token);
+        UserOauthDto userDTO = new UserOauthDto();
+        User user= userService.findUserId(email);
+
+        userDTO.setUserid(user.getUserId());
+        userDTO.setEmail(user.getEmail());
+        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        filterChain.doFilter(request, response);
     }
 
 
