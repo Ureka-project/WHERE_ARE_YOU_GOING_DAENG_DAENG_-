@@ -30,7 +30,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         if (errorMessage != null && errorMessage.startsWith("REDIRECT_TO_SIGNUP:")) {
             response.sendRedirect("/api/v1/signup?email=" + email);
         } else {
-            response.sendRedirect("/login?error=unknown");
+            response.sendRedirect("https://api.daengdaeng-where.link/login");
         }
     }
 
