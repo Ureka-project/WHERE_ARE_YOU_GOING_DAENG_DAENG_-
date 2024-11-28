@@ -48,7 +48,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
         String token = null;
-        /*if (cookies != null) {
+        if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("Authorization")) {
                     accessToken = cookie.getValue();
@@ -58,9 +58,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
             }
 
-        }*/
-        accessToken =request.getHeader("Authorization");
-        refreshToken=request.getHeader("RefreshToken");
+        }
+        //accessToken =request.getHeader("Authorization");
+        //refreshToken=request.getHeader("RefreshToken");
         log.info("accessToken : "+accessToken);
         log.info("refreshToken : "+refreshToken);
         if (accessToken == null) {
