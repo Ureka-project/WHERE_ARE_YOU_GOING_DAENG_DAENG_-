@@ -48,7 +48,7 @@ public class OuathController {
 
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("https://api.daengdaeng-where.link/");
+        response.sendRedirect("https://api.daengdaeng-where.link?email="+response.getHeader("Authorization"));
         //response.sendRedirect("/loginSuccess.html");
     }
     @PostMapping("/signup")
