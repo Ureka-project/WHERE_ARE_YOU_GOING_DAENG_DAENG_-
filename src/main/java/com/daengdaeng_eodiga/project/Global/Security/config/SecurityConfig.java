@@ -54,20 +54,22 @@ public class SecurityConfig {
                 .httpBasic((auth) -> auth.disable());
 
         http
-            .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-                @Override
-                public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                    CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("https://where-are-you-going-daeng-daeng-fe.vercel.app","http://localhost:5173"));
-                    config.setAllowedMethods(Collections.singletonList("*"));
-                    config.setAllowCredentials(true);
-                    config.setAllowedHeaders(Collections.singletonList("*"));
-                    config.setExposedHeaders(List.of("Set-Cookie"));
-                    config.setMaxAge(3600L);
-                    return config;
-                }
-            }));
-
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration config = new CorsConfiguration();
+                        config.setAllowedOrigins(List.of(
+                                "https://where-are-you-going-daeng-daeng-fe.vercel.app",
+                                "http://localhost:5173"
+                        ));
+                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                        config.setAllowCredentials(true); // 쿠키 포함 허용
+                        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+                        config.setExposedHeaders(List.of("Set-Cookie"));
+                        config.setMaxAge(3600L);
+                        return config;
+                    }
+                }));
         http
            .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
 
