@@ -35,6 +35,8 @@ public class TokenService {
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
+        response.addHeader("Authorization",   accessToken);
+        response.addHeader("RefreshToken",  refreshToken);
         OauthResponse oauthResponse = new OauthResponse(null,OauthResult.LOGIN_SUCCESS);
         return ResponseEntity.ok(ApiResponse.success(oauthResponse));
     }
