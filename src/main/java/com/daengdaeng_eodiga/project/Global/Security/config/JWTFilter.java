@@ -80,7 +80,7 @@ public class JWTFilter extends OncePerRequestFilter {
             log.info("refreshToken is null and blacklisted");
             filterChain.doFilter(request, response);
         }
-
+     
 
         String email = jwtUtil.getEmail(token);
         UserOauthDto userDTO = new UserOauthDto();
