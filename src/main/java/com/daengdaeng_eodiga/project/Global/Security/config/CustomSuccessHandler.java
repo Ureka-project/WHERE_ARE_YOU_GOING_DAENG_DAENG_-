@@ -40,7 +40,9 @@ import java.util.Optional;
             String newRefreshToken = jwtUtil.createRefreshToken(email,24 * 60 * 60 * 1000L);
 
                 response.addCookie(jwtUtil.createCookie("RefreshToken", newRefreshToken,60 * 60 * 60,response));
-                response.addCookie(jwtUtil.createCookie("Authorization", accessToken,24 * 60 * 60 * 1000,response));
+                response.addCookie(jwtUtil.createCookie("Authorization", accessToken,24 * 60 * 60 ,response));
+                response.addHeader("Authorization",   accessToken);
+                response.addHeader("RefreshToken",  newRefreshToken);
                 redisTokenRepository.saveToken(newRefreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
                 response.sendRedirect("/api/v1/loginSuccess");
         }

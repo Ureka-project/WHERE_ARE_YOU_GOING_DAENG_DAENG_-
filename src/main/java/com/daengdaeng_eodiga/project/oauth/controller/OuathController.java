@@ -42,13 +42,13 @@ public class OuathController {
     @GetMapping("/signup")
     public void showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
         //TODO : 연동 끝난 후, 쿠키에 저장
-        response.sendRedirect("https://localhost:5173/user-register?email=" + email);
+        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email);
         //response.sendRedirect("/signupPage.html");
     }
 
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("https://localhost:5173");
+        response.sendRedirect("https://api.daengdaeng-where.link/");
         //response.sendRedirect("/loginSuccess.html");
     }
     @PostMapping("/signup")
