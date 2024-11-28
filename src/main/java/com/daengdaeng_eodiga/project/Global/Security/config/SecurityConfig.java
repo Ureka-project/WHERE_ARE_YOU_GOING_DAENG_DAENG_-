@@ -62,10 +62,10 @@ public class SecurityConfig {
                                 "https://api.daengdaeng-where.link",
                                 "https://localhost:5173"
                         ));
-                        config.setAllowedMethods(List.of("*"));  // 모든 HTTP 메서드 허용
-                        config.setAllowedHeaders(List.of("*"));  // 모든 헤더 허용
-                        config.setAllowCredentials(true);
-                        config.setMaxAge(3600L);
+                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 정확한 메서드 명시
+                        config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
+                        config.setAllowCredentials(true); // 쿠키 허용
+                        config.setMaxAge(3600L); // 캐시 시간 (1시간)
                         return config;
                     }
                 }));
