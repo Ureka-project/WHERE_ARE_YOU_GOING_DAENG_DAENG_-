@@ -70,22 +70,13 @@ public class JWTUtil {
     }
 
     public Cookie createCookie(String key, String value, int expiredMs, HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(expiredMs);
-        cookie.setPath("/");
-        cookie.setSecure(false);
-        cookie.setHttpOnly(true);
-        cookie.setDomain("localhost");
-
-        response.addCookie(cookie);
-
         String cookieWithSameSite = String.format(
-                "%s=%s; Max-Age=%d; Path=%s; Domain=%s; SameSite=None",
-                key, value, expiredMs, "/", "localhost"
+                "%s=%s; Max-Age=%d; Path=%s; SameSite=None",
+                key, value, expiredMs, "/"
         );
-        response.addHeader("Set-Cookie", cookieWithSameSite);
 
-        return cookie;
+        response.addHeader("Set-Cookie", cookieWithSameSite); // Set-Cookie 헤더만 추가
+        return null; // 쿠키 객체는 반환하지 않음
     }
 
     public  Cookie deletAcessCookie(String key, String value, HttpServletResponse response) {
