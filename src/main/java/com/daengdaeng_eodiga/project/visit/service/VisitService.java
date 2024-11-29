@@ -7,12 +7,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daengdaeng_eodiga.project.Global.exception.DuplicatePetException;
+import com.daengdaeng_eodiga.project.Global.exception.InvalidRequestException;
+import com.daengdaeng_eodiga.project.Global.exception.NotFoundException;
 import com.daengdaeng_eodiga.project.pet.dto.PetResponse;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.pet.service.PetService;
@@ -64,6 +67,18 @@ public class VisitService {
 		visitRepository.save(visit);
 		visitPetRepository.saveAll(visitPets);
 
+	}
+
+	public void cancelVisit(int userId, int visitId) {
+		Optional<Visit> visit = visitRepository.findById(visitId);
+		if(visit.isEmpty()){
+			System.out.println("visitId : " + visitId);
+			throw new NotFoundException("Visit", String.format("VisitId %d", visitId));
+		}
+		if(visit.get().getUser().getUserId() != userId){
+			throw new InvalidRequestException("Visit", String.format("UserId %d", userId));
+		}
+		visitRepository.deleteById(visitId);
 	}
 
 	public List<VisitResponse> fetchVisitsByPlace(int placeId) {
