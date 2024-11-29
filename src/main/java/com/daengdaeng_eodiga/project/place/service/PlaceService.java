@@ -236,21 +236,30 @@ public class PlaceService {
 
     public void generateReviewSummary(int placeId) {
         Logger logger = LoggerFactory.getLogger(PlaceService.class);
+
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new PlaceNotFoundException("Place not found with id: " + placeId));
 
-        List<String> reviewContents = reviewRepository.findByPlace_PlaceId(placeId).stream()
+        ReviewSummary existingSummary = reviewSummaryRepository.findById(placeId).orElse(null);
+
+        String existingGoodSummary = existingSummary != null ? existingSummary.getGoodSummary() : "";
+        String existingBadSummary = existingSummary != null ? existingSummary.getBadSummary() : "";
+
+        List<String> recentReviewContents = reviewRepository.findByPlace_PlaceId(placeId).stream()
                 .map(Review::getContent)
                 .collect(Collectors.toList());
 
-        if (reviewContents.isEmpty()) {
-            logger.info("No reviews found for placeId: {}. Skipping summary generation.", placeId);
+        if (recentReviewContents.isEmpty() && existingSummary == null) {
+            logger.info("No reviews or existing summary found for placeId: {}. Skipping update.", placeId);
             return;
         }
-        String pros = summarizeInChunks(reviewContents, true);
-        String cons = summarizeInChunks(reviewContents, false);
 
-        ReviewSummary existingSummary = reviewSummaryRepository.findById(placeId).orElse(null);
+        String combinedGoodContent = existingGoodSummary + " " + String.join(" ", recentReviewContents);
+        String combinedBadContent = existingBadSummary + " " + String.join(" ", recentReviewContents);
+
+        String pros = openAiService.summarizePros(combinedGoodContent);
+        String cons = openAiService.summarizeCons(combinedBadContent);
+
         if (existingSummary == null) {
             ReviewSummary newSummary = new ReviewSummary();
             newSummary.setPlace(place);
@@ -258,11 +267,13 @@ public class PlaceService {
             newSummary.setBadSummary(cons);
             newSummary.setUpdateDate(LocalDateTime.now());
             reviewSummaryRepository.save(newSummary);
+            logger.info("New review summary created for placeId: {}", placeId);
         } else {
             existingSummary.setGoodSummary(pros);
             existingSummary.setBadSummary(cons);
             existingSummary.setUpdateDate(LocalDateTime.now());
             reviewSummaryRepository.save(existingSummary);
+            logger.info("Review summary updated for placeId: {}", placeId);
         }
     }
 
