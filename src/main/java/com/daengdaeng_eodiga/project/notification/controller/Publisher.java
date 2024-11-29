@@ -13,7 +13,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/publish")
 @RequiredArgsConstructor
@@ -26,5 +28,7 @@ public class Publisher {
 		ObjectMapper objectMapper = new ObjectMapper();
 		String message = objectMapper.writeValueAsString(request);
 		redisTemplate.convertAndSend(topic, message);
+		log.info("published topic : " + topic + " /  message : " + message);
+
 	}
 }
