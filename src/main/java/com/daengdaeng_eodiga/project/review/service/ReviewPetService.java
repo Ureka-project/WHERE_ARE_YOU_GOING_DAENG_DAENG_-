@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 public class ReviewPetService {
 	private final ReviewPetRepository reviewPetRepository;
 
-	public void saveReviewPet(Review review, List<Pet> pets) {
-		reviewPetRepository.saveAll(pets.stream().map(pet -> ReviewPet.builder().review(review).pet(pet).build()).toList());
+	public List<ReviewPet> saveReviewPet(Review review, List<Pet> pets) {
+		return reviewPetRepository.saveAll(pets.stream().map(pet -> ReviewPet.builder().review(review).pet(pet).build()).toList());
 	}
 
 
