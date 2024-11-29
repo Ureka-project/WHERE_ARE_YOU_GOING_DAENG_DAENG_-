@@ -30,14 +30,19 @@ public class OauthUserService {
         if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()) {
             throw new DuplicateUserException();
         }
-        User user = new User();
-        user.setNickname(userDTO.getNickname());
-        user.setEmail(userDTO.getEmail());
-        user.setGender(userDTO.getGender());
-        user.setCity(userDTO.getCity());
-        user.setCityDetail(userDTO.getCityDetail());
-        user.setOauthProvider(userDTO.getOauthProvider());
-        userRepository.save(user);
+        try {
+            User user = new User();
+            user.setNickname(userDTO.getNickname());
+            user.setEmail(userDTO.getEmail());
+            user.setGender(userDTO.getGender());
+            user.setCity(userDTO.getCity());
+            user.setCityDetail(userDTO.getCityDetail());
+            user.setOauthProvider(userDTO.getOauthProvider());
+            userRepository.save(user);
+        }
+        catch (UserFailedSaveException e) {
+            throw new UserFailedSaveException();
+        }
     }
     public void AdjustUser(SignUpForm userDTO) {
         Optional<User> existingUserOpt = userRepository.findByEmail(userDTO.getEmail());
@@ -53,6 +58,8 @@ public class OauthUserService {
             userRepository.save(user);
 
         }
+        else
+            throw new UserNotFoundException();
     }
     public void deleteUserByName(String email) {
         Optional<User> user = userRepository.findByEmail(email);
@@ -71,7 +78,7 @@ public class OauthUserService {
             User user1 = user.get();
             userDto.setEmail(user1.getEmail());
             userDto.setNickname(user1.getNickname());
-            String genderCode = "남자".equals(user1.getGender()) ? "GND_01" : "GND_02";
+            String genderCode = "GND_01".equals(user1.getGender()) ? "남자" : "여자";
             userDto.setGender(genderCode);
             userDto.setCity(user1.getCity());
             userDto.setCityDetail(user1.getCityDetail());

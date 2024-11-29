@@ -84,8 +84,9 @@ public class PlaceController {
     @GetMapping("/recommend")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> RecommendPlaces(@RequestBody NearestRequest request,
                                                                        @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
-        return ResponseEntity.ok(ApiResponse.success(placeService.
-                RecommendPlaces(geoService.getRegionInfo(request.getLatitude(),request.getLongitude()),request.getLatitude(),request.getLongitude(),customOAuth2User.getUserDTO().getEmail()
-        )));
+        Integer userId=customOAuth2User.getUserDTO().getUserid();
+        String myplace=geoService.getRegionInfo(request.getLatitude(),request.getLongitude(),userId);
+        List<PlaceDto> places= placeService.RecommendPlaces(myplace,request.getLatitude(),request.getLongitude(),userId);
+        return ResponseEntity.ok(ApiResponse.success(places));
     }
 }

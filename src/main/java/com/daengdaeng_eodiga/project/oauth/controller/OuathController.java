@@ -44,7 +44,7 @@ public class OuathController {
     @GetMapping("/signup")
     public void showSignUpForm(@RequestParam String email,@RequestParam String provider, HttpServletResponse response) throws IOException {
         //TODO : 연동 끝난 후, 쿠키에 저장
-        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email+"&provider=" + provider);
+        //response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email+"&provider=" + provider);
     }
 
     @GetMapping("/loginSuccess")
@@ -69,9 +69,6 @@ public class OuathController {
                                         @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
                                         HttpServletResponse response) {
         String userEmail = customOAuth2User != null ? customOAuth2User.getEmail() : null;
-        if (userEmail == null || userEmail.isEmpty()) {
-            throw new UserUnauthorizedException();
-        }
         oauthUserService.deleteUserByName(userEmail);
         return tokenService.deleteCookie(userEmail, RefreshToken, response);
     }
