@@ -1,10 +1,7 @@
 package com.daengdaeng_eodiga.project.oauth.service;
 
-import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
-import com.daengdaeng_eodiga.project.Global.exception.UserFailedDeleteException;
-import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
-import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
+import com.daengdaeng_eodiga.project.notification.service.NotificationService;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
@@ -13,7 +10,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -21,8 +17,8 @@ import java.util.Optional;
 @Transactional
 public class OauthUserService {
 
-    private final JWTUtil jwtUtil;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public void registerOrUpdateUser(SignUpForm userDTO) {
         Optional<User> existingUserOpt = userRepository.findByEmail(userDTO.getEmail());
@@ -67,6 +63,8 @@ public class OauthUserService {
         userDto.setCityDetail(user.getCityDetail());
         userDto.setCreatedAt(user.getCreatedAt());
         userDto.setUserId(user.getUserId());
+        boolean pushAgreement = notificationService.findPushTokenByUser(user).isEmpty();
+        userDto.setPushAgreement(!pushAgreement);
         return userDto;
     }
 
