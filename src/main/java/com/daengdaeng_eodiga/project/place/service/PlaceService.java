@@ -39,10 +39,11 @@ public class PlaceService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final OpenAiService openAiService;
 
-    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeType, Double latitude, Double longitude) {
-        List<Object[]> results = placeRepository.findByFiltersAndLocation(city, cityDetail, placeType, latitude, longitude);
+    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude) {
+        List<Object[]> results = placeRepository.findByFiltersAndLocation(city, cityDetail, placeTypeCode, latitude, longitude);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
+
 
 
 

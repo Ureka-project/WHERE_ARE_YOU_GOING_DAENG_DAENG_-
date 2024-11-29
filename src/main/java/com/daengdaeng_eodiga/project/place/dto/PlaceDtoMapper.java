@@ -1,5 +1,7 @@
 package com.daengdaeng_eodiga.project.place.dto;
 
+import java.util.Arrays;
+
 public class PlaceDtoMapper {
 
     private PlaceDtoMapper() {}
@@ -7,7 +9,6 @@ public class PlaceDtoMapper {
     public static PlaceDto convertToPlaceDto(Object[] result) {
         PlaceDto dto = new PlaceDto();
         try {
-
             dto.setPlaceId(result[0] != null ? ((Number) result[0]).intValue() : null);
             dto.setName(result[1] != null ? result[1].toString() : null);
             dto.setCity(result[2] != null ? result[2].toString() : null);
@@ -29,6 +30,8 @@ public class PlaceDtoMapper {
             dto.setEndTime(result.length > 18 && result[18] != null ? result[18].toString() : null);
             dto.setFavoriteCount(result.length > 19 && result[19] != null ? ((Number) result[19]).intValue() : 0);
             dto.setPlaceScore(result.length > 20 && result[20] != null ? ((Number) result[20]).doubleValue() : null);
+            System.out.println("Result array: " + Arrays.toString(result));
+
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to map result to PlaceDto. Ensure data types and query structure are correct.", e);
         }
@@ -36,7 +39,6 @@ public class PlaceDtoMapper {
     }
 
     private static boolean parseBoolean(Object value) {
-
         return Boolean.parseBoolean(value.toString()) || "1".equals(value.toString());
     }
 
