@@ -29,10 +29,10 @@ public class VisitController {
 	private final VisitService visitService;
 
 	@PostMapping("")
-	public ResponseEntity<ApiResponse<?>> registerVisits(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,@RequestBody VisitRequest request) {
+	public ResponseEntity<ApiResponse<PetsAtVisitTime>> registerVisits(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,@RequestBody VisitRequest request) {
 		int userId = customOAuth2User.getUserDTO().getUserid();
-		visitService.registerVisit(userId, request.placeId(), request.petIds(), request.visitAt());
-		return ResponseEntity.ok(ApiResponse.success(null));
+		PetsAtVisitTime response = visitService.registerVisit(userId, request.placeId(), request.petIds(), request.visitAt());
+		return ResponseEntity.ok(ApiResponse.success(response));
 
 	}
 

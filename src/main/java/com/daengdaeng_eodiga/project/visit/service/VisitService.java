@@ -44,7 +44,7 @@ public class VisitService {
 	private final PetService petService;
 	private final VisitPetRepository visitPetRepository;
 
-	public void registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
+	public PetsAtVisitTime registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
 		Place place = placeService.findPlace(placeId);
 		User user = userService.findUser(userId);
 		findVisitPet(placeId, visitAt, petIds);
@@ -64,8 +64,15 @@ public class VisitService {
 							.build();
 				})
 				.toList();
-		visitRepository.save(visit);
-		visitPetRepository.saveAll(visitPets);
+		Visit savedVisit = visitRepository.save(visit);
+		List<VisitPet> savedVisitPet = visitPetRepository.saveAll(visitPets);
+
+		return new PetsAtVisitTime(savedVisit.getVisitAt(), savedVisitPet.stream()
+				.map(visitPet -> {
+					Pet pet = visitPet.getPet();
+					return new PetResponse(pet.getPetId(), pet.getName(), pet.getImage());
+				})
+				.toList(), placeId, visit.getId(),place.getName());
 
 	}
 
