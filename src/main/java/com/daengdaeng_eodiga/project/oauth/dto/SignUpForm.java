@@ -13,5 +13,4 @@ public class SignUpForm
     private String cityDetail;
     private OauthProvider oauthProvider;
     private boolean Pushagreement;
-    private boolean Regionagreement;
 }

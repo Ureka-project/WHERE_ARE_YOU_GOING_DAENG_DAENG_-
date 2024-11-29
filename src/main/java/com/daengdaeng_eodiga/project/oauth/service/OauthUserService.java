@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.oauth.service;
 
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
+import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
 import com.daengdaeng_eodiga.project.Global.exception.UserFailedDeleteException;
 import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
@@ -25,17 +26,23 @@ public class OauthUserService {
     private final JWTUtil jwtUtil;
     private final UserRepository userRepository;
 
-    public void registerOrUpdateUser(SignUpForm userDTO) {
+    public void registerUser(SignUpForm userDTO) {
+        if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()) {
+            throw new DuplicateUserException();
+        }
+        User user = new User();
+        user.setNickname(userDTO.getNickname());
+        user.setEmail(userDTO.getEmail());
+        user.setGender(userDTO.getGender());
+        user.setCity(userDTO.getCity());
+        user.setCityDetail(userDTO.getCityDetail());
+        user.setOauthProvider(userDTO.getOauthProvider());
+        userRepository.save(user);
+    }
+    public void AdjustUser(SignUpForm userDTO) {
         Optional<User> existingUserOpt = userRepository.findByEmail(userDTO.getEmail());
-
         User user;
         if (existingUserOpt.isPresent()) {
-            user = existingUserOpt.get();
-            user.setNickname(userDTO.getNickname());
-            user.setGender(userDTO.getGender());
-            user.setCity(userDTO.getCity());
-            user.setCityDetail(userDTO.getCityDetail());
-        } else {
             user = new User();
             user.setNickname(userDTO.getNickname());
             user.setEmail(userDTO.getEmail());
@@ -43,10 +50,9 @@ public class OauthUserService {
             user.setCity(userDTO.getCity());
             user.setCityDetail(userDTO.getCityDetail());
             user.setOauthProvider(userDTO.getOauthProvider());
+            userRepository.save(user);
+
         }
-
-        userRepository.save(user);
-
     }
     public void deleteUserByName(String email) {
         Optional<User> user = userRepository.findByEmail(email);
@@ -63,10 +69,10 @@ public class OauthUserService {
         UserDto userDto = new UserDto();
         if (user.isPresent()) {
             User user1 = user.get();
-            userRepository. deleteById(user1.getUserId());
             userDto.setEmail(user1.getEmail());
             userDto.setNickname(user1.getNickname());
-            userDto.setGender(user1.getGender());
+            String genderCode = "남자".equals(user1.getGender()) ? "GND_01" : "GND_02";
+            userDto.setGender(genderCode);
             userDto.setCity(user1.getCity());
             userDto.setCityDetail(user1.getCityDetail());
             userDto.setCreatedAt(LocalDateTime.now());

@@ -1,7 +1,6 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
-import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
@@ -36,61 +35,18 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("doFilterInternal - JWTFilter : " + request.getRequestURI()+ " "+request.getMethod()+" cookies : "+request.getCookies());
-        String accessToken = null;
-        Cookie[] cookies = request.getCookies();
-        String refreshToken = null;
-        String requestUri = request.getRequestURI();
+        if(request.getRequestURI().startsWith("/api/v1/")){
+            String email = "13wjdgkbbb@gmial.com";
+            UserOauthDto userDTO = new UserOauthDto();
+            User user= userService.findUserId(email);
 
-        if (requestUri.matches("^\\/login(?:\\/.*)?$")) {
-
-            filterChain.doFilter(request, response);
-            return;
+            userDTO.setUserid(user.getUserId());
+            userDTO.setEmail(user.getEmail());
+            CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+            Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 
-
-        String token = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("Authorization")) {
-                    accessToken = cookie.getValue();
-                } else if (cookie.getName().equals("RefreshToken")) {
-                    refreshToken = cookie.getValue();
-                }
-
-            }
-
-        }
-        log.info("accessToken : "+accessToken);
-        log.info("refreshToken : "+refreshToken);
-        if (accessToken == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        token = accessToken;
-        if( jwtUtil.isJwtValid(refreshToken)== Jwtexception.mismatch ||jwtUtil.isJwtValid(token)== Jwtexception.mismatch)
-        {
-            filterChain.doFilter(request, response);
-        }
-        else if (!redisTokenRepository.isBlacklisted(refreshToken) && jwtUtil.isJwtValid(refreshToken)== Jwtexception.normal
-                &&jwtUtil.isJwtValid(token)== Jwtexception.expired)
-        {
-            String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
-            response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60*60*60,response));
-            token = newAccessToken;
-            response.addHeader("Authorization",token);
-            log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
-        }
-     
-
-        String email = jwtUtil.getEmail(token);
-        UserOauthDto userDTO = new UserOauthDto();
-        User user= userService.findUserId(email);
-
-        userDTO.setUserid(user.getUserId());
-        userDTO.setEmail(user.getEmail());
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);
     }
 

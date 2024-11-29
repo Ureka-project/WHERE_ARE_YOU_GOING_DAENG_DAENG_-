@@ -4,6 +4,8 @@ import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
+import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.UserUnauthorizedException;
 import com.daengdaeng_eodiga.project.oauth.OauthResult;
@@ -47,13 +49,13 @@ public class OuathController {
 
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("https://api.daengdaeng-where.link");
+        response.sendRedirect("/loginSuccess.html");
     }
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
-        oauthUserService.registerOrUpdateUser(signUpForm);
-        return tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response);
-        }
+        oauthUserService.registerUser(signUpForm);
+        return ResponseEntity.ok(ApiResponse.success(tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response)));
+    }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue("RefreshToken") String RefreshToken,
@@ -83,9 +85,9 @@ public class OuathController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PostMapping("/user/adjust")
+    @PutMapping("/user/adjust")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
-        oauthUserService.registerOrUpdateUser(signUpForm);
+        oauthUserService.AdjustUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
     @GetMapping("/user/duplicateNicname")
