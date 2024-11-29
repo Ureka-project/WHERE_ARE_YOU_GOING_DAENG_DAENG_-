@@ -10,5 +10,5 @@ import org.springframework.stereotype.Component;
 public class KakaoApiProperties {
     private String url;
     private String key;
-
+    private String Nopeurl;
 }

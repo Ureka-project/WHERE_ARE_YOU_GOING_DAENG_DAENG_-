@@ -4,6 +4,8 @@ import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
+import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.UserUnauthorizedException;
 import com.daengdaeng_eodiga.project.oauth.OauthResult;
@@ -39,38 +41,34 @@ public class OuathController {
     private final TokenService tokenService;
 
     @GetMapping("/signup")
-    public void showSignUpForm(@RequestParam String email, HttpServletResponse response) throws IOException {
+    public void showSignUpForm(@RequestParam String email,@RequestParam String provider, HttpServletResponse response) throws IOException {
         //TODO : 연동 끝난 후, 쿠키에 저장
-        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email);
+        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email+"&provider=" + provider);
     }
 
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("https://api.daengdaeng-where.link");
+        response.sendRedirect("/loginSuccess.html");
     }
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
-        oauthUserService.registerOrUpdateUser(signUpForm);
-        return tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response);
-        }
-
+        oauthUserService.registerUser(signUpForm);
+        return ResponseEntity.ok(ApiResponse.success(tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response)));
+    }
+    //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue("RefreshToken") String RefreshToken,
-                                         @AuthenticationPrincipal CustomOAuth2User principal,
+    public ResponseEntity<?> logout(@AuthenticationPrincipal CustomOAuth2User principal,
                                          HttpServletResponse response) {
         UserOauthDto userOauthDto = principal.getUserDTO();
-        return tokenService.deleteCookie(userOauthDto.getEmail(), RefreshToken, response);
+        return tokenService.deleteCookie(userOauthDto.getEmail(), null, response);
     }
+    //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
     @DeleteMapping("/user/delete")
-    public ResponseEntity<?> deleteUser(@CookieValue("RefreshToken") String RefreshToken,
-                                        @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+    public ResponseEntity<?> deleteUser(CustomOAuth2User customOAuth2User,
                                         HttpServletResponse response) {
         String userEmail = customOAuth2User != null ? customOAuth2User.getEmail() : null;
-        if (userEmail == null || userEmail.isEmpty()) {
-            throw new UserUnauthorizedException();
-        }
         oauthUserService.deleteUserByName(userEmail);
-        return tokenService.deleteCookie(userEmail, RefreshToken, response);
+        return tokenService.deleteCookie(userEmail, null, response);
     }
 
     @GetMapping("/user/adjust")
@@ -82,9 +80,9 @@ public class OuathController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PostMapping("/user/adjust")
+    @PutMapping("/user/adjust")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
-        oauthUserService.registerOrUpdateUser(signUpForm);
+        oauthUserService.AdjustUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
     @GetMapping("/user/duplicateNicname")

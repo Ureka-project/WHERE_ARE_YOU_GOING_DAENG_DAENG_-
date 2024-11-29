@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
+import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
 import io.jsonwebtoken.*;
 
 import io.jsonwebtoken.security.Keys;
@@ -35,19 +36,20 @@ public class JWTUtil {
         return email;
     }
 
-    public Boolean isExpired(String token) {
-
+    public Jwtexception isJwtValid(String token) {
         try {
-            return Jwts.parser()
+             Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()
-                    .getExpiration()
-                    .before(new Date());
+                    .getExpiration();
+             return Jwtexception.normal;
         } catch (ExpiredJwtException e) {
-            log.info("jwt - isExpired : " + e.getMessage());
-            return true;
+            return Jwtexception.expired;
+        }
+        catch (JwtException e) {
+            return  Jwtexception.mismatch;
         }
     }
 
@@ -81,20 +83,21 @@ public class JWTUtil {
     }
 
     public  Cookie deletAcessCookie(String key, String value, HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, null);
+        Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(0);
         cookie.setPath("/");
         cookie.setSecure(true);
-        response.addCookie(cookie);
+        cookie.setHttpOnly(true);
+        cookie.setDomain("daengdaeng-where.link");
         return cookie;
     }
     public Cookie deletRefreshCookie(String key, String value,HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, null);
+        Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(0);
         cookie.setPath("/");
         cookie.setSecure(true);
-        cookie.setDomain("localhost");
-        response.addCookie(cookie);
+        cookie.setHttpOnly(true);
+        cookie.setDomain("daengdaeng-where.link");
         return cookie;
     }
 
