@@ -82,7 +82,7 @@ public class OuathController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PostMapping("/user/adjust회")
+    @PostMapping("/user/adjust")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerOrUpdateUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(response));
