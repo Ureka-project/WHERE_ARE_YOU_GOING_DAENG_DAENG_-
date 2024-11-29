@@ -35,17 +35,17 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("doFilterInternal - JWTFilter : " + request.getRequestURI()+ " "+request.getMethod()+" cookies : "+request.getCookies());
-       if(request.getRequestURI().startsWith("/api/v1/")){
-           String email = "13wjdgkbbb@gmial.com";
-           UserOauthDto userDTO = new UserOauthDto();
-           User user= userService.findUserId(email);
+        if(request.getRequestURI().startsWith("/api/v1/")){
+            String email = "13wjdgkbbb@gmial.com";
+            UserOauthDto userDTO = new UserOauthDto();
+            User user= userService.findUserId(email);
 
-           userDTO.setUserid(user.getUserId());
-           userDTO.setEmail(user.getEmail());
-           CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
-           Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-           SecurityContextHolder.getContext().setAuthentication(authToken);
-       }
+            userDTO.setUserid(user.getUserId());
+            userDTO.setEmail(user.getEmail());
+            CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+            Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
 
         filterChain.doFilter(request, response);
     }

@@ -23,4 +23,10 @@ public class CommonCodeService {
                 .map(commonCode -> commonCode.getName())
                 .orElseThrow(CommonCodeNotFoundException::new);
     }
+
+    public void isCommonCode(String codeId) {
+        if (!commonCodeRepository.findByCodeId(codeId).isPresent()) {
+            throw new CommonCodeNotFoundException();
+        }
+    }
 }
