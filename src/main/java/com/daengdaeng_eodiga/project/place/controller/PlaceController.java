@@ -3,10 +3,7 @@ package com.daengdaeng_eodiga.project.place.controller;
 import com.daengdaeng_eodiga.project.Global.Geo.Service.GeoService;
 import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
-import com.daengdaeng_eodiga.project.place.dto.FilterRequest;
-import com.daengdaeng_eodiga.project.place.dto.NearestRequest;
-import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
-import com.daengdaeng_eodiga.project.place.dto.SearchRequest;
+import com.daengdaeng_eodiga.project.place.dto.*;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -81,12 +78,12 @@ public class PlaceController {
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
-    @GetMapping("/recommend")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> RecommendPlaces(@RequestBody NearestRequest request,
+    @PostMapping("/recommend")
+    public ResponseEntity<ApiResponse<List<PlaceWithScore>>> RecommendPlaces(@RequestBody NearestRequest request,
                                                                        @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
         Integer userId=customOAuth2User.getUserDTO().getUserid();
         String myplace=geoService.getRegionInfo(request.getLatitude(),request.getLongitude(),userId);
-        List<PlaceDto> places= placeService.RecommendPlaces(myplace,request.getLatitude(),request.getLongitude(),userId);
+        List<PlaceWithScore> places= placeService.RecommendPlaces(myplace,request.getLatitude(),request.getLongitude(),userId);
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 }
