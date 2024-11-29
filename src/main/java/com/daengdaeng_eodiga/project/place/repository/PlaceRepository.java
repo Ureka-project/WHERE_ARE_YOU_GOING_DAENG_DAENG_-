@@ -121,14 +121,14 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
     LEFT JOIN common_code c ON p.place_type = c.code_id
     WHERE (:city IS NULL OR p.city LIKE CONCAT('%', :city, '%'))
     AND (:cityDetail IS NULL OR p.city_detail LIKE CONCAT('%', :cityDetail, '%'))
-    AND (:placeType IS NULL OR :placeType = '' OR c.code_id = :placeType) -- 공통 코드 기반 필터링
+    AND (:placeType IS NULL OR :placeType = '' OR c.code_id = :placeType) 
     ORDER BY distance ASC
     LIMIT 30
     """, nativeQuery = true)
     List<Object[]> findByFiltersAndLocation(
             @Param("city") String city,
             @Param("cityDetail") String cityDetail,
-            @Param("placeType") String placeType,  // 공통 코드 값
+            @Param("placeType") String placeType,
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude
     );
