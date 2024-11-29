@@ -26,7 +26,8 @@ public enum ErrorCode {
 	NOTI_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림입니다."),
 	COOKIE_DELETION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "쿠키 삭제 실패"),
 	BANNER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 배너입니다."),
-	PUSH_TOKEN_IS_EXISTS(HttpStatus.CONFLICT, "이미 등록된 푸시 토큰입니다.");
+	PUSH_TOKEN_IS_EXISTS(HttpStatus.CONFLICT, "이미 등록된 푸시 토큰입니다."),
+	INVALID_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 타입입니다.");
 	private final HttpStatus errorCode;
 	private final String message;
 
