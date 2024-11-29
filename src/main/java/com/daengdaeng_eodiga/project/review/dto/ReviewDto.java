@@ -2,13 +2,11 @@ package com.daengdaeng_eodiga.project.review.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.daengdaeng_eodiga.project.Global.exception.InvalidTypeException;
+import com.daengdaeng_eodiga.project.Global.exception.InvalidRequestException;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,6 +55,6 @@ public class ReviewDto {
 		if (input instanceof List) {
 			return new HashSet<>((List<String>) input);
 		}
-		throw new InvalidTypeException("ReviewDto :"+ input.getClass().getName());
+		throw new InvalidRequestException("ReviewDto", input.getClass().getName());
 	}
 }
