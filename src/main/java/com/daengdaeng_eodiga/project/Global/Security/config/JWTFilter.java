@@ -59,8 +59,6 @@ public class JWTFilter extends OncePerRequestFilter {
             }
 
         }
-        //accessToken =request.getHeader("Authorization");
-        //refreshToken=request.getHeader("RefreshToken");
         log.info("accessToken : "+accessToken);
         log.info("refreshToken : "+refreshToken);
         if (accessToken == null) {
@@ -91,7 +89,6 @@ public class JWTFilter extends OncePerRequestFilter {
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
         Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
-
         filterChain.doFilter(request, response);
     }
 
