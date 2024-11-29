@@ -38,7 +38,7 @@ public class JWTFilter extends OncePerRequestFilter {
         if(request.getRequestURI().startsWith("/api/v1/")){
             String email = "13wjdgkbbb@gmial.com";
             UserOauthDto userDTO = new UserOauthDto();
-            User user= userService.findUserId(email);
+            User user= userService.findUserByemail(email);
 
             userDTO.setUserid(user.getUserId());
             userDTO.setEmail(user.getEmail());

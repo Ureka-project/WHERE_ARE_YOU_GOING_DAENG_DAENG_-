@@ -7,6 +7,7 @@ import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
+import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.notification.service.NotificationService;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
@@ -27,13 +28,16 @@ public class OauthUserService {
     private final JWTUtil jwtUtil;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
-
+    private final CommonCodeService commonCodeService;
     public void registerUser(SignUpForm userDTO) {
-        if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()) {
+        if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()||
+        userRepository.existsByNickname(userDTO.getNickname())) {
             throw new DuplicateUserException();
         }
         User user = new User();
         user.setNickname(userDTO.getNickname());
+        user.setEmail(userDTO.getEmail());
+        commonCodeService.isCommonCode(userDTO.getGender());
         user.setGender(userDTO.getGender());
         user.setCity(userDTO.getCity());
         user.setCityDetail(userDTO.getCityDetail());
@@ -47,12 +51,14 @@ public class OauthUserService {
             user = existingUserOpt.get();
             user.setNickname(userDTO.getNickname());
             user.setEmail(userDTO.getEmail());
+
+            commonCodeService.isCommonCode(userDTO.getGender());
             user.setGender(userDTO.getGender());
+
             user.setCity(userDTO.getCity());
             user.setCityDetail(userDTO.getCityDetail());
             user.setOauthProvider(userDTO.getOauthProvider());
             userRepository.save(user);
-
         }
         else
             throw new UserNotFoundException();
