@@ -3,6 +3,7 @@ package com.daengdaeng_eodiga.project.notification.controller;
 import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.notification.dto.NotiResponseDto;
+import com.daengdaeng_eodiga.project.notification.dto.PushTokenRequest;
 import com.daengdaeng_eodiga.project.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,5 +29,12 @@ public class NotificationController {
     public ResponseEntity<ApiResponse<String>> updateNotificationAsRead(@PathVariable int notificationId) {
         notificationService.updateNotificationAsRead(notificationId);
         return ResponseEntity.ok(ApiResponse.success("notification read successfully"));
+    }
+
+    @PostMapping("/pushToken")
+    public ResponseEntity<ApiResponse<?>> savePushToken(@RequestBody PushTokenRequest request, @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        int userId = customOAuth2User.getUserDTO().getUserid();
+        notificationService.savePushToken(userId, request.getToken(), request.getPushType());
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
