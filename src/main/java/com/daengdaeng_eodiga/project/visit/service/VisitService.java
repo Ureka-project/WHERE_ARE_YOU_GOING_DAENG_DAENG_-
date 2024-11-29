@@ -7,12 +7,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daengdaeng_eodiga.project.Global.exception.DuplicatePetException;
+import com.daengdaeng_eodiga.project.Global.exception.InvalidRequestException;
+import com.daengdaeng_eodiga.project.Global.exception.NotFoundException;
 import com.daengdaeng_eodiga.project.pet.dto.PetResponse;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.pet.service.PetService;
@@ -41,7 +44,7 @@ public class VisitService {
 	private final PetService petService;
 	private final VisitPetRepository visitPetRepository;
 
-	public void registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
+	public PetsAtVisitTime registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
 		Place place = placeService.findPlace(placeId);
 		User user = userService.findUser(userId);
 		findVisitPet(placeId, visitAt, petIds);
@@ -61,9 +64,28 @@ public class VisitService {
 							.build();
 				})
 				.toList();
-		visitRepository.save(visit);
-		visitPetRepository.saveAll(visitPets);
+		Visit savedVisit = visitRepository.save(visit);
+		List<VisitPet> savedVisitPet = visitPetRepository.saveAll(visitPets);
 
+		return new PetsAtVisitTime(savedVisit.getVisitAt(), savedVisitPet.stream()
+				.map(visitPet -> {
+					Pet pet = visitPet.getPet();
+					return new PetResponse(pet.getPetId(), pet.getName(), pet.getImage());
+				})
+				.toList(), placeId, visit.getId(),place.getName());
+
+	}
+
+	public void cancelVisit(int userId, int visitId) {
+		Optional<Visit> visit = visitRepository.findById(visitId);
+		if(visit.isEmpty()){
+			System.out.println("visitId : " + visitId);
+			throw new NotFoundException("Visit", String.format("VisitId %d", visitId));
+		}
+		if(visit.get().getUser().getUserId() != userId){
+			throw new InvalidRequestException("Visit", String.format("UserId %d", userId));
+		}
+		visitRepository.deleteById(visitId);
 	}
 
 	public List<VisitResponse> fetchVisitsByPlace(int placeId) {

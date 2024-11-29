@@ -3,6 +3,8 @@ package com.daengdaeng_eodiga.project.place.entity;
 import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
 import com.daengdaeng_eodiga.project.review.entity.Review;
+import com.daengdaeng_eodiga.project.visit.entity.Visit;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -65,7 +67,7 @@ public class Place extends BaseEntity {
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Visited> visitedPlaces = new ArrayList<>();
+    private List<Visit> visits = new ArrayList<>();
 
     @OneToOne(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private PlaceScore placeScores = new PlaceScore();
