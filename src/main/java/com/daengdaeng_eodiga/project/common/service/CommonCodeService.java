@@ -3,6 +3,8 @@ package com.daengdaeng_eodiga.project.common.service;
 import com.daengdaeng_eodiga.project.Global.exception.CommonCodeNotFoundException;
 import com.daengdaeng_eodiga.project.common.repository.CommonCodeRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +17,7 @@ public class CommonCodeService {
      * @param codeId
      * @return CommonName
      */
+    @Cacheable(cacheNames = "commonCode", cacheManager = "commonCodeCacheManager")
     public String getCommonCodeName(String codeId) {
         return commonCodeRepository.findByCodeId(codeId)
                 .map(commonCode -> commonCode.getName())
