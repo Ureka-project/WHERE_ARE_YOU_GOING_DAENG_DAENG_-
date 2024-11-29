@@ -76,6 +76,7 @@ public class OauthUserService {
         userDto.setCity(user.getCity());
         String genderCode = "GND_01".equals(user.getGender()) ? "남자" : "여자";
         userDto.setGender(genderCode);
+        userDto.setOauthProvider(user.getOauthProvider());
         userDto.setCityDetail(user.getCityDetail());
         userDto.setCreatedAt(user.getCreatedAt());
         userDto.setUserId(user.getUserId());
