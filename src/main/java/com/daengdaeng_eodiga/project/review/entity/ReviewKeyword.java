@@ -2,8 +2,9 @@ package com.daengdaeng_eodiga.project.review.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+@Getter
 @Entity
 @NoArgsConstructor
 @Table(name = "Review_Keyword")
