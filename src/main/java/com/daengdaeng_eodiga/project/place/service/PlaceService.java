@@ -16,6 +16,10 @@ import com.daengdaeng_eodiga.project.review.repository.ReviewRepository;
 import com.daengdaeng_eodiga.project.review.repository.ReviewSummaryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -30,6 +34,7 @@ import static java.lang.Math.min;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@EnableScheduling
 public class PlaceService {
 
     private final PlaceRepository placeRepository;
@@ -213,20 +218,37 @@ public class PlaceService {
     }
 
 
-    public void generateReviewSummary(int placeId) {
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void scheduledReviewSummaryUpdate() {
+        Logger logger = LoggerFactory.getLogger(PlaceService.class);
+        logger.info("Scheduled task started.");
 
+        LocalDateTime lastDay = LocalDateTime.now().minusDays(1);
+        List<Integer> placeIds = reviewRepository.findDistinctPlaceIdsByUpdatedAtAfter(lastDay);
+
+        for (int placeId : placeIds) {
+            logger.info("Updating review summary for placeId: {}", placeId);
+            generateReviewSummary(placeId);
+        }
+
+        logger.info("Scheduled task completed.");
+    }
+
+    public void generateReviewSummary(int placeId) {
+        Logger logger = LoggerFactory.getLogger(PlaceService.class);
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new PlaceNotFoundException("Place not found with id: " + placeId));
 
-
-        String reviewsContent = reviewRepository.findByPlace_PlaceId(placeId).stream()
+        List<String> reviewContents = reviewRepository.findByPlace_PlaceId(placeId).stream()
                 .map(Review::getContent)
-                .reduce("", (acc, content) -> acc + " " + content);
+                .collect(Collectors.toList());
 
-
-        String pros = openAiService.summarizePros(reviewsContent);
-        String cons = openAiService.summarizeCons(reviewsContent);
-
+        if (reviewContents.isEmpty()) {
+            logger.info("No reviews found for placeId: {}. Skipping summary generation.", placeId);
+            return;
+        }
+        String pros = summarizeInChunks(reviewContents, true);
+        String cons = summarizeInChunks(reviewContents, false);
 
         ReviewSummary existingSummary = reviewSummaryRepository.findById(placeId).orElse(null);
         if (existingSummary == null) {
@@ -241,6 +263,28 @@ public class PlaceService {
             existingSummary.setBadSummary(cons);
             existingSummary.setUpdateDate(LocalDateTime.now());
             reviewSummaryRepository.save(existingSummary);
+        }
+    }
+
+    private String summarizeInChunks(List<String> reviews, boolean isPros) {
+        int chunkSize = 10;
+        List<String> chunks = new ArrayList<>();
+        for (int i = 0; i < reviews.size(); i += chunkSize) {
+            List<String> chunk = reviews.subList(i, Math.min(i + chunkSize, reviews.size()));
+            String combinedReviews = String.join(" ", chunk);
+            if (isPros) {
+                chunks.add(openAiService.summarizePros(combinedReviews));
+            } else {
+                chunks.add(openAiService.summarizeCons(combinedReviews));
+            }
+        }
+
+
+        String finalSummary = String.join(" ", chunks);
+        if (isPros) {
+            return openAiService.summarizePros(finalSummary);
+        } else {
+            return openAiService.summarizeCons(finalSummary);
         }
     }
 

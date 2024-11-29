@@ -3,13 +3,13 @@ package com.daengdaeng_eodiga.project.place.controller;
 import com.daengdaeng_eodiga.project.Global.Geo.Service.GeoService;
 import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
-import com.daengdaeng_eodiga.project.place.dto.FilterRequest;
-import com.daengdaeng_eodiga.project.place.dto.NearestRequest;
-import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
-import com.daengdaeng_eodiga.project.place.dto.SearchRequest;
+import com.daengdaeng_eodiga.project.Global.exception.ReviewSummaryNotFoundException;
+import com.daengdaeng_eodiga.project.place.dto.*;
+import com.daengdaeng_eodiga.project.place.entity.ReviewSummary;
 import com.daengdaeng_eodiga.project.place.service.OpenAiService;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
 
+import com.daengdaeng_eodiga.project.review.repository.ReviewSummaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,6 +26,7 @@ public class PlaceController {
     private final PlaceService placeService;
     private final GeoService geoService;
     private final OpenAiService openAiService;
+    private final ReviewSummaryRepository reviewSummaryRepository;
 
     @PostMapping("/filter")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(@RequestBody FilterRequest request) {
@@ -92,5 +93,19 @@ public class PlaceController {
     public ResponseEntity<ApiResponse<String>> createReviewSummary(@PathVariable int placeId) {
         placeService.generateReviewSummary(placeId);
         return ResponseEntity.ok(ApiResponse.success("리뷰 요약이 성공적으로 생성되었습니다!"));
+    }
+
+    @GetMapping("/{placeId}/reviews/summary")
+    public ResponseEntity<ReviewSummaryDto> getReviewSummary(@PathVariable Integer placeId) {
+        ReviewSummary reviewSummary = reviewSummaryRepository.findById(placeId)
+                .orElseThrow(() -> new ReviewSummaryNotFoundException());
+
+        ReviewSummaryDto response = new ReviewSummaryDto(
+                reviewSummary.getPlaceId(),
+                reviewSummary.getGoodSummary(),
+                reviewSummary.getBadSummary(),
+                reviewSummary.getUpdateDate()
+        );
+        return ResponseEntity.ok(response);
     }
 }
