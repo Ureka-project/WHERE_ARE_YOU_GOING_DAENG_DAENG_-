@@ -29,14 +29,13 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/api/v1") // 경로를 명확히 지정
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class OuathController {
+    //TODO : Map 대신 ResponseDto로  타입 변경 변경
 
 
     private final OauthUserService oauthUserService;
-    private final JWTUtil jwtUtil;
-    private  final RedisTokenRepository  redisTokenRepository;
     private final TokenService tokenService;
 
     @GetMapping("/signup")
@@ -83,7 +82,7 @@ public class OuathController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @PostMapping("/user/adjust")
+    @PostMapping("/user/adjust회")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerOrUpdateUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(response));

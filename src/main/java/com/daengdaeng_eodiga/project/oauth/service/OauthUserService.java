@@ -47,29 +47,26 @@ public class OauthUserService {
 
     }
     public void deleteUserByName(String email) {
+        //TODO : orElseThrow로 변경해서 UserNotFoundException 발생시키기
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             User user1 = user.get();
             userRepository.deleteById(user1.getUserId());
         } else {
-            throw new UserFailedDeleteException();
+            throw new UserNotFoundException();
         }
     }
     public UserDto UserToDto(String email) {
 
-        Optional<User> user =userRepository.findByEmail(email);
+        User user =userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         UserDto userDto = new UserDto();
-        if (user.isPresent()) {
-            User user1 = user.get();
-            userRepository. deleteById(user1.getUserId());
-            userDto.setEmail(user1.getEmail());
-            userDto.setNickname(user1.getNickname());
-            userDto.setGender(user1.getGender());
-            userDto.setCity(user1.getCity());
-            userDto.setCityDetail(user1.getCityDetail());
-            userDto.setCreatedAt(LocalDateTime.now());
-            userDto.setUserId(user1.getUserId());
-        }
+        userDto.setEmail(user.getEmail());
+        userDto.setNickname(user.getNickname());
+        userDto.setGender(user.getGender());
+        userDto.setCity(user.getCity());
+        userDto.setCityDetail(user.getCityDetail());
+        userDto.setCreatedAt(user.getCreatedAt());
+        userDto.setUserId(user.getUserId());
         return userDto;
     }
 
