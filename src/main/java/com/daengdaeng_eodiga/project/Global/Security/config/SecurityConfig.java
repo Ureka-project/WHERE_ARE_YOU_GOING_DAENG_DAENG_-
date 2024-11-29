@@ -73,8 +73,7 @@ public class SecurityConfig {
             .authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/api/v1/**","/api/v1/loginSuccess","https://api.daengdaeng-where.link/login", "/static/**",
                     "/favicon.ico","/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
-                .anyRequest().authenticated())
-           .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
+                .anyRequest().authenticated()).addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .oauth2Login((oauth2) -> oauth2
