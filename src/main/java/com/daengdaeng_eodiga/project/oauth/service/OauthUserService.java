@@ -44,7 +44,7 @@ public class OauthUserService {
         Optional<User> existingUserOpt = userRepository.findByEmail(userDTO.getEmail());
         User user;
         if (existingUserOpt.isPresent()) {
-            user = new User();
+            user = existingUserOpt.get();
             user.setNickname(userDTO.getNickname());
             user.setEmail(userDTO.getEmail());
             user.setGender(userDTO.getGender());
