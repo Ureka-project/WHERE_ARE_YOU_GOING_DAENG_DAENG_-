@@ -88,7 +88,7 @@ public class PlaceService {
     public List<PlaceDto> RecommendPlaces(String MyPlace,double latitude, double longitude,Integer userId) {
         List<PlaceDto> RetPalceDto= new ArrayList<>();
         List<PlaceWithScore> placeArr = new ArrayList<>();
-        //List<UserRequsetPrefernceDto> UserPerferenceDto =preferenceRepository.findPreferenceTypesByUserEmail(userId);
+        List<UserRequsetPrefernceDto> UserPerferenceDto =preferenceRepository.findPreferenceTypesByUserId(userId);
         String region1 = getRegionValue(MyPlace, "region_1depth_name");
         String region2 = getRegionValue(MyPlace, "region_2depth_name");
         String region3 = getRegionValue(MyPlace, "region_3depth_name");

@@ -25,5 +25,6 @@ public class UserDto {
     private String city;
     private String cityDetail;
     private LocalDateTime createdAt;
+    private Boolean pushAgreement;
     private OauthProvider oauthProvider;
 }

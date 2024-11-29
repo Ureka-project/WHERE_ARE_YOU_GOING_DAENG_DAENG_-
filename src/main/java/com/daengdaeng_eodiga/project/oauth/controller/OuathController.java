@@ -31,20 +31,19 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/api/v1") // 경로를 명확히 지정
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class OuathController {
+    //TODO : Map 대신 ResponseDto로  타입 변경 변경
 
 
     private final OauthUserService oauthUserService;
-    private final JWTUtil jwtUtil;
-    private  final RedisTokenRepository  redisTokenRepository;
     private final TokenService tokenService;
 
     @GetMapping("/signup")
     public void showSignUpForm(@RequestParam String email,@RequestParam String provider, HttpServletResponse response) throws IOException {
         //TODO : 연동 끝난 후, 쿠키에 저장
-        //response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email+"&provider=" + provider);
+        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email+"&provider=" + provider);
     }
 
     @GetMapping("/loginSuccess")
@@ -56,21 +55,20 @@ public class OuathController {
         oauthUserService.registerUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response)));
     }
-
+    //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue("RefreshToken") String RefreshToken,
-                                         @AuthenticationPrincipal CustomOAuth2User principal,
+    public ResponseEntity<?> logout(@AuthenticationPrincipal CustomOAuth2User principal,
                                          HttpServletResponse response) {
         UserOauthDto userOauthDto = principal.getUserDTO();
-        return tokenService.deleteCookie(userOauthDto.getEmail(), RefreshToken, response);
+        return tokenService.deleteCookie(userOauthDto.getEmail(), null, response);
     }
+    //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
     @DeleteMapping("/user/delete")
-    public ResponseEntity<?> deleteUser(@CookieValue("RefreshToken") String RefreshToken,
-                                        @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+    public ResponseEntity<?> deleteUser(CustomOAuth2User customOAuth2User,
                                         HttpServletResponse response) {
         String userEmail = customOAuth2User != null ? customOAuth2User.getEmail() : null;
         oauthUserService.deleteUserByName(userEmail);
-        return tokenService.deleteCookie(userEmail, RefreshToken, response);
+        return tokenService.deleteCookie(userEmail, null, response);
     }
 
     @GetMapping("/user/adjust")
