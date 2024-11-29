@@ -83,9 +83,9 @@ public class OuathController {
     @PutMapping("/user/adjust")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.AdjustUser(signUpForm);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
-    @GetMapping("/user/duplicateNicname")
+    @GetMapping("/user/duplicateNickname")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate(@RequestParam String nickname) {
         boolean isDuplicate = oauthUserService.isNicknameDuplicate(nickname);
 
