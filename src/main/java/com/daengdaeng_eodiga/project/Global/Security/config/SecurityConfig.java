@@ -1,17 +1,15 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
-import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import com.daengdaeng_eodiga.project.user.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -47,33 +45,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-                .csrf((auth) -> auth.disable());
+        http.csrf((auth) -> auth.disable());
+        http.httpBasic((auth) -> auth.disable());
+        http.formLogin((form) -> form.disable());
 
-        http
-                .httpBasic((auth) -> auth.disable());
-
-        http
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                        CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOrigins(List.of(
-                                "https://api.daengdaeng-where.link",
-                                "https://localhost:5173"
-                        ));
-                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 정확한 메서드 명시
-                        config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
-                        config.setAllowCredentials(true); // 쿠키 허용
-                        config.setMaxAge(3600L); // 캐시 시간 (1시간)
-                        return config;
-                    }
-                }));
         http
             .authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/api/v1/**","/api/v1/loginSuccess","https://api.daengdaeng-where.link/login", "/static/**",
-                    "/favicon.ico","/css/**", "/js/**", "/images/**","signupPage.html").permitAll()
-                .anyRequest().authenticated()).addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
+                .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://api.daengdaeng-where.link/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
+                .anyRequest().authenticated())
+            .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
+
+
 
         http
                 .oauth2Login((oauth2) -> oauth2
@@ -85,10 +69,7 @@ public class SecurityConfig {
 
 
         http
-                .formLogin((formLogin) -> formLogin
-                        .loginPage("https://api.daengdaeng-where.link/login")
-                        .permitAll())
-                .exceptionHandling(exception -> exception
+            .exceptionHandling(exception -> exception
                                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
 
 
