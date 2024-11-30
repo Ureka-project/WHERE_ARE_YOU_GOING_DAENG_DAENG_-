@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
@@ -29,8 +30,7 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
-    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler
-    ) {
+    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
@@ -41,6 +41,17 @@ public class SecurityConfig {
         this.accessDeniedHandler = accessDeniedHandler;
 
     }
+    @Bean
+    public CorsConfiguration corsConfiguration() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://api.daengdaeng-where.link"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Set-Cookie","Access-Control-Allow-Origin"));
+        configuration.setExposedHeaders(List.of("Set-Cookie","Access-Control-Allow-Origin"));
+
+        return configuration;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -48,12 +59,14 @@ public class SecurityConfig {
         http.csrf((auth) -> auth.disable());
         http.httpBasic((auth) -> auth.disable());
         http.formLogin((form) -> form.disable());
+        http.cors(cors -> cors.configurationSource(request -> corsConfiguration()));
 
         http
             .authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://api.daengdaeng-where.link/login").permitAll()
+                .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://api.daengdaeng-where.link/login","/api/v1/places/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
 
