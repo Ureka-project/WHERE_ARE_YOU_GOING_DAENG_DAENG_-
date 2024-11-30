@@ -85,3 +85,6 @@ cloud:
     url: ${AWS_S3_URL}
   stack:
     auto: false
+
+frontend:
+  url: ${FRONTEND_URL}

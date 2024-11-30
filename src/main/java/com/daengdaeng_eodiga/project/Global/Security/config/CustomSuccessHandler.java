@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -21,6 +22,10 @@ import java.util.Optional;
         private final JWTUtil jwtUtil;
         private final UserRepository userRepository; // UserRepository 추가
         private final RedisTokenRepository redisTokenRepository;
+
+        @Value("${frontend.url}")
+        private String frontUrl;
+
         public CustomSuccessHandler(JWTUtil jwtUtil,UserRepository userRepository, RedisTokenRepository redisTokenRepository) {
             this.jwtUtil = jwtUtil;
             this.userRepository = userRepository;
@@ -59,7 +64,7 @@ import java.util.Optional;
                 .build();
             response.addHeader("Set-Cookie", accessTokenCookie.toString());
             redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
-            response.sendRedirect("https://api.daengdaeng-where.link/");
+            response.sendRedirect(frontUrl);
         }
 
 
