@@ -11,5 +11,5 @@ public class FilterRequest {
     private String placeType;
     private Double latitude;
     private Double longitude;
-    private int userId;
+
 }

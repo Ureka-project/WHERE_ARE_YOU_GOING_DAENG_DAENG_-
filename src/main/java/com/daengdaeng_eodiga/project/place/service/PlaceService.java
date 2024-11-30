@@ -6,15 +6,24 @@ import com.daengdaeng_eodiga.project.place.dto.PlaceDtoMapper;
 import com.daengdaeng_eodiga.project.place.dto.PlaceRcommendDto;
 import com.daengdaeng_eodiga.project.place.dto.PlaceWithScore;
 import com.daengdaeng_eodiga.project.place.entity.Place;
+import com.daengdaeng_eodiga.project.place.entity.ReviewSummary;
 import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceScoreRepository;
 import com.daengdaeng_eodiga.project.preference.dto.UserRequsetPrefernceDto;
 import com.daengdaeng_eodiga.project.preference.repository.PreferenceRepository;
+import com.daengdaeng_eodiga.project.review.entity.Review;
+import com.daengdaeng_eodiga.project.review.repository.ReviewRepository;
+import com.daengdaeng_eodiga.project.review.repository.ReviewSummaryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import java.util.List;
@@ -25,20 +34,26 @@ import static java.lang.Math.min;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@EnableScheduling
 public class PlaceService {
 
     private final PlaceRepository placeRepository;
     private final PlaceScoreRepository placeScoreRepository;
     private final PreferenceRepository preferenceRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewSummaryRepository reviewSummaryRepository;
+    private final OpenAiService openAiService;
 
-    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeType, Double latitude, Double longitude, int userId) {
-        List<Object[]> results = placeRepository.findByFiltersAndLocationWithFavorite(city, cityDetail, placeType, latitude, longitude, userId);
+    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude) {
+        List<Object[]> results = placeRepository.findByFiltersAndLocation(city, cityDetail, placeTypeCode, latitude, longitude);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
 
-    public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, int userId) {
-        List<Object[]> results = placeRepository.findByKeywordAndLocationWithFavorite(keyword, latitude, longitude, userId);
+
+
+    public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude) {
+        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, latitude, longitude);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
@@ -70,18 +85,12 @@ public class PlaceService {
 
     public List<PlaceDto> getTopScoredPlacesWithinRadius(Double latitude, Double longitude) {
         List<Object[]> results = placeRepository.findTopScoredPlacesWithinRadius(latitude, longitude);
-
-
-        return results.stream()
-                .map(PlaceDtoMapper::convertToPlaceDto)
-                .collect(Collectors.toList());
+        return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
-    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
-        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude, userId);
-        return results.stream()
-                .map(PlaceDtoMapper::convertToPlaceDto)
-                .collect(Collectors.toList());
+    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude) {
+        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude);
+        return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
 
@@ -205,6 +214,88 @@ public class PlaceService {
             }
         }
         return score;
+    }
+
+
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void scheduledReviewSummaryUpdate() {
+        Logger logger = LoggerFactory.getLogger(PlaceService.class);
+        logger.info("Scheduled task started.");
+
+        LocalDateTime lastDay = LocalDateTime.now().minusDays(1);
+        List<Integer> placeIds = reviewRepository.findDistinctPlaceIdsByUpdatedAtAfter(lastDay);
+
+        for (int placeId : placeIds) {
+            logger.info("Updating review summary for placeId: {}", placeId);
+            generateReviewSummary(placeId);
+        }
+
+        logger.info("Scheduled task completed.");
+    }
+
+    public void generateReviewSummary(int placeId) {
+        Logger logger = LoggerFactory.getLogger(PlaceService.class);
+
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new PlaceNotFoundException("Place not found with id: " + placeId));
+
+        ReviewSummary existingSummary = reviewSummaryRepository.findById(placeId).orElse(null);
+
+        String existingGoodSummary = existingSummary != null ? existingSummary.getGoodSummary() : "";
+        String existingBadSummary = existingSummary != null ? existingSummary.getBadSummary() : "";
+
+        List<String> recentReviewContents = reviewRepository.findByPlace_PlaceId(placeId).stream()
+                .map(Review::getContent)
+                .collect(Collectors.toList());
+
+        if (recentReviewContents.isEmpty() && existingSummary == null) {
+            logger.info("No reviews or existing summary found for placeId: {}. Skipping update.", placeId);
+            return;
+        }
+
+        String combinedGoodContent = existingGoodSummary + " " + String.join(" ", recentReviewContents);
+        String combinedBadContent = existingBadSummary + " " + String.join(" ", recentReviewContents);
+
+        String pros = openAiService.summarizePros(combinedGoodContent);
+        String cons = openAiService.summarizeCons(combinedBadContent);
+
+        if (existingSummary == null) {
+            ReviewSummary newSummary = new ReviewSummary();
+            newSummary.setPlace(place);
+            newSummary.setGoodSummary(pros);
+            newSummary.setBadSummary(cons);
+            newSummary.setUpdateDate(LocalDateTime.now());
+            reviewSummaryRepository.save(newSummary);
+            logger.info("New review summary created for placeId: {}", placeId);
+        } else {
+            existingSummary.setGoodSummary(pros);
+            existingSummary.setBadSummary(cons);
+            existingSummary.setUpdateDate(LocalDateTime.now());
+            reviewSummaryRepository.save(existingSummary);
+            logger.info("Review summary updated for placeId: {}", placeId);
+        }
+    }
+
+    private String summarizeInChunks(List<String> reviews, boolean isPros) {
+        int chunkSize = 10;
+        List<String> chunks = new ArrayList<>();
+        for (int i = 0; i < reviews.size(); i += chunkSize) {
+            List<String> chunk = reviews.subList(i, Math.min(i + chunkSize, reviews.size()));
+            String combinedReviews = String.join(" ", chunk);
+            if (isPros) {
+                chunks.add(openAiService.summarizePros(combinedReviews));
+            } else {
+                chunks.add(openAiService.summarizeCons(combinedReviews));
+            }
+        }
+
+
+        String finalSummary = String.join(" ", chunks);
+        if (isPros) {
+            return openAiService.summarizePros(finalSummary);
+        } else {
+            return openAiService.summarizeCons(finalSummary);
+        }
     }
 
 }

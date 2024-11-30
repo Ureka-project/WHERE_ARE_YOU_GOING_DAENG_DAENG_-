@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class NearestRequest {
     private Double latitude;
     private Double longitude;
-    private Integer userId;
 }
