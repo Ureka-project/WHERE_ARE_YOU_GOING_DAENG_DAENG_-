@@ -19,6 +19,8 @@ import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +45,9 @@ public class OuathController {
     private final JWTUtil jwtUtil;
     private final RedisTokenRepository redisTokenRepository;
 
+    @Value("${frontend.url}")
+    private String frontUrl;
+
     @GetMapping("/signup")
     public void showSignUpForm(@RequestParam String email,@RequestParam String provider, HttpServletResponse response) throws IOException {
 
@@ -65,7 +70,7 @@ public class OuathController {
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", provideCookie.toString());
-        response.sendRedirect("https://localhost:5173/user-register?email="+email+"&provider=" + provider);
+        response.sendRedirect(frontUrl+"/user-register?email="+email+"&provider=" + provider);
     }
 
     @GetMapping("/loginSuccess")
