@@ -111,46 +111,59 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
     """, nativeQuery = true)
     List<Object[]> findNearestPlaces(@Param("latitude") Double latitude, @Param("longitude") Double longitude);
 
-
     @Query(value = """
-    SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
-           p.street_addresses, p.tel_number, p.url, c.name AS place_type, p.description,
-           p.parking, p.indoor, p.outdoor,
-           (6371 * acos(cos(radians(:latitude)) * cos(radians(p.latitude)) *
-           cos(radians(p.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(p.latitude)))) AS distance
-    FROM place p
-    LEFT JOIN common_code c ON p.place_type = c.code_id
-    WHERE (:city IS NULL OR p.city LIKE CONCAT('%', :city, '%'))
-    AND (:cityDetail IS NULL OR p.city_detail LIKE CONCAT('%', :cityDetail, '%'))
-    AND (:placeType IS NULL OR :placeType = '' OR c.code_id = :placeType) 
-    ORDER BY distance ASC
-    LIMIT 30
-    """, nativeQuery = true)
+SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
+       p.street_addresses, p.tel_number, p.url, c.name AS place_type, p.description,
+       p.parking, p.indoor, p.outdoor,
+       (6371 * acos(cos(radians(:latitude)) * cos(radians(p.latitude)) *
+       cos(radians(p.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(p.latitude)))) AS distance,
+       CASE WHEN :userId = -1 THEN 0
+            WHEN f.favorite_id IS NOT NULL THEN 1
+            ELSE 0
+       END AS is_favorite
+FROM place p
+LEFT JOIN common_code c ON p.place_type = c.code_id
+LEFT JOIN favorite f ON p.place_id = f.place_id AND f.user_id = :userId
+WHERE (:city IS NULL OR p.city LIKE CONCAT('%', :city, '%'))
+AND (:cityDetail IS NULL OR p.city_detail LIKE CONCAT('%', :cityDetail, '%'))
+AND (:placeType IS NULL OR :placeType = '' OR c.code_id = :placeType)
+ORDER BY distance ASC
+LIMIT 30
+""", nativeQuery = true)
     List<Object[]> findByFiltersAndLocation(
             @Param("city") String city,
             @Param("cityDetail") String cityDetail,
             @Param("placeType") String placeType,
             @Param("latitude") Double latitude,
-            @Param("longitude") Double longitude
+            @Param("longitude") Double longitude,
+            @Param("userId") Integer userId
     );
 
 
-
-
-    @Query(value = "SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude, " +
-            "p.street_addresses, p.tel_number, p.url, c.name AS place_type, p.description, " +
-            "p.parking, p.indoor, p.outdoor, " +
-            "(6371 * acos(cos(radians(:latitude)) * cos(radians(p.latitude)) * " +
-            "cos(radians(p.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(p.latitude)))) AS distance " +
-            "FROM place p " +
-            "LEFT JOIN common_code c ON p.place_type = c.code_id " +
-            "WHERE (:keyword IS NULL OR p.name LIKE CONCAT('%', :keyword, '%')) " +
-            "ORDER BY distance ASC " +
-            "LIMIT 30", nativeQuery = true)
+    @Query(value = """
+SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
+       p.street_addresses, p.tel_number, p.url, c.name AS place_type, p.description,
+       p.parking, p.indoor, p.outdoor,
+       (6371 * acos(cos(radians(:latitude)) * cos(radians(p.latitude)) *
+       cos(radians(p.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(p.latitude)))) AS distance,
+       CASE WHEN :userId = -1 THEN 0
+            WHEN f.favorite_id IS NOT NULL THEN 1
+            ELSE 0
+       END AS is_favorite
+FROM place p
+LEFT JOIN common_code c ON p.place_type = c.code_id
+LEFT JOIN favorite f ON p.place_id = f.place_id AND f.user_id = :userId
+WHERE (:keyword IS NULL OR p.name LIKE CONCAT('%', :keyword, '%'))
+ORDER BY distance ASC
+LIMIT 30
+""", nativeQuery = true)
     List<Object[]> findByKeywordAndLocation(
             @Param("keyword") String keyword,
             @Param("latitude") Double latitude,
-            @Param("longitude") Double longitude);
+            @Param("longitude") Double longitude,
+            @Param("userId") Integer userId
+    );
+
 
     Optional<Place> findByPlaceId(Integer placeId);
 }
