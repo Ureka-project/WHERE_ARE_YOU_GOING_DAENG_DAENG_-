@@ -59,7 +59,7 @@ import java.util.Optional;
                 .build();
             response.addHeader("Set-Cookie", accessTokenCookie.toString());
             redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
-            response.sendRedirect("https://api.daengdaeng-where.link/");
+            response.sendRedirect("https://localhost:5173/");
         }
 
 

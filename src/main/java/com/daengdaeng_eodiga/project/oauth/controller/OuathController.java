@@ -65,7 +65,7 @@ public class OuathController {
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", provideCookie.toString());
-        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email="+email+"&provider=" + provider);
+        response.sendRedirect("https://localhost:5173/user-register?email="+email+"&provider=" + provider);
     }
 
     @GetMapping("/loginSuccess")
