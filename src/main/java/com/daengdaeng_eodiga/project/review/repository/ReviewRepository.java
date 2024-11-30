@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.daengdaeng_eodiga.project.review.entity.Review;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -91,4 +93,9 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
 	@Query("SELECT rk.id.keyword FROM ReviewKeyword rk WHERE rk.review.reviewId = :reviewId")
 	List<String> findKeywordsByReviewId(int reviewId);
+
+	List<Review> findByPlace_PlaceId(int placeId);
+
+	@Query("SELECT DISTINCT r.place.placeId FROM Review r WHERE r.updatedAt > :lastDay")
+	List<Integer> findDistinctPlaceIdsByUpdatedAtAfter(@Param("lastDay") LocalDateTime lastDay);
 }

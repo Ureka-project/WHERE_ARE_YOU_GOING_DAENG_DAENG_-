@@ -1,5 +1,7 @@
 package com.daengdaeng_eodiga.project.place.dto;
 
+import java.util.Arrays;
+
 public class PlaceDtoMapper {
 
     private PlaceDtoMapper() {}
@@ -22,14 +24,16 @@ public class PlaceDtoMapper {
             dto.setParking(result[12] != null && parseBoolean(result[12]));
             dto.setIndoor(result[13] != null && parseBoolean(result[13]));
             dto.setOutdoor(result[14] != null && parseBoolean(result[14]));
-            dto.setDistance(result[15] != null ? ((Number) result[15]).doubleValue() : null);
-            dto.setIsFavorite(result[16] != null && parseIntegerToBoolean(result[16]));
-            dto.setStartTime(result[17] != null ? result[17].toString() : null);
-            dto.setEndTime(result[18] != null ? result[18].toString() : null);
+            dto.setDistance(result.length > 15 && result[15] != null ? ((Number) result[15]).doubleValue() : null);
+            dto.setIsFavorite(result.length > 16 && result[16] != null && parseIntegerToBoolean(result[16]));
+            dto.setStartTime(result.length > 17 && result[17] != null ? result[17].toString() : null);
+            dto.setEndTime(result.length > 18 && result[18] != null ? result[18].toString() : null);
             dto.setFavoriteCount(result.length > 19 && result[19] != null ? ((Number) result[19]).intValue() : 0);
             dto.setPlaceScore(result.length > 20 && result[20] != null ? ((Number) result[20]).doubleValue() : null);
+            System.out.println("Result array: " + Arrays.toString(result));
+
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to map result to PlaceDto. Ensure data types are correct.", e);
+            throw new IllegalArgumentException("Failed to map result to PlaceDto. Ensure data types and query structure are correct.", e);
         }
         return dto;
     }
@@ -39,6 +43,10 @@ public class PlaceDtoMapper {
     }
 
     private static boolean parseIntegerToBoolean(Object value) {
-        return Integer.parseInt(value.toString()) == 1;
+        try {
+            return Integer.parseInt(value.toString()) == 1;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

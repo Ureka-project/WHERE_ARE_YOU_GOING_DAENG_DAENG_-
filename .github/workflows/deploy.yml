@@ -118,6 +118,7 @@ jobs:
             -e AWS_SECRET_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} \
             -e AWS_S3_BUCKET=${{secrets.AWS_S3_BUCKET}} \
             -e AWS_S3_URL=${{secrets.AWS_S3_URL}} \
+            -e OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
             975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest
 
       - name: Remove GitHub Actions IP

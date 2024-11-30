@@ -63,6 +63,10 @@ spring:
       url: "https://dapi.kakao.com/v2/${DOMAIN}/geo/coord2address.json"
       key: ${KAKAO_REST_API_KEY}
 
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+
 logging:
   level:
     org:
