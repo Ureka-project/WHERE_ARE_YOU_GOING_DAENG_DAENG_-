@@ -32,8 +32,8 @@ public class PreferenceService {
     private final GroupCodeRepository groupCodeRepository;
     private final UserRepository userRepository;
 
-    public PreferenceResponseDto registerPreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
-        User user = findUser( hardcodedUserId);
+    public PreferenceResponseDto registerPreference(int userId, PreferenceRequestDto preferenceRequestDto) {
+        User user = findUser( userId);
 
         List<CommonCode> commonCodes = findCommonCode(
                 preferenceRequestDto.getPreferenceInfo(),
@@ -42,13 +42,13 @@ public class PreferenceService {
         if (commonCodes.isEmpty()) {
             throw new CommonCodeNotFoundException();
         }
-        Set<Preference> preferences = createPreferences(commonCodes, hardcodedUserId, user);
+        Set<Preference> preferences = createPreferences(commonCodes, userId, user);
         preferenceRepository.saveAll(preferences);
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }
 
-    public PreferenceResponseDto updatePreference(int hardcodedUserId, PreferenceRequestDto preferenceRequestDto) {
-        User user = findUser(hardcodedUserId);
+    public PreferenceResponseDto updatePreference(int userId, PreferenceRequestDto preferenceRequestDto) {
+        User user = findUser(userId);
 
         preferenceRepository.deleteByUserAndPreferenceType(user, preferenceRequestDto.getPreferenceInfo());
         List<CommonCode> commonCodes = findCommonCode(
@@ -58,7 +58,7 @@ public class PreferenceService {
         if (commonCodes.isEmpty()) {
             throw new CommonCodeNotFoundException();
         }
-        Set<Preference> preferences = createPreferences(commonCodes, (int) hardcodedUserId, user);
+        Set<Preference> preferences = createPreferences(commonCodes, (int) userId, user);
         preferenceRepository.saveAll(preferences);
         return mapToDto(preferenceRequestDto.getPreferenceInfo(), preferences);
     }

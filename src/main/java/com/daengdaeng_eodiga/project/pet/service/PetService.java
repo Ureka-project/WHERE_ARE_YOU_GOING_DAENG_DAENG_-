@@ -62,7 +62,7 @@ public class PetService {
 	public void registerPet(int userId, PetRegisterDto requestDto) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(UserNotFoundException::new);
-
+		commonCodeService.isCommonCode(requestDto.getSpecies());
 		Pet pet = Pet.builder()
 				.name(requestDto.getName())
 				.image(requestDto.getImage())
