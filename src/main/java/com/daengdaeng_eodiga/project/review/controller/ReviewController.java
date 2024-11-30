@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.Global.enums.OrderType;
+import com.daengdaeng_eodiga.project.review.dto.ReviewDto;
 import com.daengdaeng_eodiga.project.review.dto.ReviewRegisterRequest;
 import com.daengdaeng_eodiga.project.review.dto.ReviewsResponse;
 import com.daengdaeng_eodiga.project.review.service.ReviewService;
@@ -28,10 +29,10 @@ public class ReviewController {
 	private final ReviewService reviewService;
 
 	@PostMapping("/review")
-	public ResponseEntity<ApiResponse<?>> registerReview(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody ReviewRegisterRequest request) {
+	public ResponseEntity<ApiResponse<ReviewDto>> registerReview(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody ReviewRegisterRequest request) {
 		int userId = customOAuth2User.getUserDTO().getUserid();
-		reviewService.registerReview(request, userId);
-		return ResponseEntity.ok(ApiResponse.success(null));
+		ReviewDto response = reviewService.registerReview(request, userId);
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@DeleteMapping("/review/{reviewId}")

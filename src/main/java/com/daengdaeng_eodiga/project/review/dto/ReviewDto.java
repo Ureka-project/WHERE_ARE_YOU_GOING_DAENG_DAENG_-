@@ -2,9 +2,11 @@ package com.daengdaeng_eodiga.project.review.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import com.daengdaeng_eodiga.project.Global.exception.InvalidRequestException;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,20 +28,33 @@ public class ReviewDto {
 	private LocalDate visitedAt;
 	private LocalDateTime createdAt;
 
-	public ReviewDto(Integer userId, Integer placeId, String nickname, String petImg, Integer reviewId, String pets,
-			String content, Integer score, String media, String keywords, LocalDate visitedAt,
+	public ReviewDto(Integer userId, Integer placeId, String nickname, String petImg, Integer reviewId, Object pets,
+			String content, Integer score, Object media, Object keywords, LocalDate visitedAt,
 			LocalDateTime createdAt) {
 		this.userId = userId;
 		this.placeId = placeId;
 		this.nickname = nickname;
 		this.petImg = petImg;
 		this.reviewId = reviewId;
-		this.pets =  pets!=null?Arrays.stream(pets.split(",")).collect(Collectors.toSet()):null;
+		this.pets = convertToSet(pets);
 		this.content = content;
 		this.score = score;
-		this.media = media!=null?Arrays.stream(media.split(",")).collect(Collectors.toSet()):null;
-		this.keywords = keywords!=null?Arrays.stream(keywords.split(",")).collect(Collectors.toSet()):null;
+		this.media = convertToSet(media);
+		this.keywords = convertToSet(keywords);
 		this.visitedAt = visitedAt;
 		this.createdAt = createdAt;
+	}
+
+	private Set<String> convertToSet(Object input) {
+		if (input == null) {
+			return new HashSet<>();
+		}
+		if (input instanceof Set) {
+			return (Set<String>)input;
+		}
+		if (input instanceof List) {
+			return new HashSet<>((List<String>) input);
+		}
+		throw new InvalidRequestException("ReviewDto", input.getClass().getName());
 	}
 }

@@ -19,6 +19,6 @@ public interface PreferenceRepository extends JpaRepository<Preference, Preferen
     @Query("SELECT new com.daengdaeng_eodiga.project.preference.dto.UserRequsetPrefernceDto(p.preferenceType) " +
             "FROM Preference p " +
             "JOIN p.user u " +
-            "WHERE u.email = :email")
-    List<UserRequsetPrefernceDto> findPreferenceTypesByUserEmail(@Param("email") String email);
+            "WHERE u.userId = :userId")
+    List<UserRequsetPrefernceDto> findPreferenceTypesByUserId(@Param("userId") Integer userId);
 }

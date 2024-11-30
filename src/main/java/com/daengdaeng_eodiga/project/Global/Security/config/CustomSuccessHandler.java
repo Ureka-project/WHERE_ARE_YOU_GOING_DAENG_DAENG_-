@@ -39,10 +39,10 @@ import java.util.Optional;
             String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L);
             String newRefreshToken = jwtUtil.createRefreshToken(email,24 * 60 * 60 * 1000L);
 
-                response.addCookie(jwtUtil.createCookie("RefreshToken", newRefreshToken,60 * 60 * 60));
-                response.addCookie(jwtUtil.createCookie("Authorization", accessToken,24 * 60 * 60 * 1000));
-                redisTokenRepository.saveToken(newRefreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
-                response.sendRedirect("/api/v1/loginSuccess");
+            response.addCookie(jwtUtil.createCookie("RefreshToken", newRefreshToken,60 * 60 * 60,response));
+            response.addCookie(jwtUtil.createCookie("Authorization", accessToken,24 * 60 * 60 ,response));
+            redisTokenRepository.saveToken(newRefreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
+            response.sendRedirect("/api/v1/loginSuccess");
         }
 
 

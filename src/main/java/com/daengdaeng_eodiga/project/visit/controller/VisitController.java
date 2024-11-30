@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,9 +29,17 @@ public class VisitController {
 	private final VisitService visitService;
 
 	@PostMapping("")
-	public ResponseEntity<ApiResponse<?>> registerVisits(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,@RequestBody VisitRequest request) {
+	public ResponseEntity<ApiResponse<PetsAtVisitTime>> registerVisits(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,@RequestBody VisitRequest request) {
 		int userId = customOAuth2User.getUserDTO().getUserid();
-		visitService.registerVisit(userId, request.placeId(), request.petIds(), request.visitAt());
+		PetsAtVisitTime response = visitService.registerVisit(userId, request.placeId(), request.petIds(), request.visitAt());
+		return ResponseEntity.ok(ApiResponse.success(response));
+
+	}
+
+	@DeleteMapping("/{visitId}")
+	public ResponseEntity<ApiResponse<?>> deleteVisits(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,@PathVariable int visitId) {
+		int userId = customOAuth2User.getUserDTO().getUserid();
+		visitService.cancelVisit(userId, visitId);
 		return ResponseEntity.ok(ApiResponse.success(null));
 
 	}

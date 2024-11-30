@@ -1,9 +1,11 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
+import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
 import io.jsonwebtoken.*;
 
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -34,19 +36,20 @@ public class JWTUtil {
         return email;
     }
 
-    public Boolean isExpired(String token) {
-
+    public Jwtexception isJwtValid(String token) {
         try {
-            return Jwts.parser()
+             Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()
-                    .getExpiration()
-                    .before(new Date());
+                    .getExpiration();
+             return Jwtexception.normal;
         } catch (ExpiredJwtException e) {
-            log.info("jwt - isExpired : " + e.getMessage());
-            return true;
+            return Jwtexception.expired;
+        }
+        catch (JwtException e) {
+            return  Jwtexception.mismatch;
         }
     }
 
@@ -68,32 +71,35 @@ public class JWTUtil {
                 .compact();
     }
 
-    public  Cookie createCookie(String key, String value,int expiredMs) {
+    public Cookie createCookie(String key, String value, int expiredMs, HttpServletResponse response) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(expiredMs);
         cookie.setPath("/");
-        //TODO :  서버 테스트 동안만 주석
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setDomain("daengdaeng-where.link");
 
-        // cookie.setSecure(true);
-        // cookie.setHttpOnly(true);
         return cookie;
     }
-    public  Cookie deletAcessCookie(String key, String value) {
-        Cookie accessTokenCookie = new Cookie("Authorization", null);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(0);
-        return accessTokenCookie;
-    }
-    public Cookie deletRefreshCookie(String key, String value) {
-        Cookie refreshTokenCookie = new Cookie("RefreshToken", null);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge(0);
-        return refreshTokenCookie;
-    }
 
-
+    public  Cookie deletAcessCookie(String key, String value, HttpServletResponse response) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setDomain("daengdaeng-where.link");
+        return cookie;
+    }
+    public Cookie deletRefreshCookie(String key, String value,HttpServletResponse response) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        cookie.setDomain("daengdaeng-where.link");
+        return cookie;
+    }
 
     public long getExpiration(String token) {
         try {

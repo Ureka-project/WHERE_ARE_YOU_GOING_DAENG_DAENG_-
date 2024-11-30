@@ -4,7 +4,11 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daengdaeng_eodiga.project.Global.enums.OrderType;
+import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.pet.service.PetService;
 import com.daengdaeng_eodiga.project.place.entity.Place;
@@ -20,6 +25,10 @@ import com.daengdaeng_eodiga.project.place.service.PlaceService;
 
 import com.daengdaeng_eodiga.project.review.dto.ReviewDto;
 import com.daengdaeng_eodiga.project.review.dto.ReviewsResponse;
+import com.daengdaeng_eodiga.project.review.entity.ReviewKeyword;
+import com.daengdaeng_eodiga.project.review.entity.ReviewMedia;
+import com.daengdaeng_eodiga.project.review.entity.ReviewPet;
+import com.daengdaeng_eodiga.project.review.repository.ReviewMediaRepository;
 import com.daengdaeng_eodiga.project.review.repository.ReviewRepository;
 import com.daengdaeng_eodiga.project.review.dto.ReviewRegisterRequest;
 import com.daengdaeng_eodiga.project.review.entity.Review;
@@ -39,24 +48,73 @@ public class ReviewService {
 	private final ReviewKeywordsService reviewKeywordsService;
 	private final PetService petService;
 	private final ReviewPetService reviewPetService;
+	private final ReviewMediaRepository reviewMediaRepository;
+	private final CommonCodeService commonCodeService;
 
+	public ReviewDto registerReview(ReviewRegisterRequest request, int userId) {
 
-
-	public void registerReview(ReviewRegisterRequest request, int userId) {
 		User user = userService.findUser(userId);
 		Place place = placeService.findPlace(request.placeId());
 		List<Pet> pets = petService.confirmUserPet(user, request.pets());
 
+		Review review = createAndSaveReview(request, user, place);
+
+		List<ReviewPet> savedReviewPets = saveReviewPetsIfPresent(review, pets);
+		List<ReviewKeyword> savedReviewKeywords = saveReviewKeywordsIfPresent(review, request.keywords().stream().toList());
+		List<ReviewMedia> savedReviewMedia = saveReviewMediaIfPresent(review, request.media());
+
+		return createReviewDto(review, savedReviewPets, savedReviewKeywords, savedReviewMedia);
+	}
+
+	private Review createAndSaveReview(ReviewRegisterRequest request, User user, Place place) {
 		Review review = Review.builder()
 			.score(request.score())
 			.content(request.content())
 			.user(user)
 			.place(place)
-			.visitedAt(request.visitedAt()).build();
-		reviewRepository.save(review);
-		reviewKeywordsService.saveReviewKeywords(review, request.keywords());
-		reviewPetService.saveReviewPet(review, pets);
+			.visitedAt(request.visitedAt())
+			.build();
+		return reviewRepository.save(review);
 	}
+
+	private List<ReviewPet> saveReviewPetsIfPresent(Review review, List<Pet> pets) {
+		return pets == null || pets.isEmpty() ? List.of() : reviewPetService.saveReviewPet(review, pets);
+	}
+
+	private List<ReviewKeyword> saveReviewKeywordsIfPresent(Review review, List<String> keywords) {
+		return keywords == null || keywords.isEmpty()? List.of() : reviewKeywordsService.saveReviewKeywords(review, keywords);
+	}
+
+	private List<ReviewMedia> saveReviewMediaIfPresent(Review review, List<String> mediaPaths) {
+		if (mediaPaths==null || mediaPaths.isEmpty()) {
+			return List.of();
+		}
+		List<ReviewMedia> reviewMedia = mediaPaths.stream()
+			.map(path -> ReviewMedia.builder().review(review).path(path).build())
+			.toList();
+		return reviewMediaRepository.saveAll(reviewMedia);
+	}
+
+	private ReviewDto createReviewDto(Review review, List<ReviewPet> savedReviewPets,
+		List<ReviewKeyword> savedReviewKeywords, List<ReviewMedia> savedReviewMedia) {
+		return new ReviewDto(
+			review.getUser().getUserId(),
+			review.getPlace().getPlaceId(),
+			review.getUser().getNickname(),
+			savedReviewPets.isEmpty() ? null : savedReviewPets.get(0).getPet().getImage(),
+			review.getReviewId(),
+			savedReviewPets.stream().map(rp -> rp.getPet().getName()).toList(),
+			review.getContent(),
+			review.getScore(),
+			savedReviewMedia.stream().map(ReviewMedia::getPath).toList(),
+			savedReviewKeywords.stream().map(keyword ->
+				commonCodeService.getCommonCodeName(keyword.getId().getKeyword())
+			).toList(),
+			review.getVisitedAt(),
+			review.getCreatedAt()
+		);
+	}
+
 
 	public void deleteReview(int reviewId) {
 		reviewRepository.deleteById(reviewId);
@@ -80,7 +138,7 @@ public class ReviewService {
 		}
 		List<ReviewDto> reviews = getReviewDto(reviewsPage);
 		List<String> keywords = reviewKeywordsService.fetchBestReviewKeywordsTop3(placeId);
-		ReviewsResponse response = new ReviewsResponse(reviews,reviewsPage.getTotalElements(),reviewsPage.getNumber(),reviewsPage.getSize(),reviewsPage.isFirst(),reviewsPage.isLast(),orderType,score,keywords);
+		ReviewsResponse response = new ReviewsResponse(reviews,reviewsPage.getTotalElements(),reviewsPage.getNumber(),reviewsPage.getSize(),reviewsPage.isFirst(),reviewsPage.isLast(),orderType,score,keywords.stream().map(keyword -> commonCodeService.getCommonCodeName(keyword)).collect(Collectors.toList()));
 
 		return response;
 	}
@@ -94,7 +152,7 @@ public class ReviewService {
 		return response;
 	}
 
-	private static List<ReviewDto> getReviewDto(Page<Object[]> reviewsPage) {
+	private List<ReviewDto> getReviewDto(Page<Object[]> reviewsPage) {
 		List<ReviewDto> reviews = new ArrayList<>();
 		for (Object[] result : reviewsPage.getContent()) {
 
@@ -104,17 +162,21 @@ public class ReviewService {
 			java.sql.Timestamp timestamp = (java.sql.Timestamp) result[11];
 			LocalDateTime createdAt = timestamp != null ? timestamp.toLocalDateTime() : null;
 
+			List<String> pets = getStrings((String)result[5]);
+			List<String> media = getStrings((String)result[8]);
+			List<String> keywords = getStrings((String)result[9]).stream().map(keyword -> commonCodeService.getCommonCodeName(keyword) ).collect(Collectors.toList());
+
 			ReviewDto reviewDto = new ReviewDto(
 				(Integer) result[0],
 				(Integer) result[1],
 				(String) result[2],
 				(String) result[3],
 				(Integer) result[4],
-				(String) result[5],
+				pets,
 				(String) result[6],
 				(Integer) result[7],
-				(String) result[8],
-				(String) result[9],
+				media,
+				keywords,
 				visitedAt,
 				createdAt
 			);
@@ -123,6 +185,15 @@ public class ReviewService {
 		return reviews;
 	}
 
-
+	private static List<String> getStrings(String str) {
+		List<String> pets;
+		if(str != null){
+			pets = Arrays.stream((str).split(","))
+				.collect(Collectors.toList());
+		}else {
+			pets = Collections.emptyList();
+		}
+		return pets;
+	}
 
 }

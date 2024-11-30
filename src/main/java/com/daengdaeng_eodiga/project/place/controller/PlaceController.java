@@ -81,12 +81,13 @@ public class PlaceController {
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
-    @GetMapping("/recommend")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> RecommendPlaces(double latitude, double longitude,
+    @PostMapping("/recommend")
+    public ResponseEntity<ApiResponse<List<PlaceWithScore>>> RecommendPlaces(@RequestBody NearestRequest request,
                                                                        @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
-        return ResponseEntity.ok(ApiResponse.success(placeService.
-                RecommendPlaces(geoService.getRegionInfo(latitude, longitude), latitude, longitude, customOAuth2User.getUserDTO().getEmail()
-                )));
+        Integer userId=customOAuth2User.getUserDTO().getUserid();
+        String myplace=geoService.getRegionInfo(request.getLatitude(),request.getLongitude(),userId);
+        List<PlaceWithScore> places= placeService.RecommendPlaces(myplace,request.getLatitude(),request.getLongitude(),userId);
+        return ResponseEntity.ok(ApiResponse.success(places));
     }
 
     @PostMapping("/{placeId}/reviews/summary")

@@ -44,6 +44,21 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M4'
+
+	//s3
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:2.4.4'
+
+	//json
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
+	//cache
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'com.github.ben-manes.caffeine:caffeine'
+
+
+
+
 }
 
 tasks.named('test') {

@@ -35,9 +35,9 @@ spring:
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
             client-secret: ${KAKAO_OAUTH_SECRET}
-            redirect-uri: "http://${DOMAIN}/login/oauth2/code/kakao"
+            redirect-uri: ${DOMAIN}/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
-            client-authentication-method: POST
+            client-authentication-method: client_secret_post
             scope: profile_nickname, profile_image, account_email
         provider:
           kakao:
@@ -63,8 +63,25 @@ spring:
       url: "https://dapi.kakao.com/v2/${DOMAIN}/geo/coord2address.json"
       key: ${KAKAO_REST_API_KEY}
 
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+
 logging:
   level:
     org:
     springframework:
       security: DEBUG
+
+
+cloud:
+  aws:
+    region: ap-northeast-2
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key:  ${AWS_SECRET_KEY}
+  s3:
+    bucket: ${AWS_S3_BUCKET}
+    url: ${AWS_S3_URL}
+  stack:
+    auto: false

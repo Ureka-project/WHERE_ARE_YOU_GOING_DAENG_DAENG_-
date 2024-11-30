@@ -2,10 +2,13 @@ package com.daengdaeng_eodiga.project.user.entity;
 
 import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
-import com.daengdaeng_eodiga.project.place.entity.Visited;
+
 import com.daengdaeng_eodiga.project.preference.entity.Preference;
 import com.daengdaeng_eodiga.project.review.entity.Review;
+import com.daengdaeng_eodiga.project.visit.entity.Visit;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +40,10 @@ public class User extends BaseEntity {
     @Column(name = "city_detail")
     private String cityDetail;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "oauth_provider")
+    private OauthProvider oauthProvider;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
@@ -50,6 +57,6 @@ public class User extends BaseEntity {
     private List<Preference> preferences = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Visited> visitieds = new ArrayList<>();
+    private List<Visit> visits = new ArrayList<>();
 
 }

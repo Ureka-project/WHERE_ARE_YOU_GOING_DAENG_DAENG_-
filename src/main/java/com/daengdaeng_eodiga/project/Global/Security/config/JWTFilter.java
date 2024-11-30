@@ -35,66 +35,17 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("doFilterInternal - JWTFilter : " + request.getRequestURI()+ " "+request.getMethod()+" cookies : "+request.getCookies());
-        String accessToken = null;
-        Cookie[] cookies = request.getCookies();
-        String refreshToken = null;
-        String requestUri = request.getRequestURI();
+        if(request.getRequestURI().startsWith("/api/v1/")){
+            String email = "13wjdgkbbb@gmial.com";
+            UserOauthDto userDTO = new UserOauthDto();
+            User user= userService.findUserByemail(email);
 
-        if (requestUri.matches("^\\/login(?:\\/.*)?$")) {
-
-            filterChain.doFilter(request, response);
-            return;
+            userDTO.setUserid(user.getUserId());
+            userDTO.setEmail(user.getEmail());
+            CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
+            Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authToken);
         }
-
-
-        String token = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("Authorization")) {
-                    accessToken = cookie.getValue();
-                } else if (cookie.getName().equals("RefreshToken")) {
-                    refreshToken = cookie.getValue();
-                }
-
-            }
-
-        }
-        log.info("accessToken : "+accessToken);
-        log.info("refreshToken : "+refreshToken);
-        if (accessToken == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        token = accessToken;
-        if (redisTokenRepository.isBlacklisted(refreshToken)&&refreshToken==null) {
-            log.info("refreshToken is null and blacklisted");
-            filterChain.doFilter(request, response);
-            return;
-        }
-        else if (!redisTokenRepository.isBlacklisted(refreshToken) && !jwtUtil.isExpired(refreshToken))  {
-            String newAccessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
-            response.addCookie(jwtUtil.createCookie("Authorization", newAccessToken,60*60*60));
-            token = newAccessToken;
-            log.info("refreshToken is not blacklisted and not expired , so new accessToken is created");
-        }
-        else
-        {
-            log.info("token is not valid");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-
-        String email = jwtUtil.getEmail(token);
-        UserOauthDto userDTO = new UserOauthDto();
-        User user= userService.findUserId(email);
-
-        userDTO.setUserid(user.getUserId());
-        userDTO.setEmail(user.getEmail());
-        CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
     }

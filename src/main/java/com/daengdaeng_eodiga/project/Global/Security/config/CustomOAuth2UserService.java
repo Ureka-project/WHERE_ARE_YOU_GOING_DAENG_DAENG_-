@@ -3,6 +3,7 @@ package com.daengdaeng_eodiga.project.Global.Security.config;
 import com.daengdaeng_eodiga.project.Global.Security.dto.GoogleResponse;
 import com.daengdaeng_eodiga.project.Global.Security.dto.KakaoResponse;
 import com.daengdaeng_eodiga.project.Global.Security.dto.OAuth2Response;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import com.daengdaeng_eodiga.project.user.entity.User;
@@ -34,25 +35,26 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response = null;
-
+        OauthProvider provider=null;
         if (registrationId.equals("kakao")) {
             oAuth2Response = new KakaoResponse(oAuth2User.getAttributes());
+             provider= OauthProvider.kakao;
+
         } else if (registrationId.equals("google")) {
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
-        } else {
-            throw new OAuth2AuthenticationException("Unsupported OAuth provider");
+             provider= OauthProvider.google;
         }
 
         String email = oAuth2Response.getEmail();
-        if (email == null || email.isEmpty()) {
-            throw new OAuth2AuthenticationException("Principal name (email) cannot be empty");
-        }
+
 
         Optional<User> existData = userRepository.findByEmail(email);
-
-        if (!existData.isPresent()) {
-            throw new OAuth2AuthenticationException(new OAuth2Error("REDIRECT_TO_SIGNUP", "REDIRECT_TO_SIGNUP: " + email, null));
-
+        if (existData.isEmpty()) {
+            throw new OAuth2AuthenticationException(new OAuth2Error(
+                    "REDIRECT_TO_SIGNUP",
+                    "REDIRECT_TO_SIGNUP: email=" + email + ", provider=" + provider,
+                    null // URI
+            ));
         } else {
             User user = existData.get();
             UserOauthDto userDTO = new UserOauthDto();

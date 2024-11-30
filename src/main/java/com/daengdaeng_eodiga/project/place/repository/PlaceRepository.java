@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlaceRepository extends JpaRepository<Place, Integer> {
 
@@ -36,7 +37,7 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
                     "COALESCE(ps.score, 5) AS score, " +
                     "GROUP_CONCAT(rk.keyword) AS keywords, " +
                     "COUNT(DISTINCT  " +
-                    "r.review_id) AS review_count " +  // review 카운트를 추가
+                    "r.review_id) AS review_count " +
                     "FROM place p " +
                     "LEFT JOIN review r ON p.place_id = r.place_id " +
                     "LEFT JOIN review_keyword rk ON rk.review_id = r.review_id " +
@@ -151,5 +152,6 @@ public interface PlaceRepository extends JpaRepository<Place, Integer> {
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude);
 
+    Optional<Place> findByPlaceId(Integer placeId);
 }
 

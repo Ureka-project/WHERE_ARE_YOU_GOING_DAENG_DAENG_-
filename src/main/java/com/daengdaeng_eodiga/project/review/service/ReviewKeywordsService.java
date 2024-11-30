@@ -16,11 +16,11 @@ import lombok.RequiredArgsConstructor;
 public class ReviewKeywordsService {
 	private final ReviewKeywordRepository reviewKeywordRepository;
 
-	public void saveReviewKeywords(Review review, Set<String> keywords) {
+	public List<ReviewKeyword> saveReviewKeywords(Review review, List<String> keywords) {
 		List<ReviewKeyword> keywordsEntity = keywords.stream()
 			.map(keyword -> ReviewKeyword.builder().review(review).keyword(keyword).build())
 			.toList();
-		reviewKeywordRepository.saveAll(keywordsEntity);
+		return reviewKeywordRepository.saveAll(keywordsEntity);
 	}
 
 	public List<String> fetchBestReviewKeywordsTop3(int placeId) {
