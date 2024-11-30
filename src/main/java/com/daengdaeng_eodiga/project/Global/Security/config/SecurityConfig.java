@@ -50,31 +50,11 @@ public class SecurityConfig {
         http.formLogin((form) -> form.disable());
 
         http
-                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                        CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOrigins(List.of(
-                                "https://api.daengdaeng-where.link",
-                                "https://localhost:5173"
-                        ));
-                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 정확한 메서드 명시
-                        config.setAllowedHeaders(List.of("*")); // 모든 헤더 허용
-                        config.setAllowCredentials(true); // 쿠키 허용
-                        config.setMaxAge(3600L); // 캐시 시간 (1시간)
-                        return config;
-                    }
-                }));
-
-        http
             .authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://api.daengdaeng-where.link/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
                 .anyRequest().authenticated())
-            .formLogin((formLogin) -> formLogin
-                .loginPage("https://api.daengdaeng-where.link/login")
-                .permitAll())
             .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
 
 
