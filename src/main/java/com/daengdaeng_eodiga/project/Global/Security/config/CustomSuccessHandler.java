@@ -6,6 +6,8 @@ import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -37,12 +39,27 @@ import java.util.Optional;
                  user = Quser.get();
             }
             String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L);
-            String newRefreshToken = jwtUtil.createRefreshToken(email,24 * 60 * 60 * 1000L);
-
-            response.addCookie(jwtUtil.createCookie("RefreshToken", newRefreshToken,60 * 60 * 60,response));
-            response.addCookie(jwtUtil.createCookie("Authorization", accessToken,24 * 60 * 60 ,response));
-            redisTokenRepository.saveToken(newRefreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
-            response.sendRedirect("/api/v1/loginSuccess");
+            String refreshToken = jwtUtil.createRefreshToken(email,24 * 60 * 60 * 1000L);
+            ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
+                .path("/")
+                .sameSite("Lax")
+                .httpOnly(false)
+                .secure(true)
+                .maxAge(60 * 60 * 60)
+                .domain(".daengdaeng-where.link")
+                .build();
+            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+            ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", accessToken)
+                .path("/")
+                .sameSite("Lax")
+                .httpOnly(false)
+                .secure(true)
+                .maxAge(60 * 60 * 60)
+                .domain(".daengdaeng-where.link")
+                .build();
+            response.addHeader("Set-Cookie", accessTokenCookie.toString());
+            redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
+            response.sendRedirect("https://api.daengdaeng-where.link/");
         }
 
 

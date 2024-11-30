@@ -20,6 +20,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -39,20 +40,68 @@ public class OuathController {
 
     private final OauthUserService oauthUserService;
     private final TokenService tokenService;
+    private final JWTUtil jwtUtil;
+    private final RedisTokenRepository redisTokenRepository;
 
     @GetMapping("/signup")
     public void showSignUpForm(@RequestParam String email,@RequestParam String provider, HttpServletResponse response) throws IOException {
-        //TODO : 연동 끝난 후, 쿠키에 저장
-        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email=" + email+"&provider=" + provider);
+
+        ResponseCookie emailCookie = ResponseCookie.from("email", email)
+            .path("/")
+            .sameSite("Lax")
+            .httpOnly(false)
+            .secure(false)
+            .maxAge(60 * 60 * 60)
+            .domain(".daengdaeng-where.link")
+            .build();
+        response.addHeader("Set-Cookie", emailCookie.toString());
+
+        ResponseCookie provideCookie = ResponseCookie.from("provider", provider)
+            .path("/")
+            .sameSite("Lax")
+            .httpOnly(false)
+            .secure(false)
+            .maxAge(60 * 60 * 60)
+            .domain(".daengdaeng-where.link")
+            .build();
+        response.addHeader("Set-Cookie", provideCookie.toString());
+        response.sendRedirect("https://api.daengdaeng-where.link/user-register?email="+email+"&provider=" + provider);
     }
 
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/loginSuccess.html");
+
     }
+
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerUser(signUpForm);
+        String accessToken = jwtUtil.createJwt(signUpForm.getEmail(), 60 * 60 * 60L);
+        String refreshToken = jwtUtil.createRefreshToken(signUpForm.getEmail(),24 * 60 * 60 * 1000L);
+
+        response.addCookie(jwtUtil.createCookie("RefreshToken", refreshToken,60 * 60 * 60,response));
+        response.addCookie(jwtUtil.createCookie("Authorization", accessToken,24 * 60 * 60 ,response));
+        redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, signUpForm.getEmail());
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
+            .path("/")
+            .sameSite("Lax")
+            .httpOnly(false)
+            .secure(true)
+            .maxAge(60 * 60 * 60)
+            .domain(".daengdaeng-where.link")
+            .build();
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", accessToken)
+            .path("/")
+            .sameSite("Lax")
+            .httpOnly(false)
+            .secure(true)
+            .maxAge(60 * 60 * 60)
+            .domain(".daengdaeng-where.link")
+            .build();
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+
         return ResponseEntity.ok(ApiResponse.success(tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response)));
     }
     //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
