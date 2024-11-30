@@ -44,16 +44,15 @@ public class PlaceService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final OpenAiService openAiService;
 
-    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude) {
-        List<Object[]> results = placeRepository.findByFiltersAndLocation(city, cityDetail, placeTypeCode, latitude, longitude);
+    public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude, Integer userId) {
+        Integer effectiveUserId = userId != null ? userId : -1;
+        List<Object[]> results = placeRepository.findByFiltersAndLocation(city, cityDetail, placeTypeCode, latitude, longitude, effectiveUserId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
-
-
-
-    public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude) {
-        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, latitude, longitude);
+    public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, Integer userId) {
+        Integer effectiveUserId = userId != null ? userId : -1;
+        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, latitude, longitude, effectiveUserId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 

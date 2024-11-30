@@ -29,23 +29,31 @@ public class PlaceController {
     private final ReviewSummaryRepository reviewSummaryRepository;
 
     @PostMapping("/filter")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(@RequestBody FilterRequest request) {
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(
+            @RequestBody FilterRequest request,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
         List<PlaceDto> places = placeService.filterPlaces(
                 request.getCity(),
                 request.getCityDetail(),
                 request.getPlaceType(),
                 request.getLatitude(),
-                request.getLongitude()
+                request.getLongitude(),
+                userId
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(@RequestBody SearchRequest request) {
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(
+            @RequestBody SearchRequest request,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
         List<PlaceDto> places = placeService.searchPlaces(
                 request.getKeyword(),
                 request.getLatitude(),
-                request.getLongitude()
+                request.getLongitude(),
+                userId
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
