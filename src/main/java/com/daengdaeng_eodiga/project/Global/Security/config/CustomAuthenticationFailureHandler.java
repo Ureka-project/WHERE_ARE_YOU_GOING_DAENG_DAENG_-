@@ -26,7 +26,13 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                         email = part.substring("email=".length());
                     } else if (part.startsWith("provider=")) {
                         String providerValue = part.substring("provider=".length());
-                        provider = OauthProvider.valueOf(providerValue.toUpperCase());
+                        //TODO : OauthProvider 소문자,대문자 통일
+                        try{
+                            provider = OauthProvider.valueOf(providerValue.toLowerCase());
+                        }catch (Exception e){
+                            provider = OauthProvider.google;
+                        }
+
                     }
                 }
             }
