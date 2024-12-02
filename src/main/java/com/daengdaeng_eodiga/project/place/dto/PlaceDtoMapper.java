@@ -30,7 +30,6 @@ public class PlaceDtoMapper {
             dto.setEndTime(result.length > 18 && result[18] != null ? result[18].toString() : null);
             dto.setFavoriteCount(result.length > 19 && result[19] != null ? ((Number) result[19]).intValue() : 0);
             dto.setPlaceScore(result.length > 20 && result[20] != null ? ((Number) result[20]).doubleValue() : null);
-            System.out.println("Result array: " + Arrays.toString(result));
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to map result to PlaceDto. Ensure data types and query structure are correct.", e);

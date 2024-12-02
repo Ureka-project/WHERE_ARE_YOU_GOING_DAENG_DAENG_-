@@ -2,12 +2,16 @@ package com.daengdaeng_eodiga.project.place.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class NearestRequest {
+
     private Double latitude;
+
     private Double longitude;
 }

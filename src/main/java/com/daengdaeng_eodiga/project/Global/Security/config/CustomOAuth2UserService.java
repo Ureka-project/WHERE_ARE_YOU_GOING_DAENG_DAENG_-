@@ -41,10 +41,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
              provider= OauthProvider.kakao;
 
         } else if (registrationId.equals("google")) {
-            oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
              provider= OauthProvider.google;
         }
-
         String email = oAuth2Response.getEmail();
 
 

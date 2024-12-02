@@ -13,6 +13,7 @@ import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import com.daengdaeng_eodiga.project.oauth.dto.SignUpForm;
+import com.daengdaeng_eodiga.project.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class OauthUserService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final CommonCodeService commonCodeService;
+    private final UserService userService;
     public void registerUser(SignUpForm userDTO) {
         if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()||
         userRepository.existsByNickname(userDTO.getNickname())) {
@@ -45,10 +47,8 @@ public class OauthUserService {
         userRepository.save(user);
     }
     public void AdjustUser(SignUpForm userDTO) {
-        Optional<User> existingUserOpt = userRepository.findByEmail(userDTO.getEmail());
-        User user;
-        if (existingUserOpt.isPresent()) {
-            user = existingUserOpt.get();
+        User user = userService.findUserByemail(userDTO.getEmail());
+        if (user!=null) {
             user.setNickname(userDTO.getNickname());
             user.setEmail(userDTO.getEmail());
 
@@ -64,31 +64,39 @@ public class OauthUserService {
             throw new UserNotFoundException();
     }
     public void deleteUserByName(String email) {
-        //TODO : orElseThrow로 변경해서 UserNotFoundException 발생시키기
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            User user1 = user.get();
-            userRepository.deleteById(user1.getUserId());
-        } else {
+        User user = userService.findUserByemail(email);
+        if(user!=null)
+        {
+            userRepository.deleteById(user.getUserId());
+        }
+        else
+        {
             throw new UserNotFoundException();
         }
+
     }
     public UserDto UserToDto(String email) {
-
-        User user =userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-        UserDto userDto = new UserDto();
-        userDto.setEmail(user.getEmail());
-        userDto.setNickname(user.getNickname());
-        userDto.setCity(user.getCity());
-        String genderCode = "GND_01".equals(user.getGender()) ? "남자" : "여자";
-        userDto.setGender(genderCode);
-        userDto.setOauthProvider(user.getOauthProvider());
-        userDto.setCityDetail(user.getCityDetail());
-        userDto.setCreatedAt(user.getCreatedAt());
-        userDto.setUserId(user.getUserId());
-        boolean pushAgreement = notificationService.findPushTokenByUser(user).isEmpty();
-        userDto.setPushAgreement(!pushAgreement);
-        return userDto;
+        User user =userService.findUserByemail(email);
+        if (user != null)
+        {
+            UserDto userDto = new UserDto();
+            userDto.setEmail(user.getEmail());
+            userDto.setNickname(user.getNickname());
+            userDto.setCity(user.getCity());
+            String genderCode = "GND_01".equals(user.getGender()) ? "남자" : "여자";
+            userDto.setGender(genderCode);
+            userDto.setOauthProvider(user.getOauthProvider());
+            userDto.setCityDetail(user.getCityDetail());
+            userDto.setCreatedAt(user.getCreatedAt());
+            userDto.setUserId(user.getUserId());
+            boolean pushAgreement = notificationService.findPushTokenByUser(user).isEmpty();
+            userDto.setPushAgreement(!pushAgreement);
+            return userDto;
+        }
+        else
+        {
+            throw new UserNotFoundException();
+        }
     }
 
     public boolean isNicknameDuplicate(String nickname) {
