@@ -58,9 +58,6 @@ public class GeoService {
             }
         }
 
-
-        System.out.println(latitude);
-        System.out.println(longitude);
         String url = kakaoApiProperties.getUrl() + "?x=" + longitude + "&y=" + latitude;
         ResponseEntity<KakaoGeoApiDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, KakaoGeoApiDto.class);
         if (response.getBody() != null) {
