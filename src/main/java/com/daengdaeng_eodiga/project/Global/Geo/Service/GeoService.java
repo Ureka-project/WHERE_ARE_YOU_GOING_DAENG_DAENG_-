@@ -31,36 +31,7 @@ public class GeoService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        if (latitude == 0.0 && longitude == 0.0) {
-            Optional<User> Ouser = userRepository.findById(userId);
-            if (Ouser.isPresent()) {
-                User user = Ouser.get();
-                String nourl = kakaoApiProperties.getNopeurl() + user.getCity() + " " + user.getCityDetail();
-                ResponseEntity<String> response = restTemplate.exchange(nourl, HttpMethod.GET, entity, String.class);
-                ObjectMapper objectMapper = new ObjectMapper();
-                KakaoApiResponseDto apiResponseDto = null;
 
-                try {
-                    apiResponseDto = objectMapper.readValue(response.getBody(), KakaoApiResponseDto.class);
-
-
-
-                    if (apiResponseDto != null && apiResponseDto.getDocuments() != null && !apiResponseDto.getDocuments().isEmpty()) {
-                        KakaoApiResponseDto.Document document = apiResponseDto.getDocuments().get(0);
-                        latitude = Double.parseDouble(document.getY());
-                        longitude = Double.parseDouble(document.getX());
-                    }
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();  // JSON 파싱 예외 처리
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();  // Double 변환 예외 처리
-                }
-            }
-        }
-
-
-        System.out.println(latitude);
-        System.out.println(longitude);
         String url = kakaoApiProperties.getUrl() + "?x=" + longitude + "&y=" + latitude;
         ResponseEntity<KakaoGeoApiDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, KakaoGeoApiDto.class);
         if (response.getBody() != null) {
@@ -75,6 +46,47 @@ public class GeoService {
         List<KakaoGeoApiDto.Document> addressInfoList = Objects.requireNonNull(response.getBody()).getDocuments();
         String ret=addressInfoList.get(0).getAddress() != null? addressInfoList.get(0).getAddress().toString() : "";
         return ret;
+    }
+
+    public List<Object> getNotAgreeInfo(double latitude, double longitude,Integer userId)  {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", kakaoApiProperties.getKey());
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        Optional<User> Ouser = userRepository.findById(userId);
+        if (Ouser.isPresent()) {
+            User user = Ouser.get();
+            String nourl = kakaoApiProperties.getNopeurl() + user.getCity() + " " + user.getCityDetail();
+            ResponseEntity<String> response = restTemplate.exchange(nourl, HttpMethod.GET, entity, String.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            KakaoApiResponseDto apiResponseDto = null;
+
+            try {
+                apiResponseDto = objectMapper.readValue(response.getBody(), KakaoApiResponseDto.class);
+
+                if (apiResponseDto != null && apiResponseDto.getDocuments() != null && !apiResponseDto.getDocuments().isEmpty()) {
+                    KakaoApiResponseDto.Document document = apiResponseDto.getDocuments().get(0);
+                    latitude = Double.parseDouble(document.getY());
+                    longitude = Double.parseDouble(document.getX());
+                    String address = apiResponseDto.getDocuments().get(0).getAddress().getRegion1DepthName() + " " +
+                            apiResponseDto.getDocuments().get(0).getAddress().getRegion2DepthName();
+                    List<Object> Ret = new ArrayList<>();
+                    Ret.add(latitude);
+                    Ret.add(longitude);
+                    Ret.add(address);
+                    return Ret;
+                }
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 
 
