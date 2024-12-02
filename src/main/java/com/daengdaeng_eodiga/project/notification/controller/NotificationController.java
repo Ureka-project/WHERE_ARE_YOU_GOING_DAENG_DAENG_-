@@ -38,7 +38,7 @@ public class NotificationController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("")
     public ResponseEntity<ApiResponse<?>> cancelPush(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
         int userId = customOAuth2User.getUserDTO().getUserid();
         notificationService.cancelPush(userId);
