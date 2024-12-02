@@ -47,27 +47,40 @@ public class VisitService {
 	public PetsAtVisitTime registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
 		Place place = placeService.findPlace(placeId);
 		User user = userService.findUser(userId);
-		findVisitPet(placeId, visitAt, petIds);
-		Visit visit = Visit.builder()
-				.visitAt(visitAt)
-				.place(place)
-				.user(user)
-				.build();
+		List<VisitPet> visitPetsAtTime = findVisitPets(place, visitAt);
+		Visit visit;
+		if(visitPetsAtTime.isEmpty()){
+			visit = Visit.builder()
+					.user(user)
+					.place(place)
+					.visitAt(visitAt)
+					.build();
+			visit = visitRepository.save(visit);
+		 } else {
+			visit = visitPetsAtTime.get(0).getVisit();
+		}
 
+		Visit savedVisit = visit;
+		List<Integer> notSavedPetIds = visitPetsAtTime.stream().filter(visitPet -> !petIds.contains(visitPet.getPet().getPetId())).map(visitPet -> {
+			return visitPet.getPet().getPetId();
+		}).toList();
+
+		if(!notSavedPetIds.isEmpty()){
+			throw new DuplicatePetException();
+		}
 
 		List<VisitPet> visitPets = petIds.stream()
 				.map(petId -> {
 					Pet pet = petService.findPet(petId);
 					return VisitPet.builder()
-							.visit(visit)
+							.visit(savedVisit)
 							.pet(pet)
 							.build();
 				})
 				.toList();
-		Visit savedVisit = visitRepository.save(visit);
 		List<VisitPet> savedVisitPet = visitPetRepository.saveAll(visitPets);
 
-		return new PetsAtVisitTime(savedVisit.getVisitAt(), savedVisitPet.stream()
+		return new PetsAtVisitTime(visit.getVisitAt(), savedVisitPet.stream()
 				.map(visitPet -> {
 					Pet pet = visitPet.getPet();
 					return new PetResponse(pet.getPetId(), pet.getName(), pet.getImage());
@@ -79,7 +92,6 @@ public class VisitService {
 	public void cancelVisit(int userId, int visitId) {
 		Optional<Visit> visit = visitRepository.findById(visitId);
 		if(visit.isEmpty()){
-			System.out.println("visitId : " + visitId);
 			throw new NotFoundException("Visit", String.format("VisitId %d", visitId));
 		}
 		if(visit.get().getUser().getUserId() != userId){
@@ -142,11 +154,8 @@ public class VisitService {
 			.toList();
 	}
 
-	public void findVisitPet(int placeId, LocalDateTime visitAt, List<Integer> petIds) {
-		List<VisitPet> visitPets = visitPetRepository.findByPlaceIdAndVisitAtInPetIds(placeId, visitAt, petIds);
-		if(!visitPets.isEmpty()){
-			throw new DuplicatePetException();
-		}
+	public List<VisitPet> findVisitPets(Place place, LocalDateTime visitAt) {
+		return visitPetRepository.findByPlaceIdAndVisitAt(place, visitAt);
 	}
 
 
