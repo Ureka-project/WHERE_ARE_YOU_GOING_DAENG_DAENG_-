@@ -3,7 +3,9 @@ package com.daengdaeng_eodiga.project.place.controller;
 import com.daengdaeng_eodiga.project.Global.Geo.Service.GeoService;
 import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
+import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.ReviewSummaryNotFoundException;
+import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.place.dto.*;
 import com.daengdaeng_eodiga.project.place.entity.ReviewSummary;
 import com.daengdaeng_eodiga.project.place.service.OpenAiService;
@@ -13,8 +15,10 @@ import com.daengdaeng_eodiga.project.review.repository.ReviewSummaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -91,14 +95,18 @@ public class PlaceController {
     }
 
     @PostMapping("/recommend")
-    public ResponseEntity<ApiResponse<List<PlaceWithScore>>> RecommendPlaces(@RequestBody NearestRequest request,
-                                                                       @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
-        Integer userId=customOAuth2User.getUserDTO().getUserid();
+    public ResponseEntity<ApiResponse<List<PlaceWithScore>>> RecommendPlaces(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+                                                                              @RequestBody NearestRequest request
+                                                                       ) {
+        Integer userId= customOAuth2User.getUserDTO().getUserid();
         String myplace="";
         double latitude=request.getLatitude();
         double longitude=request.getLongitude();
         if (request.getLatitude()==0.0 && request.getLongitude()==0.0){
-            List<Object> AgreementLocation = geoService.getNotAgreeInfo(latitude,longitude,userId);
+
+            List<Object> AgreementLocation = geoService.getNotAgreeInfo(userId);
+            if(AgreementLocation==null)
+                throw new PlaceNotFoundException();
             latitude= (double) AgreementLocation.get(0);
             longitude= (double) AgreementLocation.get(1);
             myplace= (String) AgreementLocation.get(2);
