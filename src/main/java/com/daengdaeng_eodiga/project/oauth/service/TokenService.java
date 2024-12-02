@@ -25,7 +25,7 @@ public class TokenService {
         this.redisTokenRepository = redisTokenRepository;
     }
 
-    public HttpServletResponse generateTokensAndSetCookies(String email, HttpServletResponse response) {
+    public void generateTokensAndSetCookies(String email, HttpServletResponse response) {
         String accessToken = jwtUtil.createJwt(email, jwtUtil.getAccessTokenExpiration());
         String refreshToken = jwtUtil.createRefreshToken(email,jwtUtil.getRefreshTokenExpiration());
 
@@ -50,7 +50,6 @@ public class TokenService {
                 .domain(".daengdaeng-where.link")
                 .build();
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
-        return response;
     }
     public ResponseEntity<ApiResponse<?>> deleteCookie(String email, String RefreshToken, HttpServletResponse response) {
         try {
