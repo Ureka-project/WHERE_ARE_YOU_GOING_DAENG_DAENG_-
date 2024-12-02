@@ -3,9 +3,11 @@ package com.daengdaeng_eodiga.project.notification.service;
 import com.daengdaeng_eodiga.project.Global.exception.NotificationNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.PushTokenIsExistsException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
+import com.daengdaeng_eodiga.project.notification.dto.FcmRequestDto;
 import com.daengdaeng_eodiga.project.notification.dto.NotiResponseDto;
 import com.daengdaeng_eodiga.project.notification.entity.Notification;
 import com.daengdaeng_eodiga.project.notification.entity.PushToken;
+import com.daengdaeng_eodiga.project.notification.enums.PushType;
 import com.daengdaeng_eodiga.project.notification.repository.NotificationRepository;
 import com.daengdaeng_eodiga.project.notification.repository.PushTokenRepository;
 import com.daengdaeng_eodiga.project.user.entity.User;
@@ -70,5 +72,16 @@ public class NotificationService {
     public void cancelPush(int userId) {
         User user = userService.findUser(userId);
         pushTokenRepository.deleteByUser(user);
+    }
+
+    public FcmRequestDto createFcmRequest(List<String> token, List<Integer> userId, PushType type, String petName, String placeName, String eventName) {
+        return FcmRequestDto.builder()
+                .token(token)
+                .userId(userId)
+                .type(type)
+                .petName(petName)
+                .placeName(placeName)
+                .eventName(eventName)
+                .build();
     }
 }
