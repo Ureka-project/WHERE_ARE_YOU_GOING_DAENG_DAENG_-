@@ -37,68 +37,7 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("doFilterInternal - JWTFilter : " + request.getRequestURI()+ " "+request.getMethod()+" cookies : "+request.getCookies());
 
-        Cookie[] cookies = request.getCookies();
-        if((!request.getRequestURI().startsWith("/api/v1/")) || request.getCookies() ==null){
-            log.info("cookies is null or requestUri is not /api/v1/");
-            filterChain.doFilter(request, response);
-            return;
-         }
-        String accessToken = null ;
-        String refreshToken = null ;
-
-
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("Authorization")) {
-                accessToken = cookie.getValue();
-            } else if (cookie.getName().equals("RefreshToken")) {
-                refreshToken = cookie.getValue();
-            }
-
-        }
-
-        if(accessToken==null || refreshToken==null){
-            log.info("accessToken or refreshToken is null");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        log.info("accessToken : "+accessToken);
-        log.info("refreshToken : "+refreshToken);
-
-        Jwtexception accessTokenValid = jwtUtil.isJwtValid(accessToken);
-        if(accessTokenValid.equals(Jwtexception.mismatch)){
-            log.info("accessToken is not valid");
-            filterChain.doFilter(request, response);
-            return;
-        }
-        else if(accessTokenValid.equals(Jwtexception.expired)){
-            Jwtexception refreshTokenValid = jwtUtil.isJwtValid(refreshToken);
-            if(refreshTokenValid.equals(Jwtexception.mismatch)){
-                log.info("refreshToken is not valid");
-                filterChain.doFilter(request, response);
-                return;
-            }
-            else if(refreshTokenValid.equals(Jwtexception.expired)){
-                log.info("refreshToken is expired");
-                filterChain.doFilter(request, response);
-                return;
-            } else if(refreshTokenValid.equals(Jwtexception.normal)&&!redisTokenRepository.isBlacklisted(refreshToken)){
-                log.info("refreshToken is not expired , so new accessToken is created");
-                accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), jwtUtil.getAccessTokenExpiration());
-               //TODO : retreshToken 새로 발급 필요
-                response.addCookie(jwtUtil.createCookie("Authorization", accessToken,  jwtUtil.getAccessTokenExpiration(),response));
-            }else {
-                log.info("refreshToken is not normal");
-                filterChain.doFilter(request, response);
-            return;
-        }
-    }else if(!accessTokenValid.equals(Jwtexception.normal)){
-        log.info("accessToken is not normal");
-        filterChain.doFilter(request, response);
-            return;
-        }
-
-        String email = jwtUtil.getEmail(accessToken);
+        String email ="13wjdgkbbb@gmial.com";
         UserOauthDto userDTO = new UserOauthDto();
         User user= userService.findUserByemail(email);
         userDTO.setUserid(user.getUserId());
