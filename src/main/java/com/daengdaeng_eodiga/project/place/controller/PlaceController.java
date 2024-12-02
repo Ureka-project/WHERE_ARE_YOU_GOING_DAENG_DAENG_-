@@ -96,7 +96,7 @@ public class PlaceController {
 
     @PostMapping("/recommend")
     public ResponseEntity<ApiResponse<List<PlaceWithScore>>> RecommendPlaces(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
-                                                                             @Valid @RequestBody NearestRequest request
+                                                                              @RequestBody NearestRequest request
                                                                        ) {
         Integer userId= customOAuth2User.getUserDTO().getUserid();
         String myplace="";

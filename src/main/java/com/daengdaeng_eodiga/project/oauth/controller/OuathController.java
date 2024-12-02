@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,7 +80,7 @@ public class OuathController {
     public void loginSuccess(HttpServletResponse response) throws IOException {
     }
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<?>> signup( @RequestBody @Valid  SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, BindingResult bindingResult, HttpServletResponse response) {
         oauthUserService.registerUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response)));
     }
@@ -109,12 +110,12 @@ public class OuathController {
     }
 
     @PutMapping("/user/adjust")
-    public ResponseEntity<ApiResponse<?>> AdjustUser(@Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.AdjustUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
     @GetMapping("/user/duplicateNickname")
-    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @Valid @RequestParam String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam String nickname) {
         boolean isDuplicate = oauthUserService.isNicknameDuplicate(nickname);
 
         Map<String, Boolean> response = new HashMap<>();
