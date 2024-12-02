@@ -80,9 +80,10 @@ public class OuathController {
     public void loginSuccess(HttpServletResponse response) throws IOException {
     }
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, BindingResult bindingResult, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerUser(signUpForm);
-        return ResponseEntity.ok(ApiResponse.success(tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response)));
+        tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response);
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
     //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
     @PostMapping("/logout")
