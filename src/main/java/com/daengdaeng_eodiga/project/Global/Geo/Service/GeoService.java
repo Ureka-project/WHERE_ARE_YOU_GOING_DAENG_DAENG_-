@@ -2,8 +2,10 @@ package com.daengdaeng_eodiga.project.Global.Geo.Service;
 import com.daengdaeng_eodiga.project.Global.Geo.dto.KakaoApiProperties;
 import com.daengdaeng_eodiga.project.Global.Geo.dto.KakaoApiResponseDto;
 import com.daengdaeng_eodiga.project.Global.Geo.dto.KakaoGeoApiDto;
+import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
+import com.daengdaeng_eodiga.project.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ public class GeoService {
 
 
     private final KakaoApiProperties kakaoApiProperties;
-    private final UserRepository userRepository;
+    private final UserService   userService;
     public String getRegionInfo(double latitude, double longitude,Integer userId)  {
 
         HttpHeaders headers = new HttpHeaders();
@@ -31,32 +33,6 @@ public class GeoService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        if (latitude == 0.0 && longitude == 0.0) {
-            Optional<User> Ouser = userRepository.findById(userId);
-            if (Ouser.isPresent()) {
-                User user = Ouser.get();
-                String nourl = kakaoApiProperties.getNopeurl() + user.getCity() + " " + user.getCityDetail();
-                ResponseEntity<String> response = restTemplate.exchange(nourl, HttpMethod.GET, entity, String.class);
-                ObjectMapper objectMapper = new ObjectMapper();
-                KakaoApiResponseDto apiResponseDto = null;
-
-                try {
-                    apiResponseDto = objectMapper.readValue(response.getBody(), KakaoApiResponseDto.class);
-
-
-
-                    if (apiResponseDto != null && apiResponseDto.getDocuments() != null && !apiResponseDto.getDocuments().isEmpty()) {
-                        KakaoApiResponseDto.Document document = apiResponseDto.getDocuments().get(0);
-                        latitude = Double.parseDouble(document.getY());
-                        longitude = Double.parseDouble(document.getX());
-                    }
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();  // JSON 파싱 예외 처리
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();  // Double 변환 예외 처리
-                }
-            }
-        }
 
         String url = kakaoApiProperties.getUrl() + "?x=" + longitude + "&y=" + latitude;
         ResponseEntity<KakaoGeoApiDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, KakaoGeoApiDto.class);
@@ -72,6 +48,53 @@ public class GeoService {
         List<KakaoGeoApiDto.Document> addressInfoList = Objects.requireNonNull(response.getBody()).getDocuments();
         String ret=addressInfoList.get(0).getAddress() != null? addressInfoList.get(0).getAddress().toString() : "";
         return ret;
+    }
+
+    public List<Object> getNotAgreeInfo(Integer userId)  {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", kakaoApiProperties.getKey());
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        User user = userService.findUser(userId);
+        if (user==null)
+            throw new UserNotFoundException();
+
+
+        String nourl = kakaoApiProperties.getNopeurl() + user.getCity() + " " + user.getCityDetail();
+        ResponseEntity<String> response = restTemplate.exchange(nourl, HttpMethod.GET, entity, String.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        KakaoApiResponseDto apiResponseDto = null;
+        try {
+            apiResponseDto = objectMapper.readValue(response.getBody(), KakaoApiResponseDto.class);
+            if (apiResponseDto != null && apiResponseDto.getDocuments() != null && !apiResponseDto.getDocuments().isEmpty()) {
+                List<Object> Ret = getObjects(apiResponseDto);
+                return Ret;
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        return null;
+    }
+
+    private static List<Object> getObjects(KakaoApiResponseDto apiResponseDto) {
+        KakaoApiResponseDto.Document document = apiResponseDto.getDocuments().get(0);
+        Double latitude = Double.parseDouble(document.getY());
+        Double longitude = Double.parseDouble(document.getX());
+        String address = apiResponseDto.getDocuments().get(0).getAddress().getRegion1DepthName() + " " + apiResponseDto.getDocuments().get(0).getAddress().getRegion2DepthName();
+        List<Object> Ret = new ArrayList<>();
+        Ret.add(latitude);
+        Ret.add(longitude);
+        Ret.add(address);
+        return Ret;
     }
 
 

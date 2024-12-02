@@ -6,6 +6,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,13 @@ public class JWTUtil {
     public JWTUtil(@Value("${spring.jwt.secret}")String secret) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
+    @Getter
+    @Value("${jwt.token-expiration.access}")
+    private int accessTokenExpiration;
+
+    @Getter
+    @Value("${jwt.token-expiration.refresh}")
+    private int refreshTokenExpiration;
 
     public String getEmail(String token) {
         String email = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
@@ -53,7 +61,7 @@ public class JWTUtil {
         }
     }
 
-    public String createJwt(String email, Long expiredMs) {
+    public String createJwt(String email, int expiredMs) {
         log.info("jwt - createJwt email: " + email);
         return Jwts.builder()
                 .claim("email", email)
@@ -62,7 +70,7 @@ public class JWTUtil {
                 .signWith(secretKey)
                 .compact();
     }
-    public String createRefreshToken(String email, Long expiredMs) {
+    public String createRefreshToken(String email, int expiredMs) {
         return Jwts.builder()
                 .claim("email", email)
                 .issuedAt(new Date(System.currentTimeMillis()))

@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.place.service;
 
 import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
+import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
 import com.daengdaeng_eodiga.project.place.dto.PlaceDtoMapper;
 import com.daengdaeng_eodiga.project.place.dto.PlaceRcommendDto;
@@ -43,6 +44,7 @@ public class PlaceService {
     private final ReviewRepository reviewRepository;
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final OpenAiService openAiService;
+    private final CommonCodeService commonCodeService;
 
     public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude, Integer userId) {
         Integer effectiveUserId = userId != null ? userId : -1;
@@ -168,6 +170,11 @@ public class PlaceService {
                 placeArr.remove(minPlaceWithScore);
             }
 
+        }
+        for(PlaceWithScore place : placeArr) {
+           PlaceRcommendDto placeDto = place.getPlaceRcommendDto();
+            String placeType=commonCodeService.getCommonCodeName(placeDto.getPlaceType());
+            placeDto.setPlaceType(placeType);
         }
         return placeArr;
     }

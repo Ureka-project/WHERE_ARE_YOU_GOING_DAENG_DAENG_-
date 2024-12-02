@@ -84,9 +84,9 @@ public class JWTFilter extends OncePerRequestFilter {
                 return;
             } else if(refreshTokenValid.equals(Jwtexception.normal)&&!redisTokenRepository.isBlacklisted(refreshToken)){
                 log.info("refreshToken is not expired , so new accessToken is created");
-                accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), 60 * 60 * 60L);
+                accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), jwtUtil.getAccessTokenExpiration());
                //TODO : retreshToken 새로 발급 필요
-                response.addCookie(jwtUtil.createCookie("Authorization", accessToken,60*60*60,response));
+                response.addCookie(jwtUtil.createCookie("Authorization", accessToken,  jwtUtil.getAccessTokenExpiration(),response));
             }else {
                 log.info("refreshToken is not normal");
                 filterChain.doFilter(request, response);
