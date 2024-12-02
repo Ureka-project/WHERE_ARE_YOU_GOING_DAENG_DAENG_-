@@ -66,7 +66,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://api.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
 

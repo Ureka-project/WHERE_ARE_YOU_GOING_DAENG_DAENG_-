@@ -61,8 +61,8 @@ public class GeoService {
         User user = userService.findUser(userId);
         if (user==null)
             throw new UserNotFoundException();
-        
-        
+
+
         String nourl = kakaoApiProperties.getNopeurl() + user.getCity() + " " + user.getCityDetail();
         ResponseEntity<String> response = restTemplate.exchange(nourl, HttpMethod.GET, entity, String.class);
         ObjectMapper objectMapper = new ObjectMapper();

@@ -37,4 +37,11 @@ public class NotificationController {
         notificationService.savePushToken(userId, request.getToken(), request.getPushType());
         return ResponseEntity.ok(ApiResponse.success(null));
     }
+
+    @DeleteMapping("")
+    public ResponseEntity<ApiResponse<?>> cancelPush(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        int userId = customOAuth2User.getUserDTO().getUserid();
+        notificationService.cancelPush(userId);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
 }

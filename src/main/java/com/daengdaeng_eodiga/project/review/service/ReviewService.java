@@ -111,7 +111,8 @@ public class ReviewService {
 				commonCodeService.getCommonCodeName(keyword.getId().getKeyword())
 			).toList(),
 			review.getVisitedAt(),
-			review.getCreatedAt()
+			review.getCreatedAt(),
+			review.getPlace().getName()
 		);
 	}
 
@@ -178,7 +179,9 @@ public class ReviewService {
 				media,
 				keywords,
 				visitedAt,
-				createdAt
+				createdAt,
+				(String) result[12]
+
 			);
 			reviews.add(reviewDto);
 		}
