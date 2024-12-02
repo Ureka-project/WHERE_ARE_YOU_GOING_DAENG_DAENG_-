@@ -4,32 +4,24 @@ import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
-import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
-import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
-import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
-import com.daengdaeng_eodiga.project.Global.exception.UserUnauthorizedException;
-import com.daengdaeng_eodiga.project.oauth.OauthResult;
-import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
 import com.daengdaeng_eodiga.project.oauth.dto.SignUpForm;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import com.daengdaeng_eodiga.project.oauth.service.OauthUserService;
 import com.daengdaeng_eodiga.project.oauth.service.TokenService;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
-import com.daengdaeng_eodiga.project.user.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
+
+
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +44,7 @@ public class OuathController {
     private String frontUrl;
 
     @GetMapping("/signup")
-    public void showSignUpForm(@RequestParam String email,@RequestParam String provider, HttpServletResponse response) throws IOException {
+    public void showSignUpForm(@RequestParam String email, @RequestParam String provider, HttpServletResponse response) throws IOException {
 
         ResponseCookie emailCookie = ResponseCookie.from("email", email)
             .path("/")
@@ -80,7 +72,7 @@ public class OuathController {
     public void loginSuccess(HttpServletResponse response) throws IOException {
     }
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, BindingResult bindingResult, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> signup(@Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response)));
     }
@@ -110,12 +102,13 @@ public class OuathController {
     }
 
     @PutMapping("/user/adjust")
-    public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> AdjustUser(@Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.AdjustUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
     @GetMapping("/user/duplicateNickname")
-    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam
+                                                                                         String nickname) {
         boolean isDuplicate = oauthUserService.isNicknameDuplicate(nickname);
 
         Map<String, Boolean> response = new HashMap<>();

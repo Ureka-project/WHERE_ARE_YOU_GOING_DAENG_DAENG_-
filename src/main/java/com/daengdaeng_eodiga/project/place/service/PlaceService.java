@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.place.service;
 
+import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisLocationRepository;
 import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
@@ -45,6 +46,7 @@ public class PlaceService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final OpenAiService openAiService;
     private final CommonCodeService commonCodeService;
+    private final RedisLocationRepository redisLocationRepository;
 
     public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude, Integer userId) {
         Integer effectiveUserId = userId != null ? userId : -1;
@@ -121,8 +123,8 @@ public class PlaceService {
             Boolean parking = (Boolean) arr[14];
             Boolean indoor = (Boolean) arr[15];
             Boolean outdoor = (Boolean) arr[16];
-            Double score = (Double) arr[17]; // COALESCE(ps.score, 5)
-            String keywordsStr = (String) arr[18]; // Grouped keywords (e.g., "keyword1,keyword2")
+            Double score = (Double) arr[17];
+            String keywordsStr = (String) arr[18];
             Long reviewCount = (Long) arr[19];
 
             Map<String, Integer> keywords = new HashMap<>();
@@ -149,6 +151,7 @@ public class PlaceService {
             String place2 = place.getCityDetail();
             String place3 = place.getTownship();
             score+= calculateRegionScore(region1, region2, region3, place1, place2, place3);
+
             score+= place.getScore() / 10.0;
             if (place.getReviewCount()<10)
             {
@@ -176,6 +179,7 @@ public class PlaceService {
             String placeType=commonCodeService.getCommonCodeName(placeDto.getPlaceType());
             placeDto.setPlaceType(placeType);
         }
+        redisLocationRepository.saveLocation(userId, latitude , longitude , MyPlace,placeArr);
         return placeArr;
     }
     private String getRegionValue(String roadName, String regionKey) {
