@@ -1,20 +1,17 @@
 package com.daengdaeng_eodiga.project.Global.controller;
 
-import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.daengdaeng_eodiga.project.Global.dto.ApiErrorResponse;
 import com.daengdaeng_eodiga.project.Global.exception.BusinessException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,7 +21,13 @@ public class GlobalExceptionHandler {
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ApiResponse<?>> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
-		return ResponseEntity.badRequest().body(ApiResponse.failure(ex.getBindingResult().getAllErrors().get(0).getDefaultMessage()));
+	public ResponseEntity<ApiErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		List<String> errorMessages = Collections.singletonList(ex.getBindingResult().getFieldErrors()
+				.stream()
+				.map(FieldError::getDefaultMessage)
+				.collect(Collectors.joining(", ")));
+		ApiErrorResponse response = ApiErrorResponse.error("NOT VALIDATED", errorMessages.toString());
+
+		return ResponseEntity.badRequest().body(response);
 	}
 }
