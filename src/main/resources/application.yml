@@ -62,7 +62,7 @@ spring:
     api:
       url: "https://dapi.kakao.com/v2/${DOMAIN}/geo/coord2address.json"
       key: ${KAKAO_REST_API_KEY}
-
+      Nopeurl: "https://dapi.kakao.com/v2/local/search/address.json?query="
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
@@ -88,3 +88,8 @@ cloud:
 
 frontend:
   url: ${FRONTEND_URL}
+
+jwt:
+  token-expiration:
+    access: 86400
+    refresh: 2592000

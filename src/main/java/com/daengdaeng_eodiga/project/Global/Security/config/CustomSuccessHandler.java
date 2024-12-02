@@ -43,14 +43,14 @@ import java.util.Optional;
             if (Quser.isPresent()) {
                  user = Quser.get();
             }
-            String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L);
-            String refreshToken = jwtUtil.createRefreshToken(email,24 * 60 * 60 * 1000L);
+            String accessToken = jwtUtil.createJwt(email, jwtUtil.getAccessTokenExpiration());
+            String refreshToken = jwtUtil.createRefreshToken(email,jwtUtil.getRefreshTokenExpiration());
             ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
                 .path("/")
                 .sameSite("Lax")
                 .httpOnly(false)
                 .secure(true)
-                .maxAge(60 * 60 * 60)
+                .maxAge(jwtUtil.getRefreshTokenExpiration())
                 .domain(".daengdaeng-where.link")
                 .build();
             response.addHeader("Set-Cookie", refreshTokenCookie.toString());
@@ -59,11 +59,11 @@ import java.util.Optional;
                 .sameSite("Lax")
                 .httpOnly(false)
                 .secure(true)
-                .maxAge(60 * 60 * 60)
+                .maxAge(jwtUtil.getAccessTokenExpiration())
                 .domain(".daengdaeng-where.link")
                 .build();
             response.addHeader("Set-Cookie", accessTokenCookie.toString());
-            redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, user.getEmail());
+            redisTokenRepository.saveToken(refreshToken, jwtUtil.getRefreshTokenExpiration(), user.getEmail());
             response.sendRedirect(frontUrl);
         }
 

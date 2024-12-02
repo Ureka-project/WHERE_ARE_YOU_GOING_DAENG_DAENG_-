@@ -10,6 +10,7 @@ import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -24,22 +25,32 @@ public class TokenService {
         this.redisTokenRepository = redisTokenRepository;
     }
 
-    public ResponseEntity<ApiResponse<?>> generateTokensAndSetCookies(String email, HttpServletResponse response) {
+    public HttpServletResponse generateTokensAndSetCookies(String email, HttpServletResponse response) {
+        String accessToken = jwtUtil.createJwt(email, jwtUtil.getAccessTokenExpiration());
+        String refreshToken = jwtUtil.createRefreshToken(email,jwtUtil.getRefreshTokenExpiration());
 
-        String accessToken = jwtUtil.createJwt(email, 60 * 60 * 60L);
-        String refreshToken = jwtUtil.createRefreshToken(email, 24 * 60 * 60 * 1000L);
-
-        Cookie accessTokenCookie = jwtUtil.createCookie("Authorization", accessToken,60 * 60 * 60,response);
-        Cookie refreshTokenCookie = jwtUtil.createCookie("RefreshToken", refreshToken,24 * 60 * 60 * 1000,response);
-
-        redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, email);
-
-        response.addCookie(accessTokenCookie);
-        response.addCookie(refreshTokenCookie);
-        response.addHeader("Authorization",   accessToken);
-        response.addHeader("RefreshToken",  refreshToken);
-        OauthResponse oauthResponse = new OauthResponse(null,OauthResult.LOGIN_SUCCESS);
-        return ResponseEntity.ok(ApiResponse.success(oauthResponse));
+        response.addCookie(jwtUtil.createCookie("RefreshToken", refreshToken, jwtUtil.getRefreshTokenExpiration(), response));
+        response.addCookie(jwtUtil.createCookie("Authorization", accessToken, jwtUtil.getAccessTokenExpiration(),response));
+        redisTokenRepository.saveToken(refreshToken, jwtUtil.getRefreshTokenExpiration(), email);
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
+                .path("/")
+                .sameSite("Lax")
+                .httpOnly(false)
+                .secure(true)
+                .maxAge(jwtUtil.getRefreshTokenExpiration())
+                .domain(".daengdaeng-where.link")
+                .build();
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+        ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", accessToken)
+                .path("/")
+                .sameSite("Lax")
+                .httpOnly(false)
+                .secure(true)
+                .maxAge(jwtUtil.getAccessTokenExpiration())
+                .domain(".daengdaeng-where.link")
+                .build();
+        response.addHeader("Set-Cookie", accessTokenCookie.toString());
+        return response;
     }
     public ResponseEntity<ApiResponse<?>> deleteCookie(String email, String RefreshToken, HttpServletResponse response) {
         try {

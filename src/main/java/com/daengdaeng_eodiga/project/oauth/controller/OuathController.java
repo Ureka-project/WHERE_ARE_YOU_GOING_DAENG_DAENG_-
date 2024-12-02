@@ -25,8 +25,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +58,7 @@ public class OuathController {
             .sameSite("Lax")
             .httpOnly(false)
             .secure(false)
-            .maxAge(60 * 60 * 60)
+            .maxAge(60 * 10)
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", emailCookie.toString());
@@ -66,7 +68,7 @@ public class OuathController {
             .sameSite("Lax")
             .httpOnly(false)
             .secure(false)
-            .maxAge(60 * 60 * 60)
+            .maxAge(60 * 10)
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", provideCookie.toString());
@@ -75,38 +77,10 @@ public class OuathController {
 
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
-
     }
-
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> signup( @RequestBody @Valid  SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerUser(signUpForm);
-        String accessToken = jwtUtil.createJwt(signUpForm.getEmail(), 60 * 60 * 60L);
-        String refreshToken = jwtUtil.createRefreshToken(signUpForm.getEmail(),24 * 60 * 60 * 1000L);
-
-        response.addCookie(jwtUtil.createCookie("RefreshToken", refreshToken,60 * 60 * 60,response));
-        response.addCookie(jwtUtil.createCookie("Authorization", accessToken,24 * 60 * 60 ,response));
-        redisTokenRepository.saveToken(refreshToken, 24 * 60 * 60 * 1000L, signUpForm.getEmail());
-
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
-            .path("/")
-            .sameSite("Lax")
-            .httpOnly(false)
-            .secure(true)
-            .maxAge(60 * 60 * 60)
-            .domain(".daengdaeng-where.link")
-            .build();
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
-        ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", accessToken)
-            .path("/")
-            .sameSite("Lax")
-            .httpOnly(false)
-            .secure(true)
-            .maxAge(60 * 60 * 60)
-            .domain(".daengdaeng-where.link")
-            .build();
-        response.addHeader("Set-Cookie", accessTokenCookie.toString());
-
         return ResponseEntity.ok(ApiResponse.success(tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response)));
     }
     //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
@@ -135,12 +109,12 @@ public class OuathController {
     }
 
     @PutMapping("/user/adjust")
-    public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> AdjustUser(@Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.AdjustUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
     @GetMapping("/user/duplicateNickname")
-    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate(@RequestParam String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @Valid @RequestParam String nickname) {
         boolean isDuplicate = oauthUserService.isNicknameDuplicate(nickname);
 
         Map<String, Boolean> response = new HashMap<>();
