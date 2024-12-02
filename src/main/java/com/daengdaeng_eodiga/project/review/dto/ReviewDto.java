@@ -17,6 +17,7 @@ public class ReviewDto {
 
 	private Integer userId;
 	private Integer placeId;
+	private String placeName;
 	private String nickname;
 	private String petImg;
 	private Integer reviewId;
@@ -30,7 +31,7 @@ public class ReviewDto {
 
 	public ReviewDto(Integer userId, Integer placeId, String nickname, String petImg, Integer reviewId, Object pets,
 			String content, Integer score, Object media, Object keywords, LocalDate visitedAt,
-			LocalDateTime createdAt) {
+			LocalDateTime createdAt,String placeName) {
 		this.userId = userId;
 		this.placeId = placeId;
 		this.nickname = nickname;
@@ -43,6 +44,7 @@ public class ReviewDto {
 		this.keywords = convertToSet(keywords);
 		this.visitedAt = visitedAt;
 		this.createdAt = createdAt;
+		this.placeName = placeName;
 	}
 
 	private Set<String> convertToSet(Object input) {

@@ -66,4 +66,9 @@ public class NotificationService {
     public List<PushToken> findPushTokenByUser(User user) {
         return pushTokenRepository.findByUser(user);
     }
+
+    public void cancelPush(int userId) {
+        User user = userService.findUser(userId);
+        pushTokenRepository.deleteByUser(user);
+    }
 }
