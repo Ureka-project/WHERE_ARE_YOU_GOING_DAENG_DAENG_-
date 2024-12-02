@@ -28,6 +28,7 @@ public class PlaceController {
     private final OpenAiService openAiService;
     private final ReviewSummaryRepository reviewSummaryRepository;
 
+
     @PostMapping("/filter")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(
             @RequestBody FilterRequest request,
@@ -93,8 +94,20 @@ public class PlaceController {
     public ResponseEntity<ApiResponse<List<PlaceWithScore>>> RecommendPlaces(@RequestBody NearestRequest request,
                                                                        @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
         Integer userId=customOAuth2User.getUserDTO().getUserid();
-        String myplace=geoService.getRegionInfo(request.getLatitude(),request.getLongitude(),userId);
-        List<PlaceWithScore> places= placeService.RecommendPlaces(myplace,request.getLatitude(),request.getLongitude(),userId);
+        String myplace="";
+        double latitude=request.getLatitude();
+        double longitude=request.getLongitude();
+        if (request.getLatitude()==0.0 && request.getLongitude()==0.0){
+            List<Object> AgreementLocation = geoService.getNotAgreeInfo(latitude,longitude,userId);
+            latitude= (double) AgreementLocation.get(0);
+            longitude= (double) AgreementLocation.get(1);
+            myplace= (String) AgreementLocation.get(2);
+        }
+        else
+        {
+             myplace=geoService.getRegionInfo(request.getLatitude(),request.getLongitude(),userId);
+        }
+        List<PlaceWithScore> places= placeService.RecommendPlaces(myplace,latitude,longitude,userId);
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
