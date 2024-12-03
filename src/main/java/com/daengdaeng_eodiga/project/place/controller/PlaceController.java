@@ -28,32 +28,41 @@ public class PlaceController {
     private final ReviewSummaryRepository reviewSummaryRepository;
 
     @PostMapping("/filter")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(@Valid @RequestBody FilterRequest request) {
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @Valid @RequestBody FilterRequest request) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
         List<PlaceDto> places = placeService.filterPlaces(
                 request.getCity(),
                 request.getCityDetail(),
                 request.getPlaceType(),
                 request.getLatitude(),
                 request.getLongitude(),
-                null
+                userId
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(@Valid @RequestBody SearchRequest request) {
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @Valid @RequestBody SearchRequest request) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
         List<PlaceDto> places = placeService.searchPlaces(
                 request.getKeyword(),
                 request.getLatitude(),
                 request.getLongitude(),
-                null
+                userId
         );
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
     @GetMapping("/{placeId}")
-    public ResponseEntity<ApiResponse<PlaceDto>> getPlaceDetails(@PathVariable int placeId) {
-        PlaceDto placeDetails = placeService.getPlaceDetails(placeId);
+    public ResponseEntity<ApiResponse<PlaceDto>> getPlaceDetails(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @PathVariable int placeId) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
+        PlaceDto placeDetails = placeService.getPlaceDetails(placeId, userId);
         return ResponseEntity.ok(ApiResponse.success(placeDetails));
     }
 

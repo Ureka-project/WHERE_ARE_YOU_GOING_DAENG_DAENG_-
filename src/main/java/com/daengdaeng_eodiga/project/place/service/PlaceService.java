@@ -60,16 +60,27 @@ public class PlaceService {
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
-    public PlaceDto getPlaceDetails(int placeId) {
+    private boolean checkIfUserFavoritedPlace(int placeId, Integer userId) {
+        return placeRepository.existsFavoriteByPlaceIdAndUserId(placeId, userId);
+    }
 
+    public PlaceDto getPlaceDetails(int placeId, Integer userId) {
         List<Object[]> results = placeRepository.findPlaceDetailsById(placeId);
 
         if (results.isEmpty()) {
             throw new PlaceNotFoundException();
         }
+        PlaceDto placeDto = PlaceDtoMapper.convertToPlaceDto(results.get(0));
+        if (userId != null) {
 
-        return PlaceDtoMapper.convertToPlaceDto(results.get(0));
+            boolean isFavorite = checkIfUserFavoritedPlace(placeId, userId);
+            placeDto.setIsFavorite(isFavorite);
+        } else {
+            placeDto.setIsFavorite(false);
+        }
+        return placeDto;
     }
+
 
     public Place findPlace(int placeId) {
         return placeRepository.findById(placeId).orElseThrow(PlaceNotFoundException::new);

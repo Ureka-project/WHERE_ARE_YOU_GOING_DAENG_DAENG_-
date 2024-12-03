@@ -4,6 +4,7 @@ import com.daengdaeng_eodiga.project.place.entity.Place;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -195,5 +196,13 @@ LIMIT 30;
 
 
     Optional<Place> findByPlaceId(Integer placeId);
+
+
+
+    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END " +
+            "FROM Favorite f WHERE f.place.placeId = :placeId AND f.user.userId = :userId")
+    boolean existsFavoriteByPlaceIdAndUserId(@Param("placeId") int placeId, @Param("userId") int userId);
+
 }
+
 
