@@ -5,6 +5,7 @@ import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.preference.dto.PreferenceRequestDto;
 import com.daengdaeng_eodiga.project.preference.dto.PreferenceResponseDto;
 import com.daengdaeng_eodiga.project.preference.service.PreferenceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,16 +19,19 @@ import java.util.List;
 public class PreferenceController {
     private final PreferenceService preferenceService;
 
-
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> registerPreference(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody PreferenceRequestDto preferenceRequestDto) {
+    public ResponseEntity<ApiResponse<?>> registerPreference(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @Valid @RequestBody PreferenceRequestDto preferenceRequestDto) {
         int userId = customOAuth2User.getUserDTO().getUserid();
         preferenceService.registerPreference(userId, preferenceRequestDto);
         return ResponseEntity.ok(ApiResponse.success("preferences insert succesfully"));
     }
 
     @PutMapping
-    public ResponseEntity<ApiResponse<?>> updatePreference(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @RequestBody PreferenceRequestDto preferenceRequestDto) {
+    public ResponseEntity<ApiResponse<?>> updatePreference(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @Valid @RequestBody PreferenceRequestDto preferenceRequestDto) {
         int userId = customOAuth2User.getUserDTO().getUserid();
         preferenceService.updatePreference(userId, preferenceRequestDto);
         return ResponseEntity.ok(ApiResponse.success("preferences update succesfully"));

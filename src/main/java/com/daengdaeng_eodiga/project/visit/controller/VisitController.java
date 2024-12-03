@@ -32,6 +32,7 @@ public class VisitController {
 	public ResponseEntity<ApiResponse<PetsAtVisitTime>> registerVisits(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,@RequestBody VisitRequest request) {
 		int userId = customOAuth2User.getUserDTO().getUserid();
 		PetsAtVisitTime response = visitService.registerVisit(userId, request.placeId(), request.petIds(), request.visitAt());
+		visitService.sendVisitNotification(userId, response.visitId(),response.pets().get(0).petName(),response.placeName() );
 		return ResponseEntity.ok(ApiResponse.success(response));
 
 	}
