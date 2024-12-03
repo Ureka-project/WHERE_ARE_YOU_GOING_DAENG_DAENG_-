@@ -96,7 +96,7 @@ public class OuathController {
     }
     //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
     @DeleteMapping("/user/delete")
-    public ResponseEntity<?> deleteUser(CustomOAuth2User customOAuth2User,
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
                                         HttpServletResponse response) {
         String userEmail = customOAuth2User != null ? customOAuth2User.getEmail() : null;
         oauthUserService.deleteUserByName(userEmail);

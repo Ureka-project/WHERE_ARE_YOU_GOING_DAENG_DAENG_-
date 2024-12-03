@@ -67,7 +67,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/user/duplicateNickname").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/visit/place/**").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
 

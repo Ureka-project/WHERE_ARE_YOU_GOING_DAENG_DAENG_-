@@ -2,6 +2,7 @@ package com.daengdaeng_eodiga.project.notification.controller;
 
 import org.springframework.data.redis.core.RedisTemplate;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,8 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestController
-@RequestMapping("/api/v1/publish")
+@Component
 @RequiredArgsConstructor
 public class Publisher {
 
@@ -33,8 +33,5 @@ public class Publisher {
 		} catch (JsonProcessingException e) {
 			log.error("push notification send failed - json error : " + e.getMessage());
 		}
-
-
-
 	}
 }
