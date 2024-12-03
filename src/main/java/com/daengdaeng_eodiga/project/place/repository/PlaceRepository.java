@@ -120,13 +120,19 @@ SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.long
        CASE WHEN :userId = -1 THEN 0
             WHEN f.favorite_id IS NOT NULL THEN 1
             ELSE 0
-       END AS is_favorite
+       END AS is_favorite,
+       CAST(o.start_time AS CHAR) AS start_time,
+       CAST(o.end_time AS CHAR) AS end_time,
+       (SELECT COUNT(f2.favorite_id) FROM favorite f2 WHERE f2.place_id = p.place_id) AS favorite_count,
+       ps.score AS place_score
 FROM place p
 LEFT JOIN common_code c ON p.place_type = c.code_id
 LEFT JOIN favorite f ON p.place_id = f.place_id AND f.user_id = :userId
+LEFT JOIN opening_date o ON o.place_id = p.place_id
+LEFT JOIN place_score ps ON ps.place_id = p.place_id
 WHERE (:city IS NULL OR p.city LIKE CONCAT('%', :city, '%'))
-AND (:cityDetail IS NULL OR p.city_detail LIKE CONCAT('%', :cityDetail, '%'))
-AND (:placeType IS NULL OR :placeType = '' OR c.code_id = :placeType)
+  AND (:cityDetail IS NULL OR p.city_detail LIKE CONCAT('%', :cityDetail, '%'))
+  AND (:placeType IS NULL OR :placeType = '' OR c.code_id = :placeType)
 ORDER BY distance ASC
 LIMIT 30
 """, nativeQuery = true)
@@ -149,10 +155,16 @@ SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.long
        CASE WHEN :userId = -1 THEN 0
             WHEN f.favorite_id IS NOT NULL THEN 1
             ELSE 0
-       END AS is_favorite
+       END AS is_favorite,
+       CAST(o.start_time AS CHAR) AS start_time,
+       CAST(o.end_time AS CHAR) AS end_time,
+       (SELECT COUNT(f2.favorite_id) FROM favorite f2 WHERE f2.place_id = p.place_id) AS favorite_count,
+       ps.score AS place_score
 FROM place p
 LEFT JOIN common_code c ON p.place_type = c.code_id
 LEFT JOIN favorite f ON p.place_id = f.place_id AND f.user_id = :userId
+LEFT JOIN opening_date o ON o.place_id = p.place_id
+LEFT JOIN place_score ps ON ps.place_id = p.place_id
 WHERE (:keyword IS NULL OR p.name LIKE CONCAT('%', :keyword, '%'))
 ORDER BY distance ASC
 LIMIT 30

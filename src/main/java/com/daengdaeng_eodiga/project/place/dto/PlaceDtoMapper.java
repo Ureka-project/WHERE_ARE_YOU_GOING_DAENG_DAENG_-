@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.place.dto;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class PlaceDtoMapper {
 
