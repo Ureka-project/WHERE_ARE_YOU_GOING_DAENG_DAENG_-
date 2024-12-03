@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import java.util.UUID;
@@ -17,6 +19,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.daengdaeng_eodiga.project.Global.S3.enums.S3Prefix;
 
 @Component
 @Slf4j
@@ -28,15 +31,15 @@ public class S3Uploader {
 	@Value("${cloud.s3.bucket}")
 	private String bucket;
 
-	public Map<String, String> getPresignedUrl(String prefix, String fileName) {
-		if (!prefix.isEmpty()) {
-			fileName = createPath(prefix, fileName);
+	public Map<String, String> getPresignedUrl(S3Prefix prefix, List<String> fileNames) {
+		Map<String,String> urls = new HashMap<>();
+		for(String name : fileNames) {
+			String fileName = createPath(prefix.toString(), name);
+			GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePresignedUrlRequest(bucket, fileName);
+			URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
+			urls.put(name, url.toString());
 		}
-
-		GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePresignedUrlRequest(bucket, fileName);
-		URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
-
-		return Map.of("url", url.toString());
+		return urls;
 	}
 
 	private GeneratePresignedUrlRequest getGeneratePresignedUrlRequest(String bucket, String fileName) {
