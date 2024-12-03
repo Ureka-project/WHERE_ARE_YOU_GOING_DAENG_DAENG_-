@@ -19,7 +19,7 @@ public class ReviewMedia {
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private String path;
 
     @Builder

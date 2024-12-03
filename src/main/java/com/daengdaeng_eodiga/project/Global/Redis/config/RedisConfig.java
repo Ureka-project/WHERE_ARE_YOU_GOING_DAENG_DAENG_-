@@ -1,10 +1,14 @@
 package com.daengdaeng_eodiga.project.Global.Redis.config;
 
+import com.daengdaeng_eodiga.project.Global.Redis.Dto.RedisPlaceDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.List;
 
 @Configuration
 public class RedisConfig {
@@ -19,6 +23,20 @@ public class RedisConfig {
 
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+
+        return redisTemplate;
+    }
+    @Bean
+    public RedisTemplate<String, RedisPlaceDto> listObjectRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, RedisPlaceDto> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+
+        Jackson2JsonRedisSerializer<RedisPlaceDto> serializer = new Jackson2JsonRedisSerializer<>(RedisPlaceDto.class);
+
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(serializer);
 
         return redisTemplate;
     }
