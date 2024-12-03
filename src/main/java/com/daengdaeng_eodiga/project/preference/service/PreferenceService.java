@@ -33,6 +33,7 @@ public class PreferenceService {
     private final UserRepository userRepository;
 
     public PreferenceResponseDto registerPreference(int userId, PreferenceRequestDto preferenceRequestDto) {
+        // TODO : 선호도 DB안에 같은 USER ID가 존재하다면 예외처리하도록 추가
         User user = findUser( userId);
 
         List<CommonCode> commonCodes = findCommonCode(
