@@ -33,4 +33,6 @@ public class PlaceDto {
     private String endTime;
     private int favoriteCount;
     private Double placeScore;
+    private String imageurl;
+
 }
