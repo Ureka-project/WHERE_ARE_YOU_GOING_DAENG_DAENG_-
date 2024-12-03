@@ -29,7 +29,8 @@ public enum ErrorCode {
 	BANNER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 배너입니다."),
 	PUSH_TOKEN_IS_EXISTS(HttpStatus.CONFLICT, "이미 등록된 푸시 토큰입니다."),
 	INVALID_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 요청입니다."),
-	NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 정보입니다.");
+	NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 정보입니다."),
+	MISSING_COORDINATES(HttpStatus.BAD_REQUEST, "위도와 경도 값이 필요합니다.");
 	private final HttpStatus errorCode;
 	private final String message;
 

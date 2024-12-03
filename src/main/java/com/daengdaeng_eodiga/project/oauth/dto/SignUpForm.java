@@ -4,9 +4,6 @@ import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 
 import lombok.Data;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Data
 public class SignUpForm {

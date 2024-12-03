@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.place.service;
 
+
 import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
@@ -45,6 +46,7 @@ public class PlaceService {
     private final ReviewSummaryRepository reviewSummaryRepository;
     private final OpenAiService openAiService;
     private final CommonCodeService commonCodeService;
+
 
     public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude, Integer userId) {
         Integer effectiveUserId = userId != null ? userId : -1;
@@ -95,15 +97,15 @@ public class PlaceService {
     }
 
 
-    public List<PlaceWithScore> RecommendPlaces(String MyPlace,double latitude, double longitude,Integer userId) {
+    public List<PlaceWithScore> RecommendPlaces(String MyPlace, double latitude, double longitude, Integer userId) {
         List<PlaceWithScore> placeArr = new ArrayList<>();
-        List<UserRequsetPrefernceDto> UserPerferenceDto =preferenceRepository.findPreferenceTypesByUserId(userId);
+        List<UserRequsetPrefernceDto> UserPerferenceDto = preferenceRepository.findPreferenceTypesByUserId(userId);
         String region1 = getRegionValue(MyPlace, "region_1depth_name");
         String region2 = getRegionValue(MyPlace, "region_2depth_name");
         String region3 = getRegionValue(MyPlace, "region_3depth_name");
         List<PlaceRcommendDto> RecommnedArray = new ArrayList<>();
-        List<Object[]> QueryArray =placeRepository.findPlaceRecommendationsWithKeywords();
-        for(Object[] arr : QueryArray) {
+        List<Object[]> QueryArray = placeRepository.findPlaceRecommendationsWithKeywords();
+        for (Object[] arr : QueryArray) {
             Integer placeId = (Integer) arr[0];
             String name = (String) arr[1];
             String city = (String) arr[2];
@@ -140,28 +142,27 @@ public class PlaceService {
 
             RecommnedArray.add(dto);
         }
-        for(PlaceRcommendDto place : RecommnedArray) {
+        for (PlaceRcommendDto place : RecommnedArray) {
 
-            double Placelatitude= place.getLatitude();
-            double Placelongitude= place.getLongitude();
-            double score =calculateDistance(latitude, longitude,Placelatitude, Placelongitude);
+            double Placelatitude = place.getLatitude();
+            double Placelongitude = place.getLongitude();
+            double score = calculateDistance(latitude, longitude, Placelatitude, Placelongitude);
             String place1 = place.getCity();
             String place2 = place.getCityDetail();
             String place3 = place.getTownship();
-            score+= calculateRegionScore(region1, region2, region3, place1, place2, place3);
-            score+= place.getScore() / 10.0;
-            if (place.getReviewCount()<10)
-            {
-                score+= place.getReviewCount() / 10.0;
+            score += calculateRegionScore(region1, region2, region3, place1, place2, place3);
+            score += place.getScore() / 10.0;
+            if (place.getReviewCount() < 10) {
+                score += place.getReviewCount() / 10.0;
             }
-            Map<String,Integer> placePer= place.getKeywords();
-            for(UserRequsetPrefernceDto userPer : UserPerferenceDto) {
+            Map<String, Integer> placePer = place.getKeywords();
+            for (UserRequsetPrefernceDto userPer : UserPerferenceDto) {
                 String placeValue = userPer.getPreferenceTypes();
                 if (placePer.containsKey(placeValue)) {
-                    score+=1;
+                    score += 1;
                 }
             }
-            PlaceWithScore placeWithScore = new PlaceWithScore(place, min(score,10.0));
+            PlaceWithScore placeWithScore = new PlaceWithScore(place, min(score, 10.0));
             if (placeArr.size() < 3) {
                 placeArr.add(placeWithScore);
             } else {
@@ -171,13 +172,14 @@ public class PlaceService {
             }
 
         }
-        for(PlaceWithScore place : placeArr) {
-           PlaceRcommendDto placeDto = place.getPlaceRcommendDto();
-            String placeType=commonCodeService.getCommonCodeName(placeDto.getPlaceType());
+        for (PlaceWithScore place : placeArr) {
+            PlaceRcommendDto placeDto = place.getPlaceRcommendDto();
+            String placeType = commonCodeService.getCommonCodeName(placeDto.getPlaceType());
             placeDto.setPlaceType(placeType);
         }
         return placeArr;
     }
+
     private String getRegionValue(String roadName, String regionKey) {
 
         String pattern = regionKey + "=(.*?),";
@@ -189,6 +191,7 @@ public class PlaceService {
         }
         return null;
     }
+
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371;
         double latDistance = Math.toRadians(lat2 - lat1);
@@ -197,26 +200,25 @@ public class PlaceService {
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double maxDistance=100.0;
+        double maxDistance = 100.0;
         return 5.0 / (1.0 + (R * c) / maxDistance);
     }
+
     private double calculateRegionScore(String region1, String region2, String region3, String place1, String place2, String place3) {
         double score = 0;
 
         if (region1 != null && !region1.equals(place1)) {
             return 0;
 
-        }
-        else
-        {
+        } else {
             if (region1 != null && region1.equals(place1)) {
-                score= 0.5;
+                score = 0.5;
             }
-             if (region2 != null && region2.equals(place2)) {
-                score=1;
+            if (region2 != null && region2.equals(place2)) {
+                score = 1;
             }
-             if (region3 != null && region3.equals(place3)) {
-                 score=2;
+            if (region3 != null && region3.equals(place3)) {
+                score = 2;
             }
         }
         return score;
