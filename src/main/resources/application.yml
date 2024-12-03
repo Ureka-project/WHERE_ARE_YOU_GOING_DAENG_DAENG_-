@@ -94,6 +94,7 @@ cloud:
 
 frontend:
   url: ${FRONTEND_URL}
+  test : ${TEST}
 
 jwt:
   token-expiration:

@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.user.service.UserService;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,9 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 
-import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration
 @EnableWebSecurity
@@ -29,8 +29,9 @@ public class SecurityConfig {
     private final UserService userService;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final Boolean testMode;
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
-    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler) {
+    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
@@ -39,6 +40,7 @@ public class SecurityConfig {
         this.userService = userService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
+        this.testMode = testMode;
 
     }
     @Bean
@@ -71,7 +73,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/visit/place/**").permitAll()
                 .anyRequest().authenticated())
-            .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService,testMode), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .oauth2Login((oauth2) -> oauth2
