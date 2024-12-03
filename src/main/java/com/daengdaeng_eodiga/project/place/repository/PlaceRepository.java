@@ -38,7 +38,7 @@ WHERE p.place_id = :placeId;
             "SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude, " +
                     "p.post_code, p.street_addresses, p.tel_number, p.url, p.place_type, p.description, " +
                     "p.weight_limit, p.parking, p.indoor, p.outdoor, " +
-                    "COALESCE(ps.score, 5) AS score, " +
+                    "COALESCE(ps.score, 2) AS score, " +
                     "GROUP_CONCAT(rk.keyword) AS keywords, " +
                     "COUNT(DISTINCT  " +
                     "r.review_id) AS review_count " +
