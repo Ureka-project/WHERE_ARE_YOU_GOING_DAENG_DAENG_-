@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
 public class PlaceRcommendDto {
 
     private Integer placeId;

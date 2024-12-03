@@ -15,6 +15,7 @@ import com.daengdaeng_eodiga.project.preference.entity.PreferenceId;
 import com.daengdaeng_eodiga.project.preference.repository.PreferenceRepository;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
+import com.daengdaeng_eodiga.project.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +29,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PreferenceService {
 
+    private final UserService userService;
     private final PreferenceRepository preferenceRepository;
     private final CommonCodeRepository commonCodeRepository;
     private final GroupCodeRepository groupCodeRepository;
-    private final UserRepository userRepository;
 
     public PreferenceResponseDto registerPreference(int userId, PreferenceRequestDto preferenceRequestDto) {
-        User user = findUser(userId);
+        User user = userService.findUser(userId);
         if( !preferenceRepository.findByUser(user).isEmpty() ) { throw new DuplicatePreferenceException();}
 
         List<CommonCode> commonCodes = findCommonCode(
@@ -50,7 +51,7 @@ public class PreferenceService {
     }
 
     public PreferenceResponseDto updatePreference(int userId, PreferenceRequestDto preferenceRequestDto) {
-        User user = findUser(userId);
+        User user = userService.findUser(userId);
 
         preferenceRepository.deleteByUserAndPreferenceType(user, preferenceRequestDto.getPreferenceInfo());
         List<CommonCode> commonCodes = findCommonCode(
@@ -66,7 +67,7 @@ public class PreferenceService {
     }
 
     public List<PreferenceResponseDto> fetchPreferences(int userId) {
-        User user = findUser(userId);
+        User user = userService.findUser(userId);
         List<Preference> preferences = preferenceRepository.findByUser(user);
 
         return preferences.stream()
@@ -82,15 +83,6 @@ public class PreferenceService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * user 조회 메소드
-     * @param userId
-     * @return User
-     */
-    private User findUser(int userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
-    }
     /**
      * 공통코드 조회 메소드
      * @param groupId

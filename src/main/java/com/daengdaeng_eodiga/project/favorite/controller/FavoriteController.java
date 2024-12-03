@@ -34,7 +34,8 @@ public class FavoriteController {
     }
 
     @DeleteMapping("/{favoriteId}")
-    public ResponseEntity<ApiResponse<String>> deleteFavorite(@PathVariable @Min(1) Integer favoriteId) {
+    public ResponseEntity<ApiResponse<String>> deleteFavorite(
+            @PathVariable @Min(value = 1, message = "Favorite ID는 1 이상이어야 합니다.") Integer favoriteId) {
         favoriteService.deleteFavorite(favoriteId);
         return ResponseEntity.ok(ApiResponse.success("favorite deleted succesfully"));
     }

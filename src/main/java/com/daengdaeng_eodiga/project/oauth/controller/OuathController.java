@@ -18,6 +18,7 @@ import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +26,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
+
+
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +54,7 @@ public class OuathController {
     private String frontUrl;
 
     @GetMapping("/signup")
-    public void showSignUpForm(@RequestParam String email,@RequestParam String provider, HttpServletResponse response) throws IOException {
+    public void showSignUpForm(@RequestParam String email, @RequestParam String provider, HttpServletResponse response) throws IOException {
 
         ResponseCookie emailCookie = ResponseCookie.from("email", email)
             .path("/")
@@ -111,12 +113,13 @@ public class OuathController {
     }
 
     @PutMapping("/user/adjust")
-    public ResponseEntity<ApiResponse<?>> AdjustUser(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<?>> AdjustUser(@Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.AdjustUser(signUpForm);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
     @GetMapping("/user/duplicateNickname")
-    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam String nickname) {
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam
+                                                                                         String nickname) {
         boolean isDuplicate = oauthUserService.isNicknameDuplicate(nickname);
 
         Map<String, Boolean> response = new HashMap<>();

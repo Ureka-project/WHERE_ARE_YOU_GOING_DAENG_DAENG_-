@@ -34,7 +34,7 @@ public class PetController {
 
     @PutMapping("/{petId}")
     public ResponseEntity<ApiResponse<String>> updatePet(
-            @PathVariable @Min(1) int petId,
+            @PathVariable @Min(value = 1, message = "Pet ID는 1 이상이어야 합니다.") int petId,
             @Valid @RequestBody PetUpdateDto updateDto) {
         petService.updatePet(petId, updateDto);
         return ResponseEntity.ok(ApiResponse.success("pet updated succesfully"));
@@ -49,7 +49,8 @@ public class PetController {
     }
 
     @GetMapping("/{petId}")
-    public ResponseEntity<ApiResponse<PetDetailResponseDto>> fetchPetDetail(@PathVariable int petId) {
+    public ResponseEntity<ApiResponse<PetDetailResponseDto>> fetchPetDetail(
+            @PathVariable @Min(value = 1, message = "Pet ID는 1 이상이어야 합니다.") int petId) {
         PetDetailResponseDto petDetail = petService.fetchPetDetail(petId);
         return ResponseEntity.ok(ApiResponse.success(petDetail));
     }
@@ -57,7 +58,7 @@ public class PetController {
     @DeleteMapping("/{petId}")
     public ResponseEntity<ApiResponse<String>> deletePet(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
-            @PathVariable int petId) {
+            @PathVariable @Min(value = 1, message = "Pet ID는 1 이상이어야 합니다.") int petId) {
         int userId = customOAuth2User.getUserDTO().getUserid();
         petService.deletePet(userId, petId);
         return ResponseEntity.ok(ApiResponse.success("pet deleted succesfully"));
