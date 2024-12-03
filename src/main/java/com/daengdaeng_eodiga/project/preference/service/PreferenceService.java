@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.preference.service;
 
 import com.daengdaeng_eodiga.project.Global.exception.CommonCodeNotFoundException;
+import com.daengdaeng_eodiga.project.Global.exception.DuplicatePreferenceException;
 import com.daengdaeng_eodiga.project.Global.exception.GroupCodeNotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.common.entity.CommonCode;
@@ -33,8 +34,8 @@ public class PreferenceService {
     private final UserRepository userRepository;
 
     public PreferenceResponseDto registerPreference(int userId, PreferenceRequestDto preferenceRequestDto) {
-        // TODO : 선호도 DB안에 같은 USER ID가 존재하다면 예외처리하도록 추가
-        User user = findUser( userId);
+        User user = findUser(userId);
+        if( !preferenceRepository.findByUser(user).isEmpty() ) { throw new DuplicatePreferenceException();}
 
         List<CommonCode> commonCodes = findCommonCode(
                 preferenceRequestDto.getPreferenceInfo(),
