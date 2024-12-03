@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,4 +33,6 @@ public class PlaceDto {
     private String endTime;
     private int favoriteCount;
     private Double placeScore;
+    private String imageurl;
+
 }
