@@ -28,6 +28,8 @@ public class FavoriteService {
 
     public FavoriteResponseDto registerFavorite(int userId, FavoriteRequestDto favoriteRequestDto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        if( !favoriteRepository.findByUser(user).isEmpty() ) { throw new DuplicateFavoriteException(); }
+
         Place place = placeRepository.findById(favoriteRequestDto.getPlaceId()).orElseThrow(PlaceNotFoundException::new);
 
         Favorite favorite = Favorite.builder()

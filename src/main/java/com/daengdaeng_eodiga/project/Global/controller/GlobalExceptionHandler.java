@@ -1,6 +1,6 @@
 package com.daengdaeng_eodiga.project.Global.controller;
 
-
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,6 +30,16 @@ public class GlobalExceptionHandler {
 				.map(FieldError::getDefaultMessage)
 				.collect(Collectors.joining(", ")));
 		ApiErrorResponse response = ApiErrorResponse.error("NOT VALIDATED", errorMessages.toString());
+
+		return ResponseEntity.badRequest().body(response);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<ApiErrorResponse> handleValidationExceptions(ConstraintViolationException ex) {
+		String errorMessage = ex.getConstraintViolations()
+				.stream().map(violation -> violation.getMessage())
+				.collect(Collectors.joining(", "));
+		ApiErrorResponse response = ApiErrorResponse.error("NOT VALIDATED", errorMessage);
 
 		return ResponseEntity.badRequest().body(response);
 	}
