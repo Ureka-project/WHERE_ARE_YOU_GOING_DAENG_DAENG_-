@@ -46,8 +46,10 @@ public class JWTFilter extends OncePerRequestFilter {
         String accessToken = null ;
         String refreshToken = null ;
 
-
+        log.info("cookies size : "+cookies.length);
         for (Cookie cookie : cookies) {
+            log.info("cookie name : "+cookie.getName());
+            log.info("cookie value : "+cookie.getValue());
             if (cookie.getName().equals("Authorization")) {
                 accessToken = cookie.getValue();
             } else if (cookie.getName().equals("RefreshToken")) {
@@ -100,6 +102,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
         String email = jwtUtil.getEmail(accessToken);
+        log.info("filter email : "+email);
+        log.info("filter accessToken : "+accessToken);
         UserOauthDto userDTO = new UserOauthDto();
         User user= userService.findUserByemail(email);
         userDTO.setUserid(user.getUserId());
