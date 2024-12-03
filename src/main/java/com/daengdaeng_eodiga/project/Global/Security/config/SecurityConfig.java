@@ -62,6 +62,16 @@ public class SecurityConfig {
         http.cors(cors -> cors.configurationSource(request -> corsConfiguration()));
 
         http
+            .authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://api.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/user/duplicateNickname").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
+                .anyRequest().authenticated())
+            .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService), UsernamePasswordAuthenticationFilter.class);
+
+        http
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2UserService))
