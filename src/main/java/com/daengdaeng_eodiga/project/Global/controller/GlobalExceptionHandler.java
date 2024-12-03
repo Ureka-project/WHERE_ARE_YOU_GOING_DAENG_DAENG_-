@@ -1,24 +1,17 @@
 package com.daengdaeng_eodiga.project.Global.controller;
 
-import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.daengdaeng_eodiga.project.Global.dto.ApiErrorResponse;
 import com.daengdaeng_eodiga.project.Global.exception.BusinessException;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -35,6 +28,16 @@ public class GlobalExceptionHandler {
 				.map(FieldError::getDefaultMessage)
 				.collect(Collectors.joining(", ")));
 		ApiErrorResponse response = ApiErrorResponse.error("NOT VALIDATED", errorMessages.toString());
+
+		return ResponseEntity.badRequest().body(response);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<ApiErrorResponse> handleValidationExceptions(ConstraintViolationException ex) {
+		String errorMessage = ex.getConstraintViolations()
+				.stream().map(violation -> violation.getMessage())
+				.collect(Collectors.joining(", "));
+		ApiErrorResponse response = ApiErrorResponse.error("NOT VALIDATED", errorMessage);
 
 		return ResponseEntity.badRequest().body(response);
 	}
