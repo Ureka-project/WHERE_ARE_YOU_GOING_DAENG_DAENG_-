@@ -60,9 +60,9 @@ spring:
 
   kakao:
     api:
-      url: "https://dapi.kakao.com/v2/${DOMAIN}/geo/coord2address.json"
+      url: "https://dapi.kakao.com/v2/${HOST}/geo/coord2address.json"
       key: ${KAKAO_REST_API_KEY}
-      Nopeurl: "https://dapi.kakao.com/v2/local/search/address.json?query="
+      Nopeurl: "https://dapi.kakao.com/v2/${HOST}/search/address.json?query="
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
@@ -94,6 +94,7 @@ cloud:
 
 frontend:
   url: ${FRONTEND_URL}
+  test : ${TEST}
 
 jwt:
   token-expiration:

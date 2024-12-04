@@ -29,8 +29,6 @@ public class TokenService {
         String accessToken = jwtUtil.createJwt(email, jwtUtil.getAccessTokenExpiration());
         String refreshToken = jwtUtil.createRefreshToken(email,jwtUtil.getRefreshTokenExpiration());
 
-        response.addCookie(jwtUtil.createCookie("RefreshToken", refreshToken, jwtUtil.getRefreshTokenExpiration(), response));
-        response.addCookie(jwtUtil.createCookie("Authorization", accessToken, jwtUtil.getAccessTokenExpiration(),response));
         redisTokenRepository.saveToken(refreshToken, jwtUtil.getRefreshTokenExpiration(), email);
         ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
                 .path("/")
@@ -51,28 +49,37 @@ public class TokenService {
                 .build();
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
     }
-    public ResponseEntity<ApiResponse<?>> deleteCookie(String email, String RefreshToken, HttpServletResponse response) {
+    public void deleteCookie(String email, HttpServletResponse response,Cookie Refresh) {
         try {
-            // 쿠키 삭제 처리
-            Cookie RefreshCookie = jwtUtil.deletRefreshCookie("RefreshToken", null, response);
-            Cookie accessCookie = jwtUtil.deletAcessCookie("Authorization", null, response);
-            response.addCookie(RefreshCookie);
-            response.addCookie(accessCookie);
 
-            // Redis에서 토큰 삭제
-            redisTokenRepository.deleteToken(RefreshToken);
+            redisTokenRepository.deleteToken(email);
+            ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken")
+                    .path("/")
+                    .sameSite("Lax")
+                    .httpOnly(false)
+                    .secure(true)
+                    .maxAge(0)
+                    .domain(".daengdaeng-where.link")
+                    .build();
+            response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+            ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization")
+                    .path("/")
+                    .sameSite("Lax")
+                    .httpOnly(false)
+                    .secure(true)
+                    .maxAge(0)
+                    .domain(".daengdaeng-where.link")
+                    .build();
+            response.addHeader("Set-Cookie", accessTokenCookie.toString());
 
-            long expiration = jwtUtil.getExpiration(RefreshToken);
+            long expiration = jwtUtil.getExpiration(Refresh.getValue());
             if (expiration > 0) {
-                redisTokenRepository.addToBlacklist(RefreshToken, expiration, email);
+                redisTokenRepository.addToBlacklist(Refresh.getValue(), expiration, email);
             }
 
-            // 성공적인 응답
-            return ResponseEntity.ok(ApiResponse.success(response));
-
         } catch (Exception e) {
-            // 예외 발생 시 커스텀 예외 던지기
-            throw new UserFailedDelCookie();  // 쿠키 삭제 실패 예외를 던짐
+
+            throw new UserFailedDelCookie();
         }
     }
 }

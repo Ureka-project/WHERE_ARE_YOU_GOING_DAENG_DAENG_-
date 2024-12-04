@@ -139,6 +139,7 @@ public class ReviewService {
 		}
 		List<ReviewDto> reviews = getReviewDto(reviewsPage);
 		List<String> keywords = reviewKeywordsService.fetchBestReviewKeywordsTop3(placeId);
+		System.out.println(keywords.toString());
 		ReviewsResponse response = new ReviewsResponse(reviews,reviewsPage.getTotalElements(),reviewsPage.getNumber(),reviewsPage.getSize(),reviewsPage.isFirst(),reviewsPage.isLast(),orderType,score,keywords.stream().map(keyword -> commonCodeService.getCommonCodeName(keyword)).collect(Collectors.toList()));
 
 		return response;
