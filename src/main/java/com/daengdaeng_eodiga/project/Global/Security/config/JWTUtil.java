@@ -90,24 +90,7 @@ public class JWTUtil {
         return cookie;
     }
 
-    public  Cookie deletAcessCookie(String key, String value, HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setDomain("daengdaeng-where.link");
-        return cookie;
-    }
-    public Cookie deletRefreshCookie(String key, String value,HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setDomain("daengdaeng-where.link");
-        return cookie;
-    }
+
 
     public long getExpiration(String token) {
         try {
