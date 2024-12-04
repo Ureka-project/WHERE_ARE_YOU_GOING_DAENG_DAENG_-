@@ -72,9 +72,11 @@ public class VisitService {
 		}
 
 		Visit savedVisit = visit;
-		List<Integer> notSavedPetIds = visitPetsAtTime.stream().filter(visitPet -> !petIds.contains(visitPet.getPet().getPetId())).map(visitPet -> {
+		List<Integer> visitPetIds = visitPetsAtTime.stream().map(visitPet -> {
 			return visitPet.getPet().getPetId();
 		}).toList();
+		List<Integer> notSavedPetIds = petIds.stream().filter(petId -> !visitPetIds.contains(petId)).toList();
+
 
 		if(notSavedPetIds.isEmpty()){
 			throw new DuplicatePetException();
