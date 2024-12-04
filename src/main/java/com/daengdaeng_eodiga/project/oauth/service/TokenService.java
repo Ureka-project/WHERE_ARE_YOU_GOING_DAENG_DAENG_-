@@ -29,8 +29,6 @@ public class TokenService {
         String accessToken = jwtUtil.createJwt(email, jwtUtil.getAccessTokenExpiration());
         String refreshToken = jwtUtil.createRefreshToken(email,jwtUtil.getRefreshTokenExpiration());
 
-        response.addCookie(jwtUtil.createCookie("RefreshToken", refreshToken, jwtUtil.getRefreshTokenExpiration(), response));
-        response.addCookie(jwtUtil.createCookie("Authorization", accessToken, jwtUtil.getAccessTokenExpiration(),response));
         redisTokenRepository.saveToken(refreshToken, jwtUtil.getRefreshTokenExpiration(), email);
         ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
                 .path("/")

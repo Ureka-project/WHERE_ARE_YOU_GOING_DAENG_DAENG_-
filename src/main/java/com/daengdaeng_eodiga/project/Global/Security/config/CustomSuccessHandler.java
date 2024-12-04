@@ -6,6 +6,7 @@ import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Optional;
-
+@Slf4j
 @Component
     public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
@@ -37,6 +38,7 @@ import java.util.Optional;
             CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
             String email=customUserDetails.getEmail();
 
+            log.info("onAuthenticationSuccess - CustomSuccessHandler : " + email);
 
             Optional<User> Quser = userRepository.findByEmail(email);
             User user = new User();

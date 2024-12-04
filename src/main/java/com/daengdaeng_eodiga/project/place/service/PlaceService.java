@@ -60,15 +60,25 @@ public class PlaceService {
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
-    public PlaceDto getPlaceDetails(int placeId) {
+    private boolean checkIfUserFavoritedPlace(int placeId, Integer userId) {
+        return placeRepository.existsFavoriteByPlaceIdAndUserId(placeId, userId);
+    }
 
+    public PlaceDto getPlaceDetails(int placeId, Integer userId) {
         List<Object[]> results = placeRepository.findPlaceDetailsById(placeId);
 
         if (results.isEmpty()) {
             throw new PlaceNotFoundException();
         }
+        PlaceDto placeDto = PlaceDtoMapper.convertToPlaceDto(results.get(0));
+        if (userId != null) {
 
-        return PlaceDtoMapper.convertToPlaceDto(results.get(0));
+            boolean isFavorite = checkIfUserFavoritedPlace(placeId, userId);
+            placeDto.setIsFavorite(isFavorite);
+        } else {
+            placeDto.setIsFavorite(false);
+        }
+        return placeDto;
     }
 
     public Place findPlace(int placeId) {
@@ -235,8 +245,15 @@ public class PlaceService {
         LocalDateTime lastDay = LocalDateTime.now().minusDays(1);
         List<Integer> placeIds = reviewRepository.findDistinctPlaceIdsByUpdatedAtAfter(lastDay);
 
+        if (placeIds.isEmpty()) {
+            logger.info("No places with updated reviews found. Skipping summary generation.");
+            return;
+        }
+
+        logger.info("Place IDs to update: {}", placeIds);
+
         for (int placeId : placeIds) {
-            logger.info("Updating review summary for placeId: {}", placeId);
+            logger.info("Generating review summary for placeId: {}", placeId);
             generateReviewSummary(placeId);
         }
 
@@ -259,7 +276,14 @@ public class PlaceService {
                 .collect(Collectors.toList());
 
         if (recentReviewContents.isEmpty() && existingSummary == null) {
-            logger.info("No reviews or existing summary found for placeId: {}. Skipping update.", placeId);
+            logger.info("No reviews or existing summary found for placeId: {}. Creating default summary.", placeId);
+            String defaultSummary = "리뷰 데이터가 없습니다.";
+            ReviewSummary newSummary = new ReviewSummary();
+            newSummary.setPlace(place);
+            newSummary.setGoodSummary(defaultSummary);
+            newSummary.setBadSummary(defaultSummary);
+            newSummary.setUpdateDate(LocalDateTime.now());
+            reviewSummaryRepository.save(newSummary);
             return;
         }
 
@@ -268,6 +292,17 @@ public class PlaceService {
 
         String pros = openAiService.summarizePros(combinedGoodContent);
         String cons = openAiService.summarizeCons(combinedBadContent);
+
+        if (pros == null || pros.trim().isEmpty()) {
+            pros = "장점 요약을 생성할 수 없습니다.";
+        }
+        if (cons == null || cons.trim().isEmpty()) {
+            cons = "단점 요약을 생성할 수 없습니다.";
+        }
+
+        logger.info("Review contents for placeId {}: {}", placeId, recentReviewContents);
+        logger.info("Generated Pros: {}", pros);
+        logger.info("Generated Cons: {}", cons);
 
         if (existingSummary == null) {
             ReviewSummary newSummary = new ReviewSummary();

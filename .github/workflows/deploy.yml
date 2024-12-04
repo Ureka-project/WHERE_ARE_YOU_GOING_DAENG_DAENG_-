@@ -52,6 +52,7 @@ jobs:
           AWS_S3_BUCKET : AWS-S3-BUCKET
           AWS_S3_URL : AWS-S3-URL
           FRONTEND_URL : FRONTEND-URL
+          TEST : true
 
       - name: Get Public IP
         id: ip
@@ -121,6 +122,7 @@ jobs:
             -e AWS_S3_URL=${{secrets.AWS_S3_URL}} \
             -e OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
             -e FRONTEND_URL=${{secrets.FRONTEND_URL}} \
+            -e TEST=false \
             975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest
 
       - name: Remove GitHub Actions IP

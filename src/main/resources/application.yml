@@ -67,6 +67,12 @@ spring:
     openai:
       api-key: ${OPENAI_API_KEY}
 
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: true
+
 logging:
   level:
     org:
@@ -88,6 +94,7 @@ cloud:
 
 frontend:
   url: ${FRONTEND_URL}
+  test : ${TEST}
 
 jwt:
   token-expiration:

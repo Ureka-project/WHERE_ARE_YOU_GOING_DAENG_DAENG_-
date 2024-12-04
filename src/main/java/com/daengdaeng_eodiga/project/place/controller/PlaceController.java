@@ -6,8 +6,7 @@ import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisLocationReposi
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
-import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
-import com.daengdaeng_eodiga.project.Global.exception.ReviewSummaryNotFoundException;
+import com.daengdaeng_eodiga.project.Global.exception.NotFoundException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.place.dto.*;
 import com.daengdaeng_eodiga.project.place.entity.ReviewSummary;
@@ -30,6 +29,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/places")
+@Validated
 public class PlaceController {
 
     private final PlaceService placeService;
@@ -41,8 +41,8 @@ public class PlaceController {
 
     @PostMapping("/filter")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> filterPlaces(
-            @RequestBody FilterRequest request,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @Valid @RequestBody FilterRequest request) {
         Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
         List<PlaceDto> places = placeService.filterPlaces(
                 request.getCity(),
@@ -57,8 +57,8 @@ public class PlaceController {
 
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(
-            @RequestBody SearchRequest request,
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @Valid @RequestBody SearchRequest request) {
         Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
         List<PlaceDto> places = placeService.searchPlaces(
                 request.getKeyword(),
@@ -70,8 +70,11 @@ public class PlaceController {
     }
 
     @GetMapping("/{placeId}")
-    public ResponseEntity<ApiResponse<PlaceDto>> getPlaceDetails(@PathVariable int placeId) {
-        PlaceDto placeDetails = placeService.getPlaceDetails(placeId);
+    public ResponseEntity<ApiResponse<PlaceDto>> getPlaceDetails(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @PathVariable int placeId) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
+        PlaceDto placeDetails = placeService.getPlaceDetails(placeId, userId);
         return ResponseEntity.ok(ApiResponse.success(placeDetails));
     }
 
@@ -82,21 +85,14 @@ public class PlaceController {
     }
 
     @PostMapping("/topscore")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopScoredPlacesWithinRadius(@RequestBody Map<String, Object> request) {
-        Double latitude = (Double) request.get("latitude");
-        Double longitude = (Double) request.get("longitude");
-
-        List<PlaceDto> places = placeService.getTopScoredPlacesWithinRadius(latitude, longitude);
-
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopScoredPlacesWithinRadius(@Valid @RequestBody TopScoreRequest request) {
+        List<PlaceDto> places = placeService.getTopScoredPlacesWithinRadius(request.getLatitude(), request.getLongitude());
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
     @PostMapping("/nearest")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> getNearestPlaces(@RequestBody Map<String, Object> request) {
-        Double latitude = (Double) request.get("latitude");
-        Double longitude = (Double) request.get("longitude");
-
-        List<PlaceDto> places = placeService.getNearestPlaces(latitude, longitude);
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getNearestPlaces(@Valid @RequestBody NearestRequest request) {
+        List<PlaceDto> places = placeService.getNearestPlaces(request.getLatitude(), request.getLongitude());
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
@@ -106,7 +102,7 @@ public class PlaceController {
             @Valid @RequestBody NearestRequest request) {
         if(customOAuth2User==null)
         {
-            return ResponseEntity.ok(ApiResponse.success(new ArrayList<PlaceWithScore>()));
+            throw new UserNotFoundException();
         }
         Integer userId =customOAuth2User.getUserDTO().getUserid();
         double latitude = request.getLatitude();
@@ -132,7 +128,7 @@ public class PlaceController {
             List<Object> agreementLocation = geoService.getNotAgreeInfo(userId);
 
             if (agreementLocation == null) {
-                throw new PlaceNotFoundException();
+                throw new NotFoundException("agreementLocation", "List");
             }
 
             latitude = (double) agreementLocation.get(0);
@@ -156,7 +152,7 @@ public class PlaceController {
     @GetMapping("/{placeId}/reviews/summary")
     public ResponseEntity<ReviewSummaryDto> getReviewSummary(@PathVariable Integer placeId) {
         ReviewSummary reviewSummary = reviewSummaryRepository.findById(placeId)
-                .orElseThrow(() -> new ReviewSummaryNotFoundException());
+                .orElseThrow(() -> new RuntimeException("Review Summary not found"));
 
         ReviewSummaryDto response = new ReviewSummaryDto(
                 reviewSummary.getPlaceId(),
