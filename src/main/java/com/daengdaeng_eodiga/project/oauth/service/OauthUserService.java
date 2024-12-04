@@ -46,18 +46,14 @@ public class OauthUserService {
         user.setOauthProvider(userDTO.getOauthProvider());
         userRepository.save(user);
     }
-    public void AdjustUser(SignUpForm userDTO) {
-        User user = userService.findUserByemail(userDTO.getEmail());
+    public void AdjustUser(SignUpForm userDTO,String email) {
+        User user = userService.findUserByemail(email);
         if (user!=null) {
             user.setNickname(userDTO.getNickname());
-            user.setEmail(userDTO.getEmail());
-
             commonCodeService.isCommonCode(userDTO.getGender());
             user.setGender(userDTO.getGender());
-
             user.setCity(userDTO.getCity());
             user.setCityDetail(userDTO.getCityDetail());
-            user.setOauthProvider(userDTO.getOauthProvider());
             userRepository.save(user);
         }
         else
