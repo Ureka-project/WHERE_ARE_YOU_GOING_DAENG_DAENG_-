@@ -2,13 +2,16 @@ package com.daengdaeng_eodiga.project.favorite.service;
 
 import com.daengdaeng_eodiga.project.Global.enums.OpenHoursType;
 import com.daengdaeng_eodiga.project.Global.exception.*;
+import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.favorite.dto.FavoriteRequestDto;
 import com.daengdaeng_eodiga.project.favorite.dto.FavoriteResponseDto;
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
 import com.daengdaeng_eodiga.project.favorite.repository.FavoriteRepository;
 import com.daengdaeng_eodiga.project.place.entity.OpeningDate;
 import com.daengdaeng_eodiga.project.place.entity.Place;
+import com.daengdaeng_eodiga.project.place.entity.PlaceMedia;
 import com.daengdaeng_eodiga.project.place.repository.OpeningDateRepository;
+import com.daengdaeng_eodiga.project.place.repository.PlaceMediaRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
@@ -25,6 +28,8 @@ public class FavoriteService {
     private final PlaceRepository placeRepository;
     private final UserRepository userRepository;
     private final OpeningDateRepository openingDateRepository;
+    private final PlaceMediaRepository placeMediaRepository;
+    private final CommonCodeService commonCodeService;
 
     public FavoriteResponseDto registerFavorite(int userId, FavoriteRequestDto favoriteRequestDto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -34,6 +39,9 @@ public class FavoriteService {
         }
 
         Place place = placeRepository.findById(favoriteRequestDto.getPlaceId()).orElseThrow(PlaceNotFoundException::new);
+        String placeImage = placeMediaRepository.findByPlace_PlaceId(placeId)
+                .map(PlaceMedia::getPath)
+                .orElse("");
 
         Favorite favorite = Favorite.builder()
                 .user(user)
@@ -41,7 +49,7 @@ public class FavoriteService {
                 .build();
         favoriteRepository.save(favorite);
         
-        return makeFavoriteResponseDto(place, favorite);
+        return makeFavoriteResponseDto(place, placeImage, favorite);
     }
 
     public void deleteFavorite(int favoriteId) {
@@ -57,8 +65,11 @@ public class FavoriteService {
         return favoritesPage.map(favorite -> {
             Place place = placeRepository.findById(favorite.getPlace().getPlaceId())
                     .orElseThrow(PlaceNotFoundException::new);
+            String placeImage = placeMediaRepository.findByPlace_PlaceId(place.getPlaceId())
+                    .map(PlaceMedia::getPath)
+                    .orElse("");
 
-            return makeFavoriteResponseDto(place, favorite);
+            return makeFavoriteResponseDto(place, placeImage, favorite);
         });
     }
 
@@ -68,7 +79,7 @@ public class FavoriteService {
      * @param favorite
      * @return FavoriteResponseDto
      */
-    private FavoriteResponseDto makeFavoriteResponseDto(Place place, Favorite favorite) {
+    private FavoriteResponseDto makeFavoriteResponseDto(Place place, String placeImage, Favorite favorite) {
         
         OpeningDate openingDate = openingDateRepository.findByPlace_PlaceId(place.getPlaceId())
                 .stream()
@@ -82,6 +93,8 @@ public class FavoriteService {
                 .favoriteId(favorite.getFavoriteId())
                 .placeId(place.getPlaceId())
                 .name(place.getName())
+                .placeImage(placeImage)
+                .placeType(commonCodeService.getCommonCodeName(place.getPlaceType()))
                 .streetAddresses(place.getStreetAddresses())
                 .latitude(place.getLatitude())
                 .longitude(place.getLongitude())

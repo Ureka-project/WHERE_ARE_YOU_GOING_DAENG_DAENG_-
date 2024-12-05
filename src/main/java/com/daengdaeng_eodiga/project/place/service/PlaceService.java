@@ -237,7 +237,7 @@ public class PlaceService {
     }
 
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 11 * * ?")
     public void scheduledReviewSummaryUpdate() {
         Logger logger = LoggerFactory.getLogger(PlaceService.class);
         logger.info("Scheduled task started.");
