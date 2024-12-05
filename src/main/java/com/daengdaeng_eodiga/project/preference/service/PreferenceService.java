@@ -36,7 +36,9 @@ public class PreferenceService {
 
     public PreferenceResponseDto registerPreference(int userId, PreferenceRequestDto preferenceRequestDto) {
         User user = userService.findUser(userId);
-        if( !preferenceRepository.findByUser(user).isEmpty() ) { throw new DuplicatePreferenceException();}
+        if( !preferenceRepository.findByUser_UserIdAndPreferenceType(userId, preferenceRequestDto.getPreferenceInfo()).isEmpty() ) {
+            throw new DuplicatePreferenceException();
+        }
 
         List<CommonCode> commonCodes = findCommonCode(
                 preferenceRequestDto.getPreferenceInfo(),

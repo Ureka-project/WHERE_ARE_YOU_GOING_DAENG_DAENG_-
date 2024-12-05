@@ -1,6 +1,5 @@
 package com.daengdaeng_eodiga.project.preference.repository;
 
-import com.daengdaeng_eodiga.project.preference.dto.PreferenceRequestDto;
 import com.daengdaeng_eodiga.project.preference.dto.UserRequsetPrefernceDto;
 import com.daengdaeng_eodiga.project.preference.entity.Preference;
 import com.daengdaeng_eodiga.project.preference.entity.PreferenceId;
@@ -15,7 +14,8 @@ import java.util.List;
 @Repository
 public interface PreferenceRepository extends JpaRepository<Preference, PreferenceId> {
     void deleteByUserAndPreferenceType(User user, String preferenceType);
-    List<Preference> findByUser(User user);
+    List<Preference> findByUser_UserIdAndPreferenceType(Integer userId, String preferenceType);
+    List<Preference> findByUser(User userId);
     @Query("SELECT new com.daengdaeng_eodiga.project.preference.dto.UserRequsetPrefernceDto(p.preferenceType) " +
             "FROM Preference p " +
             "JOIN p.user u " +
