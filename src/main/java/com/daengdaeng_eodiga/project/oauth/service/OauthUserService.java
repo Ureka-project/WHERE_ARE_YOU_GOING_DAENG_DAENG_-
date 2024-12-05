@@ -2,13 +2,10 @@ package com.daengdaeng_eodiga.project.oauth.service;
 
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
-import com.daengdaeng_eodiga.project.Global.exception.UserFailedDeleteException;
-import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
-import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
-import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.notification.service.NotificationService;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
@@ -17,9 +14,6 @@ import com.daengdaeng_eodiga.project.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,15 +40,16 @@ public class OauthUserService {
         user.setOauthProvider(userDTO.getOauthProvider());
         userRepository.save(user);
     }
-    public void AdjustUser(SignUpForm userDTO,String email) {
+    public void AdjustUser(SignUpForm AdjustuserDTO, String email) {
         User user = userService.findUserByemail(email);
         if (user!=null) {
-            user.setNickname(userDTO.getNickname());
-            commonCodeService.isCommonCode(userDTO.getGender());
-            user.setGender(userDTO.getGender());
-            user.setCity(userDTO.getCity());
-            user.setCityDetail(userDTO.getCityDetail());
+            user.setNickname(AdjustuserDTO.getNickname());
+            commonCodeService.isCommonCode(AdjustuserDTO.getGender());
+            user.setGender(AdjustuserDTO.getGender());
+            user.setCity(AdjustuserDTO.getCity());
+            user.setCityDetail(AdjustuserDTO.getCityDetail());
             userRepository.save(user);
+
         }
         else
             throw new UserNotFoundException();
@@ -81,12 +76,12 @@ public class OauthUserService {
             userDto.setCity(user.getCity());
             String genderCode = "GND_01".equals(user.getGender()) ? "남자" : "여자";
             userDto.setGender(genderCode);
-            userDto.setOauthProvider(user.getOauthProvider());
             userDto.setCityDetail(user.getCityDetail());
             userDto.setCreatedAt(user.getCreatedAt());
             userDto.setUserId(user.getUserId());
             boolean pushAgreement = notificationService.findPushTokenByUser(user).isEmpty();
             userDto.setPushAgreement(!pushAgreement);
+            userDto.setOauthProvider(user.getOauthProvider());;
             return userDto;
         }
         else
