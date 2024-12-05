@@ -80,4 +80,7 @@ public class Place extends BaseEntity {
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorite = new ArrayList<>();
+
+    @OneToOne(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PlaceMedia placeMedia = new PlaceMedia();
 }
