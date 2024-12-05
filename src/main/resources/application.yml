@@ -67,7 +67,6 @@ spring:
       initialize-schema: always
     job:
       enabled: true
-
 kakao:
   api:
     url: "https://dapi.kakao.com/v2/local/geo/coord2address.json"
