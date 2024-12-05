@@ -88,14 +88,14 @@ public class OuathController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue Cookie RefreshToken ,@AuthenticationPrincipal CustomOAuth2User principal,
+    public ResponseEntity<?> logout(@CookieValue("RefreshToken") Cookie RefreshToken ,@AuthenticationPrincipal CustomOAuth2User principal,
                                          HttpServletResponse response) {
         String userEmail = principal.getUserDTO().getEmail();
         tokenService.deleteCookie(userEmail, response,RefreshToken);
         return  ResponseEntity.ok(ApiResponse.success(null));
     }
     @DeleteMapping("/user/delete")
-    public ResponseEntity<?> deleteUser(@CookieValue Cookie RefreshToken ,@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+    public ResponseEntity<?> deleteUser(@CookieValue("RefreshToken") Cookie RefreshToken,@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
                                         HttpServletResponse response) {
         String userEmail = customOAuth2User.getUserDTO().getEmail();
         oauthUserService.deleteUserByName(userEmail);
@@ -111,12 +111,12 @@ public class OuathController {
         response.put("user", userDto);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
-
+    // TODO 프론트 유저 푸쉬 변경 완료되면 추가해 줘야 함
     @PutMapping("/user/adjust")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@AuthenticationPrincipal CustomOAuth2User principal ,
                                                      @Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.AdjustUser(signUpForm,principal.getUserDTO().getEmail());
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.ok(ApiResponse.success(oauthUserService.UserToDto(principal.getEmail())));
     }
     @GetMapping("/user/duplicateNickname")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam

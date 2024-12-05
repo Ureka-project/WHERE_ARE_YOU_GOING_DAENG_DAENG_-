@@ -10,10 +10,12 @@ import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class TokenService {
 
@@ -39,6 +41,7 @@ public class TokenService {
                 .domain(".daengdaeng-where.link")
                 .build();
         response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+
         ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", accessToken)
                 .path("/")
                 .sameSite("Lax")
@@ -51,7 +54,6 @@ public class TokenService {
     }
     public void deleteCookie(String email, HttpServletResponse response,Cookie Refresh) {
         try {
-
             redisTokenRepository.deleteToken(email);
             ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken")
                     .path("/")
@@ -71,7 +73,6 @@ public class TokenService {
                     .domain(".daengdaeng-where.link")
                     .build();
             response.addHeader("Set-Cookie", accessTokenCookie.toString());
-
             long expiration = jwtUtil.getExpiration(Refresh.getValue());
             if (expiration > 0) {
                 redisTokenRepository.addToBlacklist(Refresh.getValue(), expiration, email);
