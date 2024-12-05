@@ -58,12 +58,6 @@ spring:
       port: 6379
       password: ${REDIS_PWD}
 
-kakao:
-  api:
-    url: "https://dapi.kakao.com/v2/local/geo/coord2address.json"
-    key: ${KAKAO_REST_API_KEY}
-    Nopeurl: "https://dapi.kakao.com/v2/local/search/address.json?query="
-
 
   ai:
     openai:
@@ -74,6 +68,12 @@ kakao:
       initialize-schema: always
     job:
       enabled: true
+kakao:
+  api:
+    url: "https://dapi.kakao.com/v2/local/geo/coord2address.json"
+    key: ${KAKAO_REST_API_KEY}
+    Nopeurl: "https://dapi.kakao.com/v2/local/search/address.json?query="
+
 
 logging:
   level:
