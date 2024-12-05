@@ -152,7 +152,7 @@ public class PlaceController {
     @GetMapping("/{placeId}/reviews/summary")
     public ResponseEntity<ReviewSummaryDto> getReviewSummary(@PathVariable Integer placeId) {
         ReviewSummary reviewSummary = reviewSummaryRepository.findById(placeId)
-                .orElseThrow(() -> new RuntimeException("Review Summary not found"));
+                .orElseThrow(() -> new NotFoundException("Review Summary", "Place ID: " + placeId));
 
         ReviewSummaryDto response = new ReviewSummaryDto(
                 reviewSummary.getPlaceId(),

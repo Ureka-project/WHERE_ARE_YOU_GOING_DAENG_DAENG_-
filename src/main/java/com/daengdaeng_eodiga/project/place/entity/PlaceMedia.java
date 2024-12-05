@@ -3,7 +3,12 @@ package com.daengdaeng_eodiga.project.place.entity;
 import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@NoArgsConstructor
+@Getter
 @Table(name = "place_media")
 public class PlaceMedia extends BaseEntity {
     @Id
@@ -11,11 +16,11 @@ public class PlaceMedia extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int placeMediaId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, length = 1000)
     private String path;
 
     @Builder

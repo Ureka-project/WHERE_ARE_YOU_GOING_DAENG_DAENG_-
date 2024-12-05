@@ -13,12 +13,21 @@ public class OpenAiService {
     }
 
     public String summarizePros(String reviewContent) {
-        String prompt = "다음 리뷰의 장점을 한 줄로 요약해 주세요:\n" + reviewContent;
-        return openAiChatModel.call(prompt).trim();
+        try {
+            String prompt = "다음 리뷰의 장점을 한 줄로 요약해 주세요:\n" + reviewContent;
+            return openAiChatModel.call(prompt).trim();
+        } catch (Exception e) {
+            return "장점 요약을 생성할 수 없습니다.";
+        }
     }
 
     public String summarizeCons(String reviewContent) {
-        String prompt = "다음 리뷰의 단점을 한 줄로 요약해 주세요:\n" + reviewContent;
-        return openAiChatModel.call(prompt).trim();
+        try {
+            String prompt = "다음 리뷰의 단점을 한 줄로 요약해 주세요:\n" + reviewContent;
+            return openAiChatModel.call(prompt).trim();
+        } catch (Exception e) {
+            return "단점 요약을 생성할 수 없습니다.";
+        }
     }
+
 }
