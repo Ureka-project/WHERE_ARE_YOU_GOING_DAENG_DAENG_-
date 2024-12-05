@@ -4,25 +4,18 @@ import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
-import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
-import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
-import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
-import com.daengdaeng_eodiga.project.Global.exception.UserUnauthorizedException;
-import com.daengdaeng_eodiga.project.oauth.OauthResult;
-import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
 import com.daengdaeng_eodiga.project.oauth.dto.SignUpForm;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import com.daengdaeng_eodiga.project.oauth.service.OauthUserService;
 import com.daengdaeng_eodiga.project.oauth.service.TokenService;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
-import com.daengdaeng_eodiga.project.user.repository.UserRepository;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -97,8 +90,9 @@ public class OuathController {
     @DeleteMapping("/user/delete")
     public ResponseEntity<?> deleteUser(@CookieValue("RefreshToken") Cookie RefreshToken,@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
                                         HttpServletResponse response) {
+        int userid = customOAuth2User.getUserDTO().getUserid();
         String userEmail = customOAuth2User.getUserDTO().getEmail();
-        oauthUserService.deleteUserByName(userEmail);
+        oauthUserService.deleteUser(userid);
         tokenService.deleteCookie(userEmail, response,RefreshToken);
         return  ResponseEntity.ok(ApiResponse.success(null));
     }
