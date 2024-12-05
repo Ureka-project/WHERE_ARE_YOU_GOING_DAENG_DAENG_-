@@ -58,9 +58,13 @@ public class VisitService {
 	public PetsAtVisitTime registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
 		Place place = placeService.findPlace(placeId);
 		User user = userService.findUser(userId);
-		user.getPets().forEach(pet -> {
-			if(!petIds.contains(pet.getPetId())){
-				throw new NotFoundException("Pet", String.format("PetId %d", pet.getPetId()));
+		List<Integer> userPets = user.getPets().stream().map(pet -> {
+			return pet.getPetId();
+		}).toList();
+
+		petIds.forEach(petId -> {
+			if(!userPets.contains(petId)){
+				throw new NotFoundException("User의 Pet", String.format("PetId %d", petId));
 			}
 		});
 
@@ -88,7 +92,7 @@ public class VisitService {
 			throw new DuplicatePetException();
 		}
 
-		List<VisitPet> visitPets = petIds.stream()
+		List<VisitPet> visitPets = notSavedPetIds.stream()
 				.map(petId -> {
 					Pet pet = petService.findPet(petId);
 					return VisitPet.builder()
