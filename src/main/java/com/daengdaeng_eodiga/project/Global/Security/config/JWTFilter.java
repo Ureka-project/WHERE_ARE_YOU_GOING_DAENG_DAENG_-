@@ -73,37 +73,31 @@ public class JWTFilter extends OncePerRequestFilter {
             log.info("refreshToken : "+refreshToken);
 
             Jwtexception accessTokenValid = jwtUtil.isJwtValid(accessToken);
-            if(accessTokenValid.equals(Jwtexception.mismatch)){
+            if (accessTokenValid != Jwtexception.normal) {
                 log.info("accessToken is not valid");
                 filterChain.doFilter(request, response);
                 return;
-            }
-            else if(accessTokenValid.equals(Jwtexception.expired)){
+            } else  {
                 Jwtexception refreshTokenValid = jwtUtil.isJwtValid(refreshToken);
-                if(refreshTokenValid.equals(Jwtexception.mismatch)){
-                    log.info("refreshToken is not valid");
+
+                if (refreshTokenValid != Jwtexception.normal) {
+                    if (refreshTokenValid == Jwtexception.expired) {
+                        log.info("refreshToken is expired");
+                    } else {
+                        log.info("refreshToken is not valid");
+                    }
                     filterChain.doFilter(request, response);
                     return;
-                }
-                else if(refreshTokenValid.equals(Jwtexception.expired)){
-                    log.info("refreshToken is expired");
-                    filterChain.doFilter(request, response);
-                    return;
-                } else if(refreshTokenValid.equals(Jwtexception.normal)&&!redisTokenRepository.isBlacklisted(refreshToken)){
-                    log.info("refreshToken is not expired , so new accessToken is created");
+                } else if (!redisTokenRepository.isBlacklisted(refreshToken)) {
+                    log.info("refreshToken is not expired, so new accessToken is created");
                     accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), jwtUtil.getAccessTokenExpiration());
                     response.addHeader("Set-Cookie", jwtUtil.createCookie("Authorization", accessToken,
                             jwtUtil.getAccessTokenExpiration()).toString());
-
-                }else {
+                } else {
                     log.info("refreshToken is not normal");
                     filterChain.doFilter(request, response);
                     return;
                 }
-            }else if(!accessTokenValid.equals(Jwtexception.normal)){
-                log.info("accessToken is not normal");
-                filterChain.doFilter(request, response);
-                return;
             }
 
 

@@ -74,7 +74,6 @@ public class JWTUtil {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-            System.out.println(claims.getExpiration().toString());
             return Jwtexception.normal;
 
         } catch (ExpiredJwtException e) {
