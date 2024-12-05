@@ -79,8 +79,6 @@ public class OauthUserService {
             userDto.setCityDetail(user.getCityDetail());
             userDto.setCreatedAt(user.getCreatedAt());
             userDto.setUserId(user.getUserId());
-            boolean pushAgreement = notificationService.findPushTokenByUser(user).isEmpty();
-            userDto.setPushAgreement(!pushAgreement);
             userDto.setOauthProvider(user.getOauthProvider());;
             return userDto;
         }
