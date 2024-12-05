@@ -5,7 +5,6 @@ import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.notification.service.NotificationService;
-import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
@@ -54,17 +53,8 @@ public class OauthUserService {
         else
             throw new UserNotFoundException();
     }
-    public void deleteUserByName(String email) {
-        User user = userService.findUserByemail(email);
-        if(user!=null)
-        {
-            userRepository.deleteById(user.getUserId());
-        }
-        else
-        {
-            throw new UserNotFoundException();
-        }
-
+    public void deleteUser(int userId) {
+        userRepository.deleteById(userId);
     }
     public UserDto UserToDto(String email) {
         User user =userService.findUserByemail(email);
