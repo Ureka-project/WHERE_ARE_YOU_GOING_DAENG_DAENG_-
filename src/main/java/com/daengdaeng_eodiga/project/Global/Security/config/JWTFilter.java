@@ -73,11 +73,11 @@ public class JWTFilter extends OncePerRequestFilter {
             log.info("refreshToken : "+refreshToken);
 
             Jwtexception accessTokenValid = jwtUtil.isJwtValid(accessToken);
-            if (accessTokenValid != Jwtexception.normal) {
+            if (accessTokenValid != Jwtexception.normal&&accessTokenValid != Jwtexception.expired) {
                 log.info("accessToken is not valid");
                 filterChain.doFilter(request, response);
                 return;
-            } else  {
+            } else if (accessTokenValid == Jwtexception.expired) {
                 Jwtexception refreshTokenValid = jwtUtil.isJwtValid(refreshToken);
 
                 if (refreshTokenValid != Jwtexception.normal) {
@@ -94,7 +94,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     response.addHeader("Set-Cookie", jwtUtil.createCookie("Authorization", accessToken,
                             jwtUtil.getAccessTokenExpiration()).toString());
                 } else {
-                    log.info("refreshToken is not normal");
+                    log.info("logout된 토큰이다.");
                     filterChain.doFilter(request, response);
                     return;
                 }
