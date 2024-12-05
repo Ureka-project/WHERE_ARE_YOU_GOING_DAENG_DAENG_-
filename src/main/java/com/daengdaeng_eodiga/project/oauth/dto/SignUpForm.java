@@ -26,5 +26,4 @@ public class SignUpForm {
     @NotNull(message = "OAuth 제공자가 있어야합니다.")
     private OauthProvider oauthProvider;
 
-    private boolean pushAgreement;
 }
