@@ -77,7 +77,7 @@ public class OuathController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerUser(signUpForm);
-        tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response);
+        tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), signUpForm.getOauthProvider(), response);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
     @PostMapping("/logout")
@@ -100,7 +100,7 @@ public class OuathController {
     @GetMapping("/user/adjust")
     public ResponseEntity<ApiResponse<Map<String, Object>>> AdjustUserRequest(@AuthenticationPrincipal CustomOAuth2User principal) {
         UserOauthDto userOauthDto = principal.getUserDTO();
-        UserDto userDto = oauthUserService.UserToDto(userOauthDto.getEmail());
+        UserDto userDto = oauthUserService.UserToDto(userOauthDto.getEmail(),userOauthDto.getProvider());
         Map<String, Object> response = new HashMap<>();
         response.put("user", userDto);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -109,8 +109,9 @@ public class OuathController {
     @PutMapping("/user/adjust")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@AuthenticationPrincipal CustomOAuth2User principal ,
                                                      @Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
-        oauthUserService.AdjustUser(signUpForm,principal.getUserDTO().getEmail());
-        return ResponseEntity.ok(ApiResponse.success(oauthUserService.UserToDto(principal.getEmail())));
+        UserOauthDto userOauthDto = principal.getUserDTO();
+        oauthUserService.AdjustUser(signUpForm,userOauthDto.getEmail(),userOauthDto.getProvider());
+        return ResponseEntity.ok(ApiResponse.success(oauthUserService.UserToDto(userOauthDto.getEmail(),userOauthDto.getProvider())));
     }
     @GetMapping("/user/duplicateNickname")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam

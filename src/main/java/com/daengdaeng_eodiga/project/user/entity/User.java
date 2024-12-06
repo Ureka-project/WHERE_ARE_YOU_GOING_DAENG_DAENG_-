@@ -10,9 +10,11 @@ import com.daengdaeng_eodiga.project.review.entity.Review;
 import com.daengdaeng_eodiga.project.visit.entity.Visit;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @Getter
@@ -43,6 +45,9 @@ public class User extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "oauth_provider")
     private OauthProvider oauthProvider;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();

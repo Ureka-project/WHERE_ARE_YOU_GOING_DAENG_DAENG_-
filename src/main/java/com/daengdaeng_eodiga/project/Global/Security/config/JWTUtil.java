@@ -1,6 +1,8 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
+
 import io.jsonwebtoken.*;
 
 import io.jsonwebtoken.security.Keys;
@@ -45,6 +47,12 @@ public class JWTUtil {
         String email = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
         log.info("jwt - getEmail : " + email);
         return email;
+    }
+
+    public OauthProvider getProvider (String token) {
+        OauthProvider provider = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("provider", OauthProvider.class);
+        log.info("jwt - getProvider : " + provider);
+        return provider;
     }
     public long getExpiration(String token) {
         try {
@@ -91,18 +99,20 @@ public class JWTUtil {
     }
 
 
-    public String createJwt(String email, int expiredMs) {
+    public String createJwt(String email, OauthProvider provider, int expiredMs) {
         log.info("jwt - createJwt email: " + email);
         return Jwts.builder()
                 .claim("email", email)
+                .claim("provider", provider)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs* 1000L))
                 .signWith(secretKey)
                 .compact();
     }
-    public String createRefreshToken(String email, int expiredMs) {
+    public String createRefreshToken(String email, OauthProvider provider, int expiredMs) {
         return Jwts.builder()
                 .claim("email", email)
+                .claim("provider", provider)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs* 1000L))
                 .signWith(secretKey)
