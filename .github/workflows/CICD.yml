@@ -2,9 +2,9 @@ name: CICD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "test/Zero-Downtime" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "test/Zero-Downtime" ]
 
 permissions:
   contents: read
