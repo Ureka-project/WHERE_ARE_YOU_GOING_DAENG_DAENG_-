@@ -152,7 +152,7 @@ public class PlaceService {
             Double score = (Double) arr[17];
             String keywordsStr = (String) arr[18];
             Long reviewCount = (Long) arr[19];
-
+            String imageUrl=(String) arr[20];
             Map<String, Integer> keywords = new HashMap<>();
             if (keywordsStr != null && !keywordsStr.isEmpty()) {
                 String[] keywordArray = keywordsStr.split(",");
@@ -163,7 +163,7 @@ public class PlaceService {
             PlaceRcommendDto dto = new PlaceRcommendDto(
                     placeId, name, city, cityDetail, township, Placelatitude, Placelongitude,
                     postCode, streetAddresses, telNumber, url, placeType, description,
-                    weightLimit, parking, indoor, outdoor, score, keywords, reviewCount
+                    weightLimit, parking, indoor, outdoor, score, keywords, reviewCount,imageUrl
             );
 
             RecommnedArray.add(dto);
