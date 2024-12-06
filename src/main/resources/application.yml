@@ -1,14 +1,16 @@
 spring:
   profiles:
-    active: ${PROFILES:local}
+    active: local
     group:
-      local: local,common
-      blue: blue,common
-      green: green,common
+      local: local,common,secret
+      blue: blue,common,secret
+      green: green,common,secret
 
 server:
-  env: ${PROFILES:local}
+  env:blue
+
 ---
+
 spring:
   config:
     activate:
@@ -19,9 +21,9 @@ spring:
         registration:
           google:
             redirect-uri:
-              "http://52.79.50.171/login/oauth2/code/google"
+              "http://localhost:8080/login/oauth2/code/google"
           kakao:
-            redirect-uri: "http://52.79.50.171/login/oauth2/code/kakao"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
 
 server:
   port: 8080
