@@ -89,21 +89,37 @@ public class PlaceService {
         return placeScoreRepository.findById(placeId).orElseThrow(PlaceNotFoundException::new).getScore();
     }
 
-    public List<PlaceDto> getTopFavoritePlaces() {
+    public List<PlaceDto> getTopFavoritePlaces(Integer userId) {
         List<Object[]> results = placeRepository.findTopFavoritePlaces();
         return results.stream()
-                .map(PlaceDtoMapper::convertToPlaceDto)
+                .map(row -> {
+                    PlaceDto dto = PlaceDtoMapper.convertToPlaceDto(row);
+                    dto.setIsFavorite(userId != null && checkIfUserFavoritedPlace(dto.getPlaceId(), userId));
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceDto> getTopScoredPlacesWithinRadius(Double latitude, Double longitude) {
+    public List<PlaceDto> getTopScoredPlacesWithinRadius(Double latitude, Double longitude, Integer userId) {
         List<Object[]> results = placeRepository.findTopScoredPlacesWithinRadius(latitude, longitude);
-        return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
+        return results.stream()
+                .map(row -> {
+                    PlaceDto dto = PlaceDtoMapper.convertToPlaceDto(row);
+                    dto.setIsFavorite(userId != null && checkIfUserFavoritedPlace(dto.getPlaceId(), userId));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
-    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude) {
+    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
         List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude);
-        return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
+        return results.stream()
+                .map(row -> {
+                    PlaceDto dto = PlaceDtoMapper.convertToPlaceDto(row);
+                    dto.setIsFavorite(userId != null && checkIfUserFavoritedPlace(dto.getPlaceId(), userId));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
 
