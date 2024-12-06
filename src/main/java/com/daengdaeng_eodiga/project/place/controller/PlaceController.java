@@ -79,22 +79,33 @@ public class PlaceController {
     }
 
     @GetMapping("/topfavorites")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopFavoritePlaces() {
-        List<PlaceDto> topFavoritePlaces = placeService.getTopFavoritePlaces();
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopFavoritePlaces(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
+        List<PlaceDto> topFavoritePlaces = placeService.getTopFavoritePlaces(userId);
         return ResponseEntity.ok(ApiResponse.success(topFavoritePlaces));
     }
 
     @PostMapping("/topscore")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopScoredPlacesWithinRadius(@Valid @RequestBody TopScoreRequest request) {
-        List<PlaceDto> places = placeService.getTopScoredPlacesWithinRadius(request.getLatitude(), request.getLongitude());
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getTopScoredPlacesWithinRadius(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @Valid @RequestBody TopScoreRequest request) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
+        List<PlaceDto> places = placeService.getTopScoredPlacesWithinRadius(
+                request.getLatitude(), request.getLongitude(), userId);
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
     @PostMapping("/nearest")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> getNearestPlaces(@Valid @RequestBody NearestRequest request) {
-        List<PlaceDto> places = placeService.getNearestPlaces(request.getLatitude(), request.getLongitude());
+    public ResponseEntity<ApiResponse<List<PlaceDto>>> getNearestPlaces(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @Valid @RequestBody NearestRequest request) {
+        Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
+        List<PlaceDto> places = placeService.getNearestPlaces(
+                request.getLatitude(), request.getLongitude(), userId);
         return ResponseEntity.ok(ApiResponse.success(places));
     }
+
 
     @PostMapping("/recommend")
     public ResponseEntity<ApiResponse<List<PlaceWithScore>>> recommendPlaces(
