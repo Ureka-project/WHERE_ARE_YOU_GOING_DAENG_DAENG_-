@@ -93,9 +93,9 @@ spring:
     show-sql: true
 
   datasource:
-    url: jdbc:mysql://${MYSQL_DOMAIN}:3306/db_daengdaeng_eodiga_core?&rewriteBatchedStatements=true
+    url: jdbc:mysql://${MYSQL_DOMAIN_V2}:3306/database-1?&rewriteBatchedStatements=true
     username: root
-    password: ${MYSQL_PWD}
+    password: ${MYSQL_PWD_V2}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   sql:
