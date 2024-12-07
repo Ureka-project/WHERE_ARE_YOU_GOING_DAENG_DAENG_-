@@ -46,6 +46,8 @@ public class GeoService {
     }
     private static String getMaps(ResponseEntity<KakaoGeoApiDto> response) {
         List<KakaoGeoApiDto.Document> addressInfoList = Objects.requireNonNull(response.getBody()).getDocuments();
+        if(addressInfoList.size()==0 || addressInfoList == null)
+            return "";
         String ret=addressInfoList.get(0).getAddress() != null? addressInfoList.get(0).getAddress().toString() : "";
         return ret;
     }
