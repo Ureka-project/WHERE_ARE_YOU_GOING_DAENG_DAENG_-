@@ -67,6 +67,16 @@ import java.util.Optional;
                 .domain(".daengdaeng-where.link")
                 .build();
             response.addHeader("Set-Cookie", accessTokenCookie.toString());
+
+            ResponseCookie isLogin = ResponseCookie.from("loginSuccess", String.valueOf(true))
+                .path("/")
+                .sameSite("Lax")
+                .httpOnly(false)
+                .secure(true)
+                .maxAge(jwtUtil.getAccessTokenExpiration())
+                .domain(".daengdaeng-where.link")
+                .build();
+            response.addHeader("Set-Cookie", isLogin.toString());
             redisTokenRepository.saveToken(refreshToken, jwtUtil.getRefreshTokenExpiration(), user.getEmail());
             response.sendRedirect(frontUrl);
         }
