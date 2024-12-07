@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
+import com.daengdaeng_eodiga.project.oauth.controller.OuathController;
 import com.daengdaeng_eodiga.project.user.service.UserService;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,8 +31,10 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final Boolean testMode;
+    private final OuathController ouathController;
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
-    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode) {
+    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode,
+        OuathController ouathController) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
@@ -42,6 +45,7 @@ public class SecurityConfig {
         this.accessDeniedHandler = accessDeniedHandler;
         this.testMode = testMode;
 
+        this.ouathController = ouathController;
     }
     @Bean
     public CorsConfiguration corsConfiguration() {
@@ -66,7 +70,6 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://pet.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/user/duplicateNickname").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
@@ -80,7 +83,7 @@ public class SecurityConfig {
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler)
-                        .failureHandler(new CustomAuthenticationFailureHandler())
+                        .failureHandler(new CustomAuthenticationFailureHandler(ouathController))
                 );
 
 

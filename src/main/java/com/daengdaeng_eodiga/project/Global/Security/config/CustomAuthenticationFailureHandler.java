@@ -1,16 +1,23 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.oauth.OauthProvider;
+import com.daengdaeng_eodiga.project.oauth.controller.OuathController;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+@RequiredArgsConstructor
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
+
+    private final OuathController ouathController;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -41,7 +48,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             email = "unknown@example.com";
         }
         if (errorMessage != null && errorMessage.startsWith("REDIRECT_TO_SIGNUP:")) {
-            response.sendRedirect("/api/v1/signup");
+            ouathController.showSignUpForm(email, provider.toString(), response);
         } else {
             response.sendRedirect("/login?error=unknown");
         }

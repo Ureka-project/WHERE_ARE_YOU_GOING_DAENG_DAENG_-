@@ -46,8 +46,8 @@ public class OuathController {
     @Value("${frontend.url}")
     private String frontUrl;
 
-    @GetMapping("/signup")
-    public void showSignUpForm(@RequestParam String email, @RequestParam String provider, HttpServletResponse response) throws IOException {
+
+    public void showSignUpForm(String email, String provider, HttpServletResponse response) throws IOException {
 
         ResponseCookie emailCookie = ResponseCookie.from("email", email)
             .path("/")
@@ -68,7 +68,7 @@ public class OuathController {
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", provideCookie.toString());
-        response.sendRedirect(frontUrl+"/user-register?email="+email+"&provider=" + provider);
+        response.sendRedirect(frontUrl+"/user-register");
     }
 
     @GetMapping("/loginSuccess")
