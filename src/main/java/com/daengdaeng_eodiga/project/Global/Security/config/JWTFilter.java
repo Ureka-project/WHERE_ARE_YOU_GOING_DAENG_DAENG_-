@@ -90,7 +90,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     return;
                 } else if (!redisTokenRepository.isBlacklisted(refreshToken)) {
                     log.info("refreshToken is not expired, so new accessToken is created");
-                    accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken),jwtUtil.getProvider(refreshToken), jwtUtil.getAccessTokenExpiration());
+                    accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken),jwtUtil.getProvider(refreshToken).toString(), jwtUtil.getAccessTokenExpiration());
                     response.addHeader("Set-Cookie", jwtUtil.createCookie("Authorization", accessToken,
                             jwtUtil.getAccessTokenExpiration()).toString());
                 } else {
