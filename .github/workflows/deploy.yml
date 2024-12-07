@@ -47,6 +47,13 @@ jobs:
           REDIS_PWD : redis-password-example
           DOMAIN : localhost
           SECURITY_SECRET : testSecretKey20230327testSecretKey20230327testSecretKey20230327
+          AWS_ACCESS_KEY : AWS-ACCESS-KEY
+          AWS_SECRET_KEY : AWS-SECRET-KEY
+          AWS_S3_BUCKET : AWS-S3-BUCKET
+          AWS_S3_URL : AWS-S3-URL
+          FRONTEND_URL : FRONTEND-URL
+          TEST : true
+          HOST : localhost
 
       - name: Get Public IP
         id: ip
@@ -89,13 +96,12 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/Eye_of_AI_Client
             aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws configure set region ${{ env.AWS_REGION }}
-            ECR_REGISTRY_LOGIN=$(aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }})
-            sudo docker rm $(sudo docker ps --filter "ancestor=975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest" --format "{{.ID}}")
-            sudo docker rm $(sudo docker ps -a --filter "ancestor=975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest" --format "{{.ID}}")
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+            sudo docker stop $(sudo docker ps -a --filter "ancestor=975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest" --format "{{.ID}}") || true
+            sudo docker rm $(sudo docker ps -a --filter "ancestor=975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest" --format "{{.ID}}") || true
             sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
             sudo docker run -d --name daengdaeng -p 8080:8080 --net host \
             -e MYSQL_PWD=${{secrets.MYSQL_PWD}} \
@@ -110,6 +116,14 @@ jobs:
             -e REDIS_PWD=${{secrets.REDIS_PWD}} \
             -e SECURITY_SECRET=${{secrets.SECURITY_SECRET}} \
             -e DOMAIN=${{secrets.EC2_DNS_ADDRESS}} \
+            -e AWS_ACCESS_KEY=${{secrets.AWS_ACCESS_KEY_ID}} \
+            -e AWS_SECRET_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} \
+            -e AWS_S3_BUCKET=${{secrets.AWS_S3_BUCKET}} \
+            -e AWS_S3_URL=${{secrets.AWS_S3_URL}} \
+            -e OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
+            -e FRONTEND_URL=${{secrets.FRONTEND_URL}} \
+            -e TEST=false \
+            -e HOST=${{secrets.HOST}} \
             975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest
 
       - name: Remove GitHub Actions IP

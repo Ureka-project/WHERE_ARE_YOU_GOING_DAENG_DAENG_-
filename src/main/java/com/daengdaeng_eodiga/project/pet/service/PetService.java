@@ -22,9 +22,11 @@ import com.daengdaeng_eodiga.project.pet.repository.PetRepository;
 import com.daengdaeng_eodiga.project.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PetService {
 	private final PetRepository petRepository;
 	private final UserRepository userRepository;
@@ -62,7 +64,9 @@ public class PetService {
 	public void registerPet(int userId, PetRegisterDto requestDto) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(UserNotFoundException::new);
-
+		commonCodeService.isCommonCode(requestDto.getSpecies());
+		commonCodeService.isCommonCode(requestDto.getGender());
+		commonCodeService.isCommonCode(requestDto.getSize());
 		Pet pet = Pet.builder()
 				.name(requestDto.getName())
 				.image(requestDto.getImage())
@@ -80,7 +84,9 @@ public class PetService {
 	public void updatePet(int petId, PetUpdateDto updateDto) {
 		Pet pet = petRepository.findById(petId)
 				.orElseThrow(PetNotFoundException::new);
-
+		commonCodeService.isCommonCode(updateDto.getSpecies());
+		commonCodeService.isCommonCode(updateDto.getGender());
+		commonCodeService.isCommonCode(updateDto.getSize());
 		pet.setName(updateDto.getName());
 		pet.setImage(updateDto.getImage());
 		pet.setSpecies(updateDto.getSpecies());

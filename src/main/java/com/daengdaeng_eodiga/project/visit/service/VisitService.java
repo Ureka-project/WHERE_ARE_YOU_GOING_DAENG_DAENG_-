@@ -1,5 +1,7 @@
 package com.daengdaeng_eodiga.project.visit.service;
 
+import static java.lang.Thread.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -7,12 +9,22 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daengdaeng_eodiga.project.Global.exception.DuplicatePetException;
+import com.daengdaeng_eodiga.project.Global.exception.InvalidRequestException;
+import com.daengdaeng_eodiga.project.Global.exception.NotFoundException;
+import com.daengdaeng_eodiga.project.notification.controller.Publisher;
+import com.daengdaeng_eodiga.project.notification.dto.FcmRequestDto;
+import com.daengdaeng_eodiga.project.notification.entity.PushToken;
+import com.daengdaeng_eodiga.project.notification.enums.NotificationTopic;
+import com.daengdaeng_eodiga.project.notification.enums.PushType;
+import com.daengdaeng_eodiga.project.notification.service.NotificationService;
 import com.daengdaeng_eodiga.project.pet.dto.PetResponse;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.pet.service.PetService;
@@ -40,30 +52,75 @@ public class VisitService {
 	private final UserService userService;
 	private final PetService petService;
 	private final VisitPetRepository visitPetRepository;
+	private final Publisher publisher;
+	private final NotificationService notificationService;
 
-	public void registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
+	public PetsAtVisitTime registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
 		Place place = placeService.findPlace(placeId);
 		User user = userService.findUser(userId);
-		findVisitPet(placeId, visitAt, petIds);
-		Visit visit = Visit.builder()
-				.visitAt(visitAt)
-				.place(place)
-				.user(user)
-				.build();
+		List<Integer> userPets = user.getPets().stream().map(pet -> {
+			return pet.getPetId();
+		}).toList();
+
+		petIds.forEach(petId -> {
+			if(!userPets.contains(petId)){
+				throw new NotFoundException("User의 Pet", String.format("PetId %d", petId));
+			}
+		});
+
+		List<VisitPet> visitPetsAtTime = findVisitPets(place, visitAt,user);
+		Visit visit;
+		if(visitPetsAtTime.isEmpty()){
+			visit = Visit.builder()
+					.user(user)
+					.place(place)
+					.visitAt(visitAt)
+					.build();
+			visit = visitRepository.save(visit);
+		 } else {
+			visit = visitPetsAtTime.get(0).getVisit();
+		}
+
+		Visit savedVisit = visit;
+		List<Integer> visitPetIds = visitPetsAtTime.stream().map(visitPet -> {
+			return visitPet.getPet().getPetId();
+		}).toList();
+		List<Integer> notSavedPetIds = petIds.stream().filter(petId -> !visitPetIds.contains(petId)).toList();
 
 
-		List<VisitPet> visitPets = petIds.stream()
+		if(notSavedPetIds.isEmpty()){
+			throw new DuplicatePetException();
+		}
+
+		List<VisitPet> visitPets = notSavedPetIds.stream()
 				.map(petId -> {
 					Pet pet = petService.findPet(petId);
 					return VisitPet.builder()
-							.visit(visit)
+							.visit(savedVisit)
 							.pet(pet)
 							.build();
 				})
 				.toList();
-		visitRepository.save(visit);
-		visitPetRepository.saveAll(visitPets);
+		List<VisitPet> savedVisitPet = visitPetRepository.saveAll(visitPets);
 
+		return new PetsAtVisitTime(visit.getVisitAt(), savedVisitPet.stream()
+				.map(visitPet -> {
+					Pet pet = visitPet.getPet();
+					return new PetResponse(pet.getPetId(), pet.getName(), pet.getImage());
+				})
+				.toList(), placeId, visit.getId(),place.getName());
+
+	}
+
+	public void cancelVisit(int userId, int visitId) {
+		Optional<Visit> visit = visitRepository.findById(visitId);
+		if(visit.isEmpty()){
+			throw new NotFoundException("Visit", String.format("VisitId %d", visitId));
+		}
+		if(visit.get().getUser().getUserId() != userId){
+			throw new InvalidRequestException("Visit", String.format("UserId %d", userId));
+		}
+		visitRepository.deleteById(visitId);
 	}
 
 	public List<VisitResponse> fetchVisitsByPlace(int placeId) {
@@ -120,11 +177,25 @@ public class VisitService {
 			.toList();
 	}
 
-	public void findVisitPet(int placeId, LocalDateTime visitAt, List<Integer> petIds) {
-		List<VisitPet> visitPets = visitPetRepository.findByPlaceIdAndVisitAtInPetIds(placeId, visitAt, petIds);
-		if(!visitPets.isEmpty()){
-			throw new DuplicatePetException();
-		}
+	public List<VisitPet> findVisitPets(Place place, LocalDateTime visitAt,User user) {
+		return visitPetRepository.findByPlaceIdAndVisitAt(place, visitAt,user);
+	}
+
+	@Async
+	public void sendVisitNotification(int userId, int visitId, String petName, String placeName) {
+		List<PushToken> pushTokens = fetchVisitPushTokens(userId,visitId);
+		List<String> tokens = pushTokens.stream().map(pushToken -> {
+			return pushToken.getToken();
+		}).toList();
+		List<Integer> userIds = pushTokens.stream().map(pushToken -> {
+			return pushToken.getUser().getUserId();
+		}).toList();
+		FcmRequestDto fcmRequestDto = notificationService.createFcmRequest(tokens, userIds, PushType.VISIT, petName, placeName, null);
+		publisher.publish(NotificationTopic.FCM, fcmRequestDto);
+	}
+
+	public List<PushToken> fetchVisitPushTokens(int userId, int visitId) {
+		return visitRepository.findPushTokenByVisitId(visitId,userId);
 	}
 
 

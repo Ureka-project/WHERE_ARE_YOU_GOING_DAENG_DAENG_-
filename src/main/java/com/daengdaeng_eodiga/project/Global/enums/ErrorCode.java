@@ -19,11 +19,20 @@ public enum ErrorCode {
 	DAY_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 휴무일입니다."),
 	OPENING_DATE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 영업 시간입니다."),
 	DUPLICATE_PET(HttpStatus.CONFLICT,"이미 등록된 반려동물입니다."),
+	DUPLICATE_USER(HttpStatus.CONFLICT,"이미 등록된 유저입니다."),
 	USER_FAILED_SAVE(HttpStatus.INTERNAL_SERVER_ERROR, "유저 저장에 실패했습니다."),
 	USER_FAILED_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "유저 삭제에 실패했습니다."),
 	USER_FAILED_ADJUST(HttpStatus.INTERNAL_SERVER_ERROR, "유저 수정에 실패했습니다."),
-	NOTI_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림입니다."),
-	BANNER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 배너입니다.");
+	NOTI_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알립입니다."),
+	REVIEW_SUMMARY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 장소에 대한 리뷰 요약 정보를 찾을 수 없습니다."),
+	COOKIE_DELETION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "쿠키 삭제 실패"),
+	BANNER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 배너입니다."),
+	PUSH_TOKEN_IS_EXISTS(HttpStatus.CONFLICT, "이미 등록된 푸시 토큰입니다."),
+	INVALID_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 요청입니다."),
+	NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 정보입니다."),
+	MISSING_COORDINATES(HttpStatus.BAD_REQUEST, "위도와 경도 값이 필요합니다."),
+	DUPLICATE_PREFERENCE(HttpStatus.CONFLICT, "이미 등록된 선호도입니다."),
+	DUPLICATE_FAVORITE(HttpStatus.CONFLICT, "이미 등록된 즐겨찾기입니다.");
 	private final HttpStatus errorCode;
 	private final String message;
 

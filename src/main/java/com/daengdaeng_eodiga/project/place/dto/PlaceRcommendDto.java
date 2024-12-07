@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
 public class PlaceRcommendDto {
 
     private Integer placeId;
@@ -38,10 +39,12 @@ public class PlaceRcommendDto {
     private Double score;
     private Map<String,Integer> keywords;
     private Long  reviewCount;
+    private String imageUrl;
     public PlaceRcommendDto(Integer placeId, String name, String city, String cityDetail, String township,
                             Double latitude, Double longitude, String postCode, String streetAddresses,
                             String telNumber, String url, String placeType, String description, String weightLimit,
-                            Boolean parking, Boolean indoor, Boolean outdoor,Double score,  Map<String,Integer> keywords,Long  reviewCount) {
+                            Boolean parking, Boolean indoor, Boolean outdoor,Double score,  Map<String,Integer> keywords,Long  reviewCount,
+                            String imageUrl) {
         this.placeId = placeId;
         this.name = name;
         this.city = city;
@@ -62,6 +65,7 @@ public class PlaceRcommendDto {
         this.score = score;
         this.keywords =keywords;
         this.reviewCount = reviewCount;
+        this.imageUrl = imageUrl;
     }
 
 }

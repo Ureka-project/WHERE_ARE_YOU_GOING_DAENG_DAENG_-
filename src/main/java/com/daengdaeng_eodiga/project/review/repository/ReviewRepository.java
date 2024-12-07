@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.daengdaeng_eodiga.project.review.entity.Review;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -19,15 +21,18 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "			r.content, r.score, "
 		+ "        GROUP_CONCAT(DISTINCT rm.path ORDER BY rm.path ASC) AS media, "
 		+ "        GROUP_CONCAT(DISTINCT rk.keyword ORDER BY rk.keyword ASC) AS keywords, "
-		+ "        r.visited_at AS visitedAt, r.created_at AS createdAt  "
+		+ "        r.visited_at AS visitedAt, r.created_at AS createdAt ,"
+		+ "		   pl.name AS placeName "
 		+ "    FROM review r "
 		+ "    LEFT JOIN users u ON r.user_id = u.user_id "
 		+ "    LEFT JOIN review_pet rp ON rp.review_id = r.review_id "
 		+ "    LEFT JOIN pet p ON rp.pet_id = p.pet_id "
 		+ "    LEFT JOIN review_keyword rk ON rk.review_id = r.review_id "
 		+ "	   LEFT JOIN review_media rm ON rm.review_id = r.review_id "
+		+ "	   LEFT JOIN place pl ON r.place_id = pl.place_id "
 		+ "    WHERE r.place_id = :placeId "
-		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at"
+		+ "    AND u.deleted_at IS NULL "
+		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at, pl.name "
 		+ "	   ORDER BY createdAt desc ; ", nativeQuery = true)
 	Page<Object[]> findAllByPlaceOrderByLatest(int placeId, Pageable pageable);
 
@@ -38,15 +43,18 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "			r.content, r.score, "
 		+ "        GROUP_CONCAT(DISTINCT rm.path ORDER BY rm.path ASC) AS media, "
 		+ "        GROUP_CONCAT(DISTINCT rk.keyword ORDER BY rk.keyword ASC) AS keywords, "
-		+ "        r.visited_at AS visitedAt, r.created_at AS createdAt  "
+		+ "        r.visited_at AS visitedAt, r.created_at AS createdAt ,"
+		+ "		   pl.name AS placeName "
 		+ "    FROM review r "
 		+ "    LEFT JOIN users u ON r.user_id = u.user_id "
 		+ "    LEFT JOIN review_pet rp ON rp.review_id = r.review_id "
 		+ "    LEFT JOIN pet p ON rp.pet_id = p.pet_id "
 		+ "    LEFT JOIN review_keyword rk ON rk.review_id = r.review_id "
 		+ "	   LEFT JOIN review_media rm ON rm.review_id = r.review_id "
+		+ "	   LEFT JOIN place pl ON r.place_id = pl.place_id "
 		+ "    WHERE r.place_id = :placeId "
-		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at "
+		+ "    AND u.deleted_at IS NULL "
+		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at, pl.name "
 		+ "	   ORDER BY r.score desc ; ", nativeQuery = true)
 	Page<Object[]> findAllByPlaceOrderByHighScore(int placeId, Pageable pageable);
 
@@ -57,15 +65,18 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "			r.content, r.score, "
 		+ "        GROUP_CONCAT(DISTINCT rm.path ORDER BY rm.path ASC) AS media, "
 		+ "        GROUP_CONCAT(DISTINCT rk.keyword ORDER BY rk.keyword ASC) AS keywords, "
-		+ "        r.visited_at AS visitedAt, r.created_at AS createdAt  "
+		+ "        r.visited_at AS visitedAt, r.created_at AS createdAt ,"
+		+ "		   pl.name AS placeName "
 		+ "    FROM review r "
 		+ "    LEFT JOIN users u ON r.user_id = u.user_id "
 		+ "    LEFT JOIN review_pet rp ON rp.review_id = r.review_id "
 		+ "    LEFT JOIN pet p ON rp.pet_id = p.pet_id "
 		+ "    LEFT JOIN review_keyword rk ON rk.review_id = r.review_id "
 		+ "	   LEFT JOIN review_media rm ON rm.review_id = r.review_id "
+		+ "	   LEFT JOIN place pl ON r.place_id = pl.place_id "
 		+ "    WHERE r.place_id = :placeId "
-		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at "
+		+ "    AND u.deleted_at IS NULL "
+		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at, pl.name "
 		+ "	   ORDER BY r.score; ", nativeQuery = true)
 	Page<Object[]> findAllByPlaceOrderByLowScore(int placeId, Pageable pageable);
 
@@ -76,19 +87,27 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "			r.content, r.score, "
 		+ "        GROUP_CONCAT(DISTINCT rm.path ORDER BY rm.path ASC) AS media, "
 		+ "        GROUP_CONCAT(DISTINCT rk.keyword ORDER BY rk.keyword ASC) AS keywords, "
-		+ "        r.visited_at AS visitedAt, r.created_at AS createdAt  "
+		+ "        r.visited_at AS visitedAt, r.created_at AS createdAt,  "
+		+ "		   pl.name AS placeName "
 		+ "    FROM review r "
 		+ "    LEFT JOIN users u ON r.user_id = u.user_id "
 		+ "    LEFT JOIN review_pet rp ON rp.review_id = r.review_id "
 		+ "    LEFT JOIN pet p ON rp.pet_id = p.pet_id "
 		+ "    LEFT JOIN review_keyword rk ON rk.review_id = r.review_id "
 		+ "	   LEFT JOIN review_media rm ON rm.review_id = r.review_id "
+		+ "	   LEFT JOIN place pl ON r.place_id = pl.place_id "
 		+ "    WHERE r.user_id = :userId "
-		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at"
+		+ "    AND u.deleted_at IS NULL "
+		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at, pl.name "
 		+ "	   ORDER BY r.created_at desc; ", nativeQuery = true)
 	Page<Object[]> findAllByUserOrderByLatest(int userId, Pageable pageable);
 
 
 	@Query("SELECT rk.id.keyword FROM ReviewKeyword rk WHERE rk.review.reviewId = :reviewId")
 	List<String> findKeywordsByReviewId(int reviewId);
+
+	List<Review> findByPlace_PlaceId(int placeId);
+
+	@Query("SELECT DISTINCT r.place.placeId FROM Review r WHERE r.updatedAt > :lastDay")
+	List<Integer> findDistinctPlaceIdsByUpdatedAtAfter(@Param("lastDay") LocalDateTime lastDay);
 }

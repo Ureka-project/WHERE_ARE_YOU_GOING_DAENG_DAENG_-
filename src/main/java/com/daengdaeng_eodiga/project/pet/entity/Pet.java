@@ -1,11 +1,16 @@
 package com.daengdaeng_eodiga.project.pet.entity;
 import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
+import com.daengdaeng_eodiga.project.review.entity.ReviewPet;
 import com.daengdaeng_eodiga.project.user.entity.User;
+import com.daengdaeng_eodiga.project.visit.entity.VisitPet;
+
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -38,6 +43,12 @@ public class Pet extends BaseEntity {
     private String size;
     @ColumnDefault("false")
     private Boolean neutering;
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewPet> reviewPets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VisitPet> visitPets = new ArrayList<>();
 
     @Builder
     public Pet(User user, String name, String image, String gender, Date birthday, String species, String size, Boolean neutering) {
