@@ -41,7 +41,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             email = "unknown@example.com";
         }
         if (errorMessage != null && errorMessage.startsWith("REDIRECT_TO_SIGNUP:")) {
-            response.sendRedirect("/api/v1/signup?email=" + email + "&provider=" + provider);
+            response.sendRedirect("/api/v1/signup");
         } else {
             response.sendRedirect("/login?error=unknown");
         }
