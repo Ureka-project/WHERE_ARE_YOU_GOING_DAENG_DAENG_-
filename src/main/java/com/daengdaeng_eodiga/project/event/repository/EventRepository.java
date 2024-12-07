@@ -11,7 +11,6 @@ import java.util.List;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer> {
-
-    @Query("SELECT e FROM Event e WHERE :today BETWEEN e.startDate AND e.endDate")
+    @Query("SELECT e FROM Event e WHERE :today <= e.endDate")
     List<Event> findActiveEvents(@Param("today") LocalDate today);
 }
