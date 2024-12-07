@@ -8,13 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer> {
 
     @Query("SELECT e FROM Event e WHERE :today BETWEEN e.startDate AND e.endDate")
     List<Event> findActiveEvents(@Param("today") LocalDate today);
-
-    Optional<Event> findByEventId(Integer id);
 }
