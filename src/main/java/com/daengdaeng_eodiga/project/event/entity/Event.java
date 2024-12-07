@@ -20,18 +20,21 @@ public class Event extends BaseEntity {
     @Column(name = "event_name")
     private String eventName;
 
-    @Column(name = "event_description")
+    @Column(name = "event_image")
+    private String eventImage;
+
+    @Column(name = "event_description", length = 500)
     private String eventDescription;
+
+    @Column(name = "place_name")
+    private String placeName;
+
+    @Column(name = "place_address")
+    private String placeAddress;
 
     @Column(name = "start_date")
     private LocalDate  startDate;
 
     @Column(name = "end_date")
     private LocalDate endDate;
-
-    @Column(name = "place")
-    private String place;
-
-    @Column(name = "event_image")
-    private String eventImage;
 }
