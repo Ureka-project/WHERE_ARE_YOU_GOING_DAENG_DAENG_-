@@ -85,8 +85,7 @@ public class JWTUtil {
             return Jwtexception.normal;
 
         } catch (ExpiredJwtException e) {
-            throw e;
-            // return Jwtexception.expired;
+            return Jwtexception.expired;
         } catch (MalformedJwtException e) {
             return Jwtexception.mismatch;
         }
