@@ -47,7 +47,7 @@ public class SecurityConfig {
     public CorsConfiguration corsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://api.daengdaeng-where.link"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://pet.daengdaeng-where.link"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Set-Cookie","Access-Control-Allow-Origin"));
         configuration.setExposedHeaders(List.of("Set-Cookie","Access-Control-Allow-Origin"));
@@ -65,7 +65,7 @@ public class SecurityConfig {
 
         http
             .authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://api.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
+                .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://pet.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/user/duplicateNickname").permitAll()
