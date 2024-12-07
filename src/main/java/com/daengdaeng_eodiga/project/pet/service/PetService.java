@@ -65,6 +65,8 @@ public class PetService {
 		User user = userRepository.findById(userId)
 				.orElseThrow(UserNotFoundException::new);
 		commonCodeService.isCommonCode(requestDto.getSpecies());
+		commonCodeService.isCommonCode(requestDto.getGender());
+		commonCodeService.isCommonCode(requestDto.getSize());
 		Pet pet = Pet.builder()
 				.name(requestDto.getName())
 				.image(requestDto.getImage())
@@ -82,7 +84,9 @@ public class PetService {
 	public void updatePet(int petId, PetUpdateDto updateDto) {
 		Pet pet = petRepository.findById(petId)
 				.orElseThrow(PetNotFoundException::new);
-
+		commonCodeService.isCommonCode(updateDto.getSpecies());
+		commonCodeService.isCommonCode(updateDto.getGender());
+		commonCodeService.isCommonCode(updateDto.getSize());
 		pet.setName(updateDto.getName());
 		pet.setImage(updateDto.getImage());
 		pet.setSpecies(updateDto.getSpecies());

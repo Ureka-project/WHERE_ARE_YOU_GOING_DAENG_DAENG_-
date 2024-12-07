@@ -47,8 +47,8 @@ import java.util.Optional;
             if (Quser.isPresent()) {
                  user = Quser.get();
             }
-            String accessToken = jwtUtil.createJwt(email, provider, jwtUtil.getAccessTokenExpiration());
-            String refreshToken = jwtUtil.createRefreshToken(email,provider, jwtUtil.getRefreshTokenExpiration());
+            String accessToken = jwtUtil.createJwt(email, provider.toString(), jwtUtil.getAccessTokenExpiration());
+            String refreshToken = jwtUtil.createRefreshToken(email,provider.toString(), jwtUtil.getRefreshTokenExpiration());
             ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
                 .path("/")
                 .sameSite("Lax")

@@ -50,9 +50,9 @@ public class JWTUtil {
     }
 
     public OauthProvider getProvider (String token) {
-        OauthProvider provider = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("provider", OauthProvider.class);
+        String provider = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("provider", String.class);
         log.info("jwt - getProvider : " + provider);
-        return provider;
+        return OauthProvider.valueOf(provider);
     }
     public long getExpiration(String token) {
         try {
@@ -85,7 +85,8 @@ public class JWTUtil {
             return Jwtexception.normal;
 
         } catch (ExpiredJwtException e) {
-            return Jwtexception.expired;
+            throw e;
+            // return Jwtexception.expired;
         } catch (MalformedJwtException e) {
             return Jwtexception.mismatch;
         }
@@ -99,22 +100,24 @@ public class JWTUtil {
     }
 
 
-    public String createJwt(String email, OauthProvider provider, int expiredMs) {
+    public String createJwt(String email, String provider, int expiredMs) {
         log.info("jwt - createJwt email: " + email);
+        long now = new Date().getTime();
         return Jwts.builder()
                 .claim("email", email)
                 .claim("provider", provider)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs* 1000L))
+                .issuedAt(new Date(now))
+                .expiration(new Date(now+expiredMs))
                 .signWith(secretKey)
                 .compact();
     }
-    public String createRefreshToken(String email, OauthProvider provider, int expiredMs) {
+    public String createRefreshToken(String email, String provider, int expiredMs) {
+        long now = new Date().getTime();
         return Jwts.builder()
                 .claim("email", email)
                 .claim("provider", provider)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs* 1000L))
+                .issuedAt(new Date(now))
+                .expiration(new Date(now+expiredMs))
                 .signWith(secretKey)
                 .compact();
     }

@@ -99,8 +99,8 @@ frontend:
 
 jwt:
   token-expiration:
-    access: 86400
-    refresh: 2592000
+    access: 86400000
+    refresh: 1209600000
 
 server:
   tomcat:
