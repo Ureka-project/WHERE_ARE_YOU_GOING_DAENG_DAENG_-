@@ -5,6 +5,7 @@ import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepositor
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
 import com.daengdaeng_eodiga.project.Global.exception.UserFailedDelCookie;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.oauth.OauthResult;
 import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
 
@@ -27,15 +28,15 @@ public class TokenService {
         this.redisTokenRepository = redisTokenRepository;
     }
 
-    public void generateTokensAndSetCookies(String email, HttpServletResponse response) {
-        String accessToken = jwtUtil.createJwt(email, jwtUtil.getAccessTokenExpiration());
-        String refreshToken = jwtUtil.createRefreshToken(email,jwtUtil.getRefreshTokenExpiration());
+    public void generateTokensAndSetCookies(String email, OauthProvider provider, HttpServletResponse response) {
+        String accessToken = jwtUtil.createJwt(email, provider, jwtUtil.getAccessTokenExpiration());
+        String refreshToken = jwtUtil.createRefreshToken(email, provider, jwtUtil.getRefreshTokenExpiration());
 
         redisTokenRepository.saveToken(refreshToken, jwtUtil.getRefreshTokenExpiration(), email);
         ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
                 .path("/")
                 .sameSite("Lax")
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(true)
                 .maxAge(jwtUtil.getRefreshTokenExpiration())
                 .domain(".daengdaeng-where.link")
@@ -45,7 +46,7 @@ public class TokenService {
         ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", accessToken)
                 .path("/")
                 .sameSite("Lax")
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(true)
                 .maxAge(jwtUtil.getAccessTokenExpiration())
                 .domain(".daengdaeng-where.link")
@@ -58,7 +59,7 @@ public class TokenService {
             ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken")
                     .path("/")
                     .sameSite("Lax")
-                    .httpOnly(false)
+                    .httpOnly(true)
                     .secure(true)
                     .maxAge(0)
                     .domain(".daengdaeng-where.link")
@@ -67,7 +68,7 @@ public class TokenService {
             ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization")
                     .path("/")
                     .sameSite("Lax")
-                    .httpOnly(false)
+                    .httpOnly(true)
                     .secure(true)
                     .maxAge(0)
                     .domain(".daengdaeng-where.link")

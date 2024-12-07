@@ -96,11 +96,10 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/Eye_of_AI_Client
             aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws configure set region ${{ env.AWS_REGION }}
-            ECR_REGISTRY_LOGIN=$(aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }})
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
             sudo docker stop $(sudo docker ps -a --filter "ancestor=975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest" --format "{{.ID}}") || true
             sudo docker rm $(sudo docker ps -a --filter "ancestor=975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest" --format "{{.ID}}") || true
             sudo docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest

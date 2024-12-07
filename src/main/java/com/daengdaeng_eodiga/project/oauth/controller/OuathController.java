@@ -46,13 +46,13 @@ public class OuathController {
     @Value("${frontend.url}")
     private String frontUrl;
 
-    @GetMapping("/signup")
-    public void showSignUpForm(@RequestParam String email, @RequestParam String provider, HttpServletResponse response) throws IOException {
+
+    public void showSignUpForm(String email, String provider, HttpServletResponse response) throws IOException {
 
         ResponseCookie emailCookie = ResponseCookie.from("email", email)
             .path("/")
             .sameSite("Lax")
-            .httpOnly(false)
+            .httpOnly(true)
             .secure(false)
             .maxAge(60 * 10)
             .domain(".daengdaeng-where.link")
@@ -62,13 +62,13 @@ public class OuathController {
         ResponseCookie provideCookie = ResponseCookie.from("provider", provider)
             .path("/")
             .sameSite("Lax")
-            .httpOnly(false)
+            .httpOnly(true)
             .secure(false)
             .maxAge(60 * 10)
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", provideCookie.toString());
-        response.sendRedirect(frontUrl+"/user-register?email="+email+"&provider=" + provider);
+        response.sendRedirect(frontUrl+"/user-register");
     }
 
     @GetMapping("/loginSuccess")
@@ -77,7 +77,7 @@ public class OuathController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerUser(signUpForm);
-        tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response);
+        tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), signUpForm.getOauthProvider(), response);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
     @PostMapping("/logout")
@@ -100,7 +100,7 @@ public class OuathController {
     @GetMapping("/user/adjust")
     public ResponseEntity<ApiResponse<Map<String, Object>>> AdjustUserRequest(@AuthenticationPrincipal CustomOAuth2User principal) {
         UserOauthDto userOauthDto = principal.getUserDTO();
-        UserDto userDto = oauthUserService.UserToDto(userOauthDto.getEmail());
+        UserDto userDto = oauthUserService.UserToDto(userOauthDto.getEmail(),userOauthDto.getProvider());
         Map<String, Object> response = new HashMap<>();
         response.put("user", userDto);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -109,8 +109,9 @@ public class OuathController {
     @PutMapping("/user/adjust")
     public ResponseEntity<ApiResponse<?>> AdjustUser(@AuthenticationPrincipal CustomOAuth2User principal ,
                                                      @Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
-        oauthUserService.AdjustUser(signUpForm,principal.getUserDTO().getEmail());
-        return ResponseEntity.ok(ApiResponse.success(oauthUserService.UserToDto(principal.getEmail())));
+        UserOauthDto userOauthDto = principal.getUserDTO();
+        oauthUserService.AdjustUser(signUpForm,userOauthDto.getEmail(),userOauthDto.getProvider());
+        return ResponseEntity.ok(ApiResponse.success(oauthUserService.UserToDto(userOauthDto.getEmail(),userOauthDto.getProvider())));
     }
     @GetMapping("/user/duplicateNickname")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam
