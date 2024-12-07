@@ -123,7 +123,7 @@ public class JWTUtil {
         return ResponseCookie.from(key, value)
                 .path("/")
                 .sameSite("Lax")
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(true)
                 .maxAge(expiredMs)
                 .domain(".daengdaeng-where.link")
