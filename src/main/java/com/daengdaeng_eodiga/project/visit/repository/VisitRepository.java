@@ -12,10 +12,18 @@ import com.daengdaeng_eodiga.project.visit.entity.Visit;
 
 public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
-	@Query("SELECT v.visitAt as visitAt, vp.pet.petId as petId, vp.pet.image as petImg, vp.pet.name as petName, v.place.placeId as placeId, v.id as visitId, v.place.name as placeName FROM Visit v LEFT JOIN VisitPet vp on vp.visit.id = v.id WHERE v.place.placeId = :placeId and  v.visitAt BETWEEN :startDateTime AND :endDateTime")
+	@Query("SELECT v.visitAt as visitAt, vp.pet.petId as petId, vp.pet.image as petImg, vp.pet.name as petName, v.place.placeId as placeId, v.id as visitId, v.place.name as placeName "
+		+ "FROM Visit v "
+		+ "LEFT JOIN VisitPet vp on vp.visit.id = v.id "
+		+ "WHERE v.place.placeId = :placeId "
+		+ "and  v.visitAt BETWEEN :startDateTime AND :endDateTime "
+		+ "and v.user.deletedAt IS NULL ")
 	List<VisitInfo> findVisitInfoByPlaceId(int placeId, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
-	@Query("SELECT v.visitAt as visitAt, vp.pet.petId as petId, vp.pet.image as petImg, vp.pet.name as petName, v.place.placeId as placeId, v.place.name as placeName, v.id as visitId  FROM Visit v LEFT JOIN VisitPet vp on vp.visit.id = v.id WHERE v.user.userId = :userId and v.visitAt >= :startDateTime order by v.visitAt desc")
+	@Query("SELECT v.visitAt as visitAt, vp.pet.petId as petId, vp.pet.image as petImg, vp.pet.name as petName, v.place.placeId as placeId, v.place.name as placeName, v.id as visitId  "
+		+ "FROM Visit v LEFT JOIN VisitPet vp on vp.visit.id = v.id "
+		+ "WHERE v.user.userId = :userId and v.visitAt >= :startDateTime "
+		+ "order by v.visitAt desc")
 	List<VisitInfo> findVisitInfoByUserId(int userId, LocalDateTime startDateTime);
 
 	@Query("SELECT pt FROM Visit v " +
@@ -23,7 +31,8 @@ public interface VisitRepository extends JpaRepository<Visit, Integer> {
 		"JOIN PushToken pt ON pt.user = u " +
 		"WHERE v.place = (SELECT v2.place FROM Visit v2 WHERE v2.id = :visitId) " +
 		"AND v.visitAt = (SELECT v2.visitAt FROM Visit v2 WHERE v2.id = :visitId)"+
-		"AND u.userId != :userId"
+		"AND u.userId != :userId "+
+		"AND u.deletedAt IS NULL "
 	)
 	List<PushToken> findPushTokenByVisitId(int visitId,int userId);
 }

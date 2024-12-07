@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
@@ -37,20 +38,21 @@ import java.util.Optional;
         public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
             CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
             String email=customUserDetails.getEmail();
+            OauthProvider provider=customUserDetails.getUserDTO().getProvider();
 
             log.info("onAuthenticationSuccess - CustomSuccessHandler : " + email);
 
-            Optional<User> Quser = userRepository.findByEmail(email);
+            Optional<User> Quser = userRepository.findByEmailAndOauthProviderAndDeletedAtIsNull(email,provider);
             User user = new User();
             if (Quser.isPresent()) {
                  user = Quser.get();
             }
-            String accessToken = jwtUtil.createJwt(email, jwtUtil.getAccessTokenExpiration());
-            String refreshToken = jwtUtil.createRefreshToken(email,jwtUtil.getRefreshTokenExpiration());
+            String accessToken = jwtUtil.createJwt(email, provider, jwtUtil.getAccessTokenExpiration());
+            String refreshToken = jwtUtil.createRefreshToken(email,provider, jwtUtil.getRefreshTokenExpiration());
             ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
                 .path("/")
                 .sameSite("Lax")
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(true)
                 .maxAge(jwtUtil.getRefreshTokenExpiration())
                 .domain(".daengdaeng-where.link")
@@ -59,7 +61,7 @@ import java.util.Optional;
             ResponseCookie accessTokenCookie = ResponseCookie.from("Authorization", accessToken)
                 .path("/")
                 .sameSite("Lax")
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(true)
                 .maxAge(jwtUtil.getAccessTokenExpiration())
                 .domain(".daengdaeng-where.link")

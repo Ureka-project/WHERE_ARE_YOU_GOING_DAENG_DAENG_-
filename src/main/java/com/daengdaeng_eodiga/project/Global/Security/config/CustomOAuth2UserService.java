@@ -47,7 +47,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2Response.getEmail();
 
 
-        Optional<User> existData = userRepository.findByEmail(email);
+        Optional<User> existData = userRepository.findByEmailAndOauthProviderAndDeletedAtIsNull(email,provider);
         if (existData.isEmpty()) {
             throw new OAuth2AuthenticationException(new OAuth2Error(
                     "REDIRECT_TO_SIGNUP",
@@ -59,6 +59,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             UserOauthDto userDTO = new UserOauthDto();
             userDTO.setEmail(user.getEmail());
             userDTO.setName(user.getEmail());
+            userDTO.setProvider(user.getOauthProvider());
             return new CustomOAuth2User(userDTO);
         }
     }

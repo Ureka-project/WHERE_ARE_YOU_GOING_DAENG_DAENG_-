@@ -2,10 +2,9 @@ package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
-import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
-import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import com.daengdaeng_eodiga.project.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,7 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Set;
+
 @Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -41,7 +40,8 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("doFilterInternal - JWTFilter : " + request.getRequestURI()+ " "+request.getMethod()+" cookies : "+request.getCookies());
         Cookie[] cookies = request.getCookies();
-        String email = "13wjdgkbbb@gmial.com";
+        String email = "user1@example.com";
+        OauthProvider provider = OauthProvider.google;
         if(!testMode){
             if((!request.getRequestURI().startsWith("/api/v1/")) || request.getCookies() ==null){
                 log.info("cookies is null or requestUri is not /api/v1/");
@@ -90,7 +90,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     return;
                 } else if (!redisTokenRepository.isBlacklisted(refreshToken)) {
                     log.info("refreshToken is not expired, so new accessToken is created");
-                    accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), jwtUtil.getAccessTokenExpiration());
+                    accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken),jwtUtil.getProvider(refreshToken), jwtUtil.getAccessTokenExpiration());
                     response.addHeader("Set-Cookie", jwtUtil.createCookie("Authorization", accessToken,
                             jwtUtil.getAccessTokenExpiration()).toString());
                 } else {
@@ -102,12 +102,13 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
             email = jwtUtil.getEmail(accessToken);
+            provider = jwtUtil.getProvider(accessToken);
         }
 
 
-        log.info("filter email : "+email);
+        log.info("filter email : "+email + " provider : "+provider);
         UserOauthDto userDTO = new UserOauthDto();
-        User user= userService.findUserByemail(email);
+        User user= userService.findUserByemailAndProvider(email,provider);
         userDTO.setUserid(user.getUserId());
         userDTO.setEmail(user.getEmail());
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
