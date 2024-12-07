@@ -28,8 +28,7 @@ public class OauthUserService {
     private final CommonCodeService commonCodeService;
     private final UserService userService;
     public void registerUser(SignUpForm userDTO) {
-        if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()||
-        userRepository.existsByNickname(userDTO.getNickname())) {
+        if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()) {
             throw new DuplicateUserException();
         }
         User user = new User();

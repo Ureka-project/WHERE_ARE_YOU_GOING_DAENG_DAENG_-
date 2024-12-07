@@ -29,8 +29,8 @@ public class TokenService {
     }
 
     public void generateTokensAndSetCookies(String email, OauthProvider provider, HttpServletResponse response) {
-        String accessToken = jwtUtil.createJwt(email, provider, jwtUtil.getAccessTokenExpiration());
-        String refreshToken = jwtUtil.createRefreshToken(email, provider, jwtUtil.getRefreshTokenExpiration());
+        String accessToken = jwtUtil.createJwt(email, provider.toString(), jwtUtil.getAccessTokenExpiration());
+        String refreshToken = jwtUtil.createRefreshToken(email, provider.toString(), jwtUtil.getRefreshTokenExpiration());
 
         redisTokenRepository.saveToken(refreshToken, jwtUtil.getRefreshTokenExpiration(), email);
         ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", refreshToken)
@@ -52,6 +52,7 @@ public class TokenService {
                 .domain(".daengdaeng-where.link")
                 .build();
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
+
     }
     public void deleteCookie(String email, HttpServletResponse response,Cookie Refresh) {
         try {
