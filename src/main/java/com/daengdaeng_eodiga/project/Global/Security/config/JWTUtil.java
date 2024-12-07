@@ -1,6 +1,8 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
+
 import io.jsonwebtoken.*;
 
 import io.jsonwebtoken.security.Keys;
@@ -11,10 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.security.SignatureException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -25,10 +29,11 @@ import java.util.TimeZone;
 @Component
 public class JWTUtil {
 
-    private SecretKey secretKey;
-
+    private final SecretKey secretKey;
+    private final String text_key;
     public JWTUtil(@Value("${spring.jwt.secret}")String secret) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.secretKey =  Keys.hmacShaKeyFor(secret.getBytes());
+        this.text_key=secret;
     }
     @Getter
     @Value("${jwt.token-expiration.access}")
@@ -44,77 +49,17 @@ public class JWTUtil {
         return email;
     }
 
-    public Jwtexception isJwtValid(String token) {
-        try {
-             Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getExpiration();
-             return Jwtexception.normal;
-        } catch (ExpiredJwtException e) {
-            return Jwtexception.expired;
-        }
-        catch (JwtException e) {
-            return  Jwtexception.mismatch;
-        }
+    public OauthProvider getProvider (String token) {
+        OauthProvider provider = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("provider", OauthProvider.class);
+        log.info("jwt - getProvider : " + provider);
+        return provider;
     }
-
-    public String createJwt(String email, int expiredMs) {
-        log.info("jwt - createJwt email: " + email);
-        return Jwts.builder()
-                .claim("email", email)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(secretKey)
-                .compact();
-    }
-    public String createRefreshToken(String email, int expiredMs) {
-        return Jwts.builder()
-                .claim("email", email)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(secretKey)
-                .compact();
-    }
-
-    public Cookie createCookie(String key, String value, int expiredMs, HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(expiredMs);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setDomain("daengdaeng-where.link");
-
-        return cookie;
-    }
-
-    public  Cookie deletAcessCookie(String key, String value, HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setDomain("daengdaeng-where.link");
-        return cookie;
-    }
-    public Cookie deletRefreshCookie(String key, String value,HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setDomain("daengdaeng-where.link");
-        return cookie;
-    }
-
     public long getExpiration(String token) {
         try {
             Date expiration =Jwts.parser()
                     .verifyWith(secretKey)
                     .build()
-                    .parseSignedClaims(token).getBody().getExpiration();
+                    .parseSignedClaims(token).getPayload().getExpiration();
 
             LocalDateTime targetTime = expiration.toInstant()
                     .atZone(ZoneId.of("CST6CDT"))
@@ -122,11 +67,66 @@ public class JWTUtil {
 
             LocalDateTime now = LocalDateTime.now(ZoneId.of("CST6CDT"));
 
-            long secondsBetween = Duration.between(now, targetTime).getSeconds();
-
-            return secondsBetween;
+            return Duration.between(now, targetTime).getSeconds();
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    public Jwtexception isJwtValid(String token) {
+        try {
+            SecretKey key = Keys.hmacShaKeyFor(text_key.getBytes());
+
+            Claims claims = Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return Jwtexception.normal;
+
+        } catch (ExpiredJwtException e) {
+            return Jwtexception.expired;
+        } catch (MalformedJwtException e) {
+            return Jwtexception.mismatch;
+        }
+        catch (UnsupportedJwtException e) {
+            return Jwtexception.unsupportedJwt;
+        } catch (IllegalArgumentException e) {
+            return Jwtexception.invalidArgument;
+        } catch (JwtException e) {
+            return Jwtexception.otherError;
+        }
+    }
+
+
+    public String createJwt(String email, OauthProvider provider, int expiredMs) {
+        log.info("jwt - createJwt email: " + email);
+        return Jwts.builder()
+                .claim("email", email)
+                .claim("provider", provider)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiredMs* 1000L))
+                .signWith(secretKey)
+                .compact();
+    }
+    public String createRefreshToken(String email, OauthProvider provider, int expiredMs) {
+        return Jwts.builder()
+                .claim("email", email)
+                .claim("provider", provider)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiredMs* 1000L))
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public ResponseCookie createCookie(String key, String value, int expiredMs) {
+        return ResponseCookie.from(key, value)
+                .path("/")
+                .sameSite("Lax")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(expiredMs)
+                .domain(".daengdaeng-where.link")
+                .build();
     }
 }

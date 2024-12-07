@@ -2,10 +2,9 @@ package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
-import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
-import com.daengdaeng_eodiga.project.user.repository.UserRepository;
 import com.daengdaeng_eodiga.project.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,7 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Set;
+
 @Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -41,7 +40,8 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("doFilterInternal - JWTFilter : " + request.getRequestURI()+ " "+request.getMethod()+" cookies : "+request.getCookies());
         Cookie[] cookies = request.getCookies();
-        String email = "13wjdgkbbb@gmial.com";
+        String email = "user1@example.com";
+        OauthProvider provider = OauthProvider.google;
         if(!testMode){
             if((!request.getRequestURI().startsWith("/api/v1/")) || request.getCookies() ==null){
                 log.info("cookies is null or requestUri is not /api/v1/");
@@ -73,46 +73,42 @@ public class JWTFilter extends OncePerRequestFilter {
             log.info("refreshToken : "+refreshToken);
 
             Jwtexception accessTokenValid = jwtUtil.isJwtValid(accessToken);
-            if(accessTokenValid.equals(Jwtexception.mismatch)){
+            if (accessTokenValid != Jwtexception.normal&&accessTokenValid != Jwtexception.expired) {
                 log.info("accessToken is not valid");
                 filterChain.doFilter(request, response);
                 return;
-            }
-            else if(accessTokenValid.equals(Jwtexception.expired)){
+            } else if (accessTokenValid == Jwtexception.expired) {
                 Jwtexception refreshTokenValid = jwtUtil.isJwtValid(refreshToken);
-                if(refreshTokenValid.equals(Jwtexception.mismatch)){
-                    log.info("refreshToken is not valid");
+
+                if (refreshTokenValid != Jwtexception.normal) {
+                    if (refreshTokenValid == Jwtexception.expired) {
+                        log.info("refreshToken is expired");
+                    } else {
+                        log.info("refreshToken is not valid");
+                    }
+                    filterChain.doFilter(request, response);
+                    return;
+                } else if (!redisTokenRepository.isBlacklisted(refreshToken)) {
+                    log.info("refreshToken is not expired, so new accessToken is created");
+                    accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken),jwtUtil.getProvider(refreshToken), jwtUtil.getAccessTokenExpiration());
+                    response.addHeader("Set-Cookie", jwtUtil.createCookie("Authorization", accessToken,
+                            jwtUtil.getAccessTokenExpiration()).toString());
+                } else {
+                    log.info("logout된 토큰이다.");
                     filterChain.doFilter(request, response);
                     return;
                 }
-                else if(refreshTokenValid.equals(Jwtexception.expired)){
-                    log.info("refreshToken is expired");
-                    filterChain.doFilter(request, response);
-                    return;
-                } else if(refreshTokenValid.equals(Jwtexception.normal)&&!redisTokenRepository.isBlacklisted(refreshToken)){
-                    log.info("refreshToken is not expired , so new accessToken is created");
-                    accessToken = jwtUtil.createJwt(jwtUtil.getEmail(refreshToken), jwtUtil.getAccessTokenExpiration());
-                    //TODO : retreshToken 새로 발급 필요
-                    response.addCookie(jwtUtil.createCookie("Authorization", accessToken,  jwtUtil.getAccessTokenExpiration(),response));
-                }else {
-                    log.info("refreshToken is not normal");
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-            }else if(!accessTokenValid.equals(Jwtexception.normal)){
-                log.info("accessToken is not normal");
-                filterChain.doFilter(request, response);
-                return;
             }
 
 
             email = jwtUtil.getEmail(accessToken);
+            provider = jwtUtil.getProvider(accessToken);
         }
 
 
-        log.info("filter email : "+email);
+        log.info("filter email : "+email + " provider : "+provider);
         UserOauthDto userDTO = new UserOauthDto();
-        User user= userService.findUserByemail(email);
+        User user= userService.findUserByemailAndProvider(email,provider);
         userDTO.setUserid(user.getUserId());
         userDTO.setEmail(user.getEmail());
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);

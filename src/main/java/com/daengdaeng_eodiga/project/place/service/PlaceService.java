@@ -89,21 +89,37 @@ public class PlaceService {
         return placeScoreRepository.findById(placeId).orElseThrow(PlaceNotFoundException::new).getScore();
     }
 
-    public List<PlaceDto> getTopFavoritePlaces() {
+    public List<PlaceDto> getTopFavoritePlaces(Integer userId) {
         List<Object[]> results = placeRepository.findTopFavoritePlaces();
         return results.stream()
-                .map(PlaceDtoMapper::convertToPlaceDto)
+                .map(row -> {
+                    PlaceDto dto = PlaceDtoMapper.convertToPlaceDto(row);
+                    dto.setIsFavorite(userId != null && checkIfUserFavoritedPlace(dto.getPlaceId(), userId));
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceDto> getTopScoredPlacesWithinRadius(Double latitude, Double longitude) {
+    public List<PlaceDto> getTopScoredPlacesWithinRadius(Double latitude, Double longitude, Integer userId) {
         List<Object[]> results = placeRepository.findTopScoredPlacesWithinRadius(latitude, longitude);
-        return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
+        return results.stream()
+                .map(row -> {
+                    PlaceDto dto = PlaceDtoMapper.convertToPlaceDto(row);
+                    dto.setIsFavorite(userId != null && checkIfUserFavoritedPlace(dto.getPlaceId(), userId));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
-    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude) {
+    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
         List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude);
-        return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
+        return results.stream()
+                .map(row -> {
+                    PlaceDto dto = PlaceDtoMapper.convertToPlaceDto(row);
+                    dto.setIsFavorite(userId != null && checkIfUserFavoritedPlace(dto.getPlaceId(), userId));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
 
@@ -136,7 +152,7 @@ public class PlaceService {
             Double score = (Double) arr[17];
             String keywordsStr = (String) arr[18];
             Long reviewCount = (Long) arr[19];
-
+            String imageUrl=(String) arr[20];
             Map<String, Integer> keywords = new HashMap<>();
             if (keywordsStr != null && !keywordsStr.isEmpty()) {
                 String[] keywordArray = keywordsStr.split(",");
@@ -147,7 +163,7 @@ public class PlaceService {
             PlaceRcommendDto dto = new PlaceRcommendDto(
                     placeId, name, city, cityDetail, township, Placelatitude, Placelongitude,
                     postCode, streetAddresses, telNumber, url, placeType, description,
-                    weightLimit, parking, indoor, outdoor, score, keywords, reviewCount
+                    weightLimit, parking, indoor, outdoor, score, keywords, reviewCount,imageUrl
             );
 
             RecommnedArray.add(dto);
@@ -237,7 +253,7 @@ public class PlaceService {
     }
 
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 11 * * ?")
     public void scheduledReviewSummaryUpdate() {
         Logger logger = LoggerFactory.getLogger(PlaceService.class);
         logger.info("Scheduled task started.");

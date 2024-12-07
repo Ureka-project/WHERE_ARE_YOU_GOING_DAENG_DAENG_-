@@ -4,25 +4,18 @@ import com.daengdaeng_eodiga.project.Global.Security.config.CustomOAuth2User;
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
 import com.daengdaeng_eodiga.project.Global.dto.ApiResponse;
-import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
-import com.daengdaeng_eodiga.project.Global.exception.UserFailedSaveException;
-import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
-import com.daengdaeng_eodiga.project.Global.exception.UserUnauthorizedException;
-import com.daengdaeng_eodiga.project.oauth.OauthResult;
-import com.daengdaeng_eodiga.project.oauth.dto.OauthResponse;
 import com.daengdaeng_eodiga.project.oauth.dto.SignUpForm;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import com.daengdaeng_eodiga.project.oauth.service.OauthUserService;
 import com.daengdaeng_eodiga.project.oauth.service.TokenService;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
-import com.daengdaeng_eodiga.project.user.repository.UserRepository;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -53,13 +46,13 @@ public class OuathController {
     @Value("${frontend.url}")
     private String frontUrl;
 
-    @GetMapping("/signup")
-    public void showSignUpForm(@RequestParam String email, @RequestParam String provider, HttpServletResponse response) throws IOException {
+
+    public void showSignUpForm(String email, String provider, HttpServletResponse response) throws IOException {
 
         ResponseCookie emailCookie = ResponseCookie.from("email", email)
             .path("/")
             .sameSite("Lax")
-            .httpOnly(false)
+            .httpOnly(true)
             .secure(false)
             .maxAge(60 * 10)
             .domain(".daengdaeng-where.link")
@@ -69,13 +62,13 @@ public class OuathController {
         ResponseCookie provideCookie = ResponseCookie.from("provider", provider)
             .path("/")
             .sameSite("Lax")
-            .httpOnly(false)
+            .httpOnly(true)
             .secure(false)
             .maxAge(60 * 10)
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", provideCookie.toString());
-        response.sendRedirect(frontUrl+"/user-register?email="+email+"&provider=" + provider);
+        response.sendRedirect(frontUrl+"/user-register");
     }
 
     @GetMapping("/loginSuccess")
@@ -84,38 +77,41 @@ public class OuathController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody SignUpForm signUpForm, HttpServletResponse response) {
         oauthUserService.registerUser(signUpForm);
-        tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), response);
+        tokenService.generateTokensAndSetCookies(signUpForm.getEmail(), signUpForm.getOauthProvider(), response);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
-    //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal CustomOAuth2User principal,
+    public ResponseEntity<?> logout(@CookieValue("RefreshToken") Cookie RefreshToken ,@AuthenticationPrincipal CustomOAuth2User principal,
                                          HttpServletResponse response) {
-        UserOauthDto userOauthDto = principal.getUserDTO();
-        return tokenService.deleteCookie(userOauthDto.getEmail(), null, response);
+        String userEmail = principal.getUserDTO().getEmail();
+        tokenService.deleteCookie(userEmail, response,RefreshToken);
+        return  ResponseEntity.ok(ApiResponse.success(null));
     }
-    //Todo::@CookieValue("RefreshToken") String RefreshToken, 나중에 넣어야함
     @DeleteMapping("/user/delete")
-    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+    public ResponseEntity<?> deleteUser(@CookieValue("RefreshToken") Cookie RefreshToken,@AuthenticationPrincipal CustomOAuth2User customOAuth2User,
                                         HttpServletResponse response) {
-        String userEmail = customOAuth2User != null ? customOAuth2User.getEmail() : null;
-        oauthUserService.deleteUserByName(userEmail);
-        return tokenService.deleteCookie(userEmail, null, response);
+        int userid = customOAuth2User.getUserDTO().getUserid();
+        String userEmail = customOAuth2User.getUserDTO().getEmail();
+        oauthUserService.deleteUser(userid);
+        tokenService.deleteCookie(userEmail, response,RefreshToken);
+        return  ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/user/adjust")
     public ResponseEntity<ApiResponse<Map<String, Object>>> AdjustUserRequest(@AuthenticationPrincipal CustomOAuth2User principal) {
         UserOauthDto userOauthDto = principal.getUserDTO();
-        UserDto userDto = oauthUserService.UserToDto(userOauthDto.getEmail());
+        UserDto userDto = oauthUserService.UserToDto(userOauthDto.getEmail(),userOauthDto.getProvider());
         Map<String, Object> response = new HashMap<>();
         response.put("user", userDto);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
-
+    // TODO 프론트 유저 푸쉬 변경 완료되면 추가해 줘야 함
     @PutMapping("/user/adjust")
-    public ResponseEntity<ApiResponse<?>> AdjustUser(@Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
-        oauthUserService.AdjustUser(signUpForm);
-        return ResponseEntity.ok(ApiResponse.success(null));
+    public ResponseEntity<ApiResponse<?>> AdjustUser(@AuthenticationPrincipal CustomOAuth2User principal ,
+                                                     @Valid @RequestBody SignUpForm signUpForm, HttpServletResponse response) {
+        UserOauthDto userOauthDto = principal.getUserDTO();
+        oauthUserService.AdjustUser(signUpForm,userOauthDto.getEmail(),userOauthDto.getProvider());
+        return ResponseEntity.ok(ApiResponse.success(oauthUserService.UserToDto(userOauthDto.getEmail(),userOauthDto.getProvider())));
     }
     @GetMapping("/user/duplicateNickname")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNicknameDuplicate( @RequestParam

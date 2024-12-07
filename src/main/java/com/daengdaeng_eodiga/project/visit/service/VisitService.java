@@ -58,6 +58,16 @@ public class VisitService {
 	public PetsAtVisitTime registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
 		Place place = placeService.findPlace(placeId);
 		User user = userService.findUser(userId);
+		List<Integer> userPets = user.getPets().stream().map(pet -> {
+			return pet.getPetId();
+		}).toList();
+
+		petIds.forEach(petId -> {
+			if(!userPets.contains(petId)){
+				throw new NotFoundException("User의 Pet", String.format("PetId %d", petId));
+			}
+		});
+
 		List<VisitPet> visitPetsAtTime = findVisitPets(place, visitAt,user);
 		Visit visit;
 		if(visitPetsAtTime.isEmpty()){
@@ -72,15 +82,17 @@ public class VisitService {
 		}
 
 		Visit savedVisit = visit;
-		List<Integer> notSavedPetIds = visitPetsAtTime.stream().filter(visitPet -> !petIds.contains(visitPet.getPet().getPetId())).map(visitPet -> {
+		List<Integer> visitPetIds = visitPetsAtTime.stream().map(visitPet -> {
 			return visitPet.getPet().getPetId();
 		}).toList();
+		List<Integer> notSavedPetIds = petIds.stream().filter(petId -> !visitPetIds.contains(petId)).toList();
+
 
 		if(notSavedPetIds.isEmpty()){
 			throw new DuplicatePetException();
 		}
 
-		List<VisitPet> visitPets = petIds.stream()
+		List<VisitPet> visitPets = notSavedPetIds.stream()
 				.map(petId -> {
 					Pet pet = petService.findPet(petId);
 					return VisitPet.builder()
