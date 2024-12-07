@@ -1,13 +1,8 @@
 package com.daengdaeng_eodiga.project.banner.service;
 
-import com.daengdaeng_eodiga.project.Global.exception.BannerNotFoundException;
-import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
-import com.daengdaeng_eodiga.project.banner.dto.BannerDetailDto;
-import com.daengdaeng_eodiga.project.banner.dto.BannerListDto;
+import com.daengdaeng_eodiga.project.banner.dto.BannersDto;
 import com.daengdaeng_eodiga.project.event.entity.Event;
 import com.daengdaeng_eodiga.project.event.repository.EventRepository;
-import com.daengdaeng_eodiga.project.place.entity.Place;
-import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -20,32 +15,23 @@ import java.util.stream.Collectors;
 public class BannerService {
 
     private final EventRepository eventRepository;
-    private final PlaceRepository placeRepository;
 
-    public List<BannerListDto> fetchBannerList() {
+    public List<BannersDto> fetchBanners() {
         List<Event> activeEvents = eventRepository.findActiveEvents(LocalDate.now());
-
-        return activeEvents.stream()
-                .map(event -> new BannerListDto(event.getEventId(), event.getEventImage()))
-                .collect(Collectors.toList());
-    }
-
-    public BannerDetailDto fetchBannerDetail(int eventId) {
-        Event eventDetail = eventRepository.findByEventId(eventId)
-                .orElseThrow(BannerNotFoundException::new);
-
-        Place place = placeRepository.findByPlaceId(
-                Integer.parseInt(eventDetail.getPlace())).orElseThrow(PlaceNotFoundException::new);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        return BannerDetailDto.builder()
-                .eventImage(eventDetail.getEventImage())
-                .eventName(eventDetail.getEventName())
-                .placeName(place.getName())
-                .eventDescription(eventDetail.getEventDescription())
-                .startDate(eventDetail.getStartDate().format(formatter))
-                .endDate(eventDetail.getEndDate().format(formatter))
-                .build();
+        return activeEvents.stream()
+                .map(event -> BannersDto.builder()
+                                .eventId(event.getEventId())
+                                .eventName(event.getEventName())
+                                .eventImage(event.getEventImage())
+                                .eventDescription(event.getEventDescription())
+                                .placeName(event.getPlaceName())
+                                .placeAddress(event.getPlaceAddress())
+                                .startDate(event.getStartDate().format(formatter))
+                                .endDate(event.getEndDate().format(formatter))
+                                .build())
+                .collect(Collectors.toList());
     }
 }
