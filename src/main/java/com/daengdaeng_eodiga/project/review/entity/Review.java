@@ -30,6 +30,9 @@ public class Review extends BaseEntity {
     @Column(name = "visited_at")
     private LocalDate visitedAt;
 
+    @Column(name = "review_type")
+    private String reviewtype;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
@@ -48,11 +51,12 @@ public class Review extends BaseEntity {
     private List<ReviewPet> reviewPets = new ArrayList<>();
 
     @Builder
-    public Review(int score, String content, LocalDate visitedAt, Place place, User user) {
+    public Review(int score, String content, LocalDate visitedAt, Place place, User user, String reviewtype) {
         this.score = score;
         this.content = content;
         this.visitedAt = visitedAt;
         this.place = place;
         this.user = user;
+        this.reviewtype = reviewtype;
     }
 }
