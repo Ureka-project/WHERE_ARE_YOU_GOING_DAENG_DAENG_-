@@ -20,7 +20,7 @@ public class Event extends BaseEntity {
     @Column(name = "event_name")
     private String eventName;
 
-    @Column(name = "event_image")
+    @Column(name = "event_image", length = 500)
     private String eventImage;
 
     @Column(name = "event_description", length = 500)
