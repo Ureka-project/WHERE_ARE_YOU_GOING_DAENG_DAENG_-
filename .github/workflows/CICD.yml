@@ -73,7 +73,7 @@ jobs:
         with:
           username: ubuntu
           host: ${{ secrets.LIVE_SERVER_IP }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.EC2_SSH_KEY_V2 }}
           script_stop: true
           script: |
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
