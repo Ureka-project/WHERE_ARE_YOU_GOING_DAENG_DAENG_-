@@ -32,14 +32,14 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME_V2 }}
-          password: ${{ secrets.DOCKERHUB_TOKEN_V2 }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker
-        run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server .
+        run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/live_server .
 
       - name: Push Docker
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
         
   deploy:
     needs: build
@@ -59,12 +59,40 @@ jobs:
             echo "CURRENT_PORT=8080" >> $GITHUB_ENV
             echo "STOPPED_PORT=8081" >> $GITHUB_ENV
             echo "TARGET_UPSTREAM=green" >> $GITHUB_ENV
-          else 
+          elif [ $CURRENT_UPSTREAM = green ]; then
             echo "CURRENT_PORT=8081" >> $GITHUB_ENV
             echo "STOPPED_PORT=8080" >> $GITHUB_ENV
             echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
+          else
+            echo "error"
+            exit 1
           fi
           
+      - name: Docker run
+        run: |
+          sudo docker run -d --name daengdaeng -p 8080:8080 --net host \
+            -e MYSQL_PWD=${{secrets.MYSQL_PWD}} \
+            -e SPRING_PROFILES_ACTIVE=default \
+            -e GOOGLE_OAUTH_ID=${{secrets.GOOGLE_OAUTH_ID}} \
+            -e GOOGLE_OAUTH_SECRET=${{secrets.GOOGLE_OAUTH_SECRET}} \
+            -e KAKAO_OAUTH_ID=${{secrets.KAKAO_OAUTH_ID}} \
+            -e KAKAO_OAUTH_SECRET=${{secrets.KAKAO_OAUTH_SECRET}} \
+            -e KAKAO_REST_API_KEY=${{secrets.KAKAO_REST_API_KEY}} \
+            -e MYSQL_DOMAIN=${{secrets.MYSQL_DOMAIN}} \
+            -e REDIS_DOMAIN=${{secrets.REDIS_DOMAIN}} \
+            -e REDIS_PWD=${{secrets.REDIS_PWD}} \
+            -e SECURITY_SECRET=${{secrets.SECURITY_SECRET}} \
+            -e DOMAIN=${{secrets.EC2_DNS_ADDRESS}} \
+            -e AWS_ACCESS_KEY=${{secrets.AWS_ACCESS_KEY_ID}} \
+            -e AWS_SECRET_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} \
+            -e AWS_S3_BUCKET=${{secrets.AWS_S3_BUCKET}} \
+            -e AWS_S3_URL=${{secrets.AWS_S3_URL}} \
+            -e OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}} \
+            -e FRONTEND_URL=${{secrets.FRONTEND_URL}} \
+            -e TEST=false \
+            -e HOST=${{secrets.HOST}} \
+            975049923363.dkr.ecr.ap-northeast-2.amazonaws.com/daeng-daeng-ecr:latest
+
       - name: Docker compose
         uses: appleboy/ssh-action@master
         with:
@@ -80,7 +108,7 @@ jobs:
         uses: jtalk/url-health-check-action@v3
         with:
           url: http://${{ secrets.LIVE_SERVER_IP }}:${{env.STOPPED_PORT}}/env
-          max-attempts: 5
+          max-attempts: 3
           retry-delay: 10s
 
       - name: Change nginx upstream
