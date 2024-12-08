@@ -77,7 +77,7 @@ jobs:
             
       - name: Docker Compose Up
         run: |
-          docker-compose -f ./docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
+          docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
         env:
           MYSQL_PWD: ${{ secrets.MYSQL_PWD_V2 }}
           SPRING_PROFILES_ACTIVE: default
