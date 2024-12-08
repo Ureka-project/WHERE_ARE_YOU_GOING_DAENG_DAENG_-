@@ -72,9 +72,15 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
           
-      - name: Docker Compose Up
-        run: |
-          docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
+      - name: Docker Compose Up on AWS
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          username: ubuntu
+          host: ${{ secrets.LIVE_SERVER_IP }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu
+            docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
         env:
           SPRING_PROFILES_ACTIVE: default
           MYSQL_PWD: ${{ secrets.MYSQL_PWD_V2 }}
