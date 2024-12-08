@@ -85,12 +85,14 @@ spring:
   jpa:
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
         jdbc:
           time_zone: UTC
     hibernate:
       ddl-auto: update
     defer-datasource-initialization: true
     show-sql: true
+
 
   datasource:
     url: jdbc:mysql://${MYSQL_DOMAIN_V2}:3306/database-1?&rewriteBatchedStatements=true
