@@ -137,9 +137,9 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_DOMAIN}
+      host: ${REDIS_DOMAIN_V2}
       port: 6379
-      password: ${REDIS_PWD}
+      password: ${REDIS_PWD_V2}
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
