@@ -72,13 +72,15 @@ jobs:
           sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
           
-      - name: Docker Compose Up on AWS
-        uses: appleboy/ssh-action@v0.1.0
+      - name: Docker Compose Up and Pull Image on AWS
+        uses: appleboy/ssh-action@master
         with:
           username: ubuntu
           host: ${{ secrets.LIVE_SERVER_IP }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
           script: |
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
             cd /home/ubuntu
             docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
         env:
@@ -103,17 +105,6 @@ jobs:
           TEST: false
           HOST: ${{ secrets.HOST }}
 
-
-      - name: Docker compose
-        uses: appleboy/ssh-action@master
-        with:
-          username: ubuntu
-          host: ${{ secrets.LIVE_SERVER_IP }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
-          script: |
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
-            sudo docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
 
       - name: Check deploy server URL
