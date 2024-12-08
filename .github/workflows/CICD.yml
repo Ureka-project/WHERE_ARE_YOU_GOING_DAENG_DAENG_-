@@ -69,18 +69,12 @@ jobs:
           fi
 
           
-      - name: Install Docker Compose
-        run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-
-            
       - name: Docker Compose Up
         run: |
           docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
         env:
-          MYSQL_PWD: ${{ secrets.MYSQL_PWD_V2 }}
           SPRING_PROFILES_ACTIVE: default
+          MYSQL_PWD: ${{ secrets.MYSQL_PWD_V2 }}
           GOOGLE_OAUTH_ID: ${{ secrets.GOOGLE_OAUTH_ID }}
           GOOGLE_OAUTH_SECRET: ${{ secrets.GOOGLE_OAUTH_SECRET }}
           KAKAO_OAUTH_ID: ${{ secrets.KAKAO_OAUTH_ID }}
