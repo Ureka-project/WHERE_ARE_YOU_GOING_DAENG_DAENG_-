@@ -67,7 +67,19 @@ jobs:
             echo "error"
             exit 1
           fi
-          
+        
+
+      - name: Docker compose
+        uses: appleboy/ssh-action@master
+        with:
+          username: ubuntu
+          host: ${{ secrets.LIVE_SERVER_IP }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
+            sudo docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
+
       - name: Docker run
         run: |
           docker run \
@@ -92,18 +104,6 @@ jobs:
             -e TEST=false \
             -e HOST=${{ secrets.HOST }} \
             ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
-
-
-      - name: Docker compose
-        uses: appleboy/ssh-action@master
-        with:
-          username: ubuntu
-          host: ${{ secrets.LIVE_SERVER_IP }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
-          script: |
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
-            sudo docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
       - name: Check deploy server URL
         uses: jtalk/url-health-check-action@v3
