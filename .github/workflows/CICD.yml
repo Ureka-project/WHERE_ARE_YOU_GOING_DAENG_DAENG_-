@@ -70,9 +70,7 @@ jobs:
 
       - name: Docker run
         run: |
-          docker run -d \
-            --name live_server \
-            --platform linux/amd64 \
+          docker run 
             -e MYSQL_PWD=${{ secrets.MYSQL_PWD_V2 }} \
             -e SPRING_PROFILES_ACTIVE=default \
             -e GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }} \
