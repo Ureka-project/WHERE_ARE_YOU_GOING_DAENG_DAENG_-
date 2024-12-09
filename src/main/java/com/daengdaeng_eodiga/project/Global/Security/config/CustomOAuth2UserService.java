@@ -3,6 +3,7 @@ package com.daengdaeng_eodiga.project.Global.Security.config;
 import com.daengdaeng_eodiga.project.Global.Security.dto.GoogleResponse;
 import com.daengdaeng_eodiga.project.Global.Security.dto.KakaoResponse;
 import com.daengdaeng_eodiga.project.Global.Security.dto.OAuth2Response;
+import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
 import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.oauth.dto.UserOauthDto;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
@@ -47,14 +48,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2Response.getEmail();
 
 
-        Optional<User> existData = userRepository.findByEmailAndOauthProviderAndDeletedAtIsNull(email,provider);
+        Optional<User> existData = userRepository.findByEmailAndOauthProvider(email,provider);
         if (existData.isEmpty()) {
             throw new OAuth2AuthenticationException(new OAuth2Error(
                     "REDIRECT_TO_SIGNUP",
                     "REDIRECT_TO_SIGNUP: email=" + email + ", provider=" + provider,
-                    null // URI
+                    null
             ));
         } else {
+            if(existData.get().getDeletedAt()!=null){
+                throw new DuplicateUserException();
+            }
             User user = existData.get();
             UserOauthDto userDTO = new UserOauthDto();
             userDTO.setEmail(user.getEmail());
