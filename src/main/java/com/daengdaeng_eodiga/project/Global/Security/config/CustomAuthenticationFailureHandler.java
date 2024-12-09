@@ -40,17 +40,22 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                         }catch (Exception e){
                             provider = OauthProvider.google;
                         }
-                        ouathController.showSignUpForm(email, provider.toString(), response);
 
                     }
                 }
             } else if (errorMessage.startsWith("DELETED_USER:")) {
                 request.setAttribute("exception", new DuplicateUserException());
+
             }
-        }else{
+        }
+        if (email == null) {
+            email = "unknown@example.com";
+        }
+        if (errorMessage != null && errorMessage.startsWith("REDIRECT_TO_SIGNUP:")) {
+            ouathController.showSignUpForm(email, provider.toString(), response);
+        } else {
             response.sendRedirect("/login?error=unknown");
         }
-
     }
 
 }
