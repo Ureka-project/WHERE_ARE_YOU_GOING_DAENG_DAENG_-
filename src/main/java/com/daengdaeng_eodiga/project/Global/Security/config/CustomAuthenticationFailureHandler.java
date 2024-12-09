@@ -8,17 +8,23 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     private final OuathController ouathController;
+    @Value("${frontend.url}")
+    private String frontUrl;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -40,17 +46,22 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                         }catch (Exception e){
                             provider = OauthProvider.google;
                         }
-                        ouathController.showSignUpForm(email, provider.toString(), response);
 
                     }
                 }
-            } else if (errorMessage.startsWith("DELETED_USER:")) {
-                request.setAttribute("exception", new DuplicateUserException());
             }
-        }else{
+        }
+        if (email == null) {
+            email = "unknown@example.com";
+        }
+        if (errorMessage != null && errorMessage.startsWith("REDIRECT_TO_SIGNUP:")) {
+            ouathController.showSignUpForm(email, provider.toString(), response);
+        } else if (errorMessage != null && errorMessage.startsWith("DELETED_USER:")) {
+            log.info("redirect to DELETE_USER page");
+            ouathController.deletedUserRedirect(response);
+        } else {
             response.sendRedirect("/login?error=unknown");
         }
-
     }
 
 }
