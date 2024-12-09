@@ -71,6 +71,10 @@ public class OuathController {
         response.sendRedirect(frontUrl+"/user-register");
     }
 
+    public void deletedUserRedirect(HttpServletResponse response) throws IOException {
+        response.sendRedirect(frontUrl+"/error?status=DELETE_USER");
+    }
+
     @GetMapping("/loginSuccess")
     public void loginSuccess(HttpServletResponse response) throws IOException {
     }
