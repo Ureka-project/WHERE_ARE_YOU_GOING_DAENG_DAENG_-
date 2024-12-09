@@ -58,7 +58,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             ouathController.showSignUpForm(email, provider.toString(), response);
         } else if (errorMessage != null && errorMessage.startsWith("DELETED_USER:")) {
             log.info("redirect to DELETE_USER page");
-            response.sendRedirect(frontUrl+"/error?status=DELETE_USER");
+            ouathController.deletedUserRedirect(response);
         } else {
             response.sendRedirect("/login?error=unknown");
         }
