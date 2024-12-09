@@ -55,7 +55,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_V2 }}
           aws-region: 'ap-northeast-2'
 
-      # GitHub Actions VM 환경의 IP를 인바운드 규칙에 추가한다.
+
       - name: Add GitHub Actions IP 22
         run: |
           aws ec2 authorize-security-group-ingress \
