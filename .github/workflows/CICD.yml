@@ -82,28 +82,27 @@ jobs:
           script: |
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
             cd /home/ubuntu
+            # 환경 변수 전달을 위한 방법
+            export MYSQL_PWD_V2=${{ secrets.MYSQL_PWD_V2 }}
+            export GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }}
+            export GOOGLE_OAUTH_SECRET=${{ secrets.GOOGLE_OAUTH_SECRET }}
+            export KAKAO_OAUTH_ID=${{ secrets.KAKAO_OAUTH_ID }}
+            export KAKAO_OAUTH_SECRET=${{ secrets.KAKAO_OAUTH_SECRET }}
+            export KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}
+            export MYSQL_DOMAIN_V2=${{ secrets.MYSQL_DOMAIN_V2 }}
+            export REDIS_DOMAIN_V2=${{ secrets.REDIS_DOMAIN_V2 }}
+            export REDIS_PWD_V2=${{ secrets.REDIS_PWD_V2 }}
+            export SECURITY_SECRET=${{ secrets.SECURITY_SECRET }}
+            export DOMAIN=${{ secrets.EC2_DNS_ADDRESS }}
+            export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }}
+            export AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            export AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}
+            export AWS_S3_URL=${{ secrets.AWS_S3_URL }}
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            export FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            export TEST=false
+            # Docker Compose 명령어 실행
             sudo docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
-        env:
-          SPRING_PROFILES_ACTIVE: default
-          MYSQL_PWD: ${{ secrets.MYSQL_PWD_V2 }}
-          GOOGLE_OAUTH_ID: ${{ secrets.GOOGLE_OAUTH_ID }}
-          GOOGLE_OAUTH_SECRET: ${{ secrets.GOOGLE_OAUTH_SECRET }}
-          KAKAO_OAUTH_ID: ${{ secrets.KAKAO_OAUTH_ID }}
-          KAKAO_OAUTH_SECRET: ${{ secrets.KAKAO_OAUTH_SECRET }}
-          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
-          MYSQL_DOMAIN: ${{ secrets.MYSQL_DOMAIN_V2 }}
-          REDIS_DOMAIN: ${{ secrets.REDIS_DOMAIN_V2 }}
-          REDIS_PWD: ${{ secrets.REDIS_PWD_V2 }}
-          SECURITY_SECRET: ${{ secrets.SECURITY_SECRET }}
-          DOMAIN: ${{ secrets.EC2_DNS_ADDRESS }}
-          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          AWS_S3_URL: ${{ secrets.AWS_S3_URL }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
-          TEST: false
-          HOST: ${{ secrets.HOST }}
 
 
 
