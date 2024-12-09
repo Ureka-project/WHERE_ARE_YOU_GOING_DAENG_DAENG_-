@@ -89,7 +89,7 @@ public class SecurityConfig {
 
         http
             .exceptionHandling(exception -> exception
-                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+                                .authenticationEntryPoint(authenticationEntryPoint));
 
 
         http
