@@ -66,7 +66,7 @@ spring:
     jdbc:
       initialize-schema: always
     job:
-      enabled: true
+      enabled: false
 
 kakao:
   api:

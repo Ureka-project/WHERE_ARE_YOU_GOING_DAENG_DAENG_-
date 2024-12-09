@@ -36,7 +36,6 @@ import static java.lang.Math.min;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@EnableScheduling
 public class PlaceService {
 
     private final PlaceRepository placeRepository;
