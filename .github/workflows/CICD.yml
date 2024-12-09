@@ -59,14 +59,14 @@ jobs:
       - name: Add GitHub Actions IP 22
         run: |
           aws ec2 authorize-security-group-ingress \
-              --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+              --group-id ${{ secrets.SECURITY_GROUP_ID_V2 }} \
               --protocol tcp \
               --port 22 \
               --cidr ${{ steps.ip.outputs.ipv4 }}/32
       - name: Add GitHub Actions IP 80
         run: |
           aws ec2 authorize-security-group-ingress \
-              --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+              --group-id ${{ secrets.SECURITY_GROUP_ID_V2 }} \
               --protocol tcp \
               --port 80 \
               --cidr ${{ steps.ip.outputs.ipv4 }}/32
@@ -167,7 +167,7 @@ jobs:
       - name: Remove GitHub Actions IP
         run: |
           aws ec2 revoke-security-group-ingress \
-              --group-id ${{ secrets.SECURITY_GROUP_ID }} \
+              --group-id ${{ secrets.SECURITY_GROUP_ID_V2 }} \
               --protocol tcp \
               --port 22 \
               --cidr ${{ steps.ip.outputs.ipv4 }}/32
