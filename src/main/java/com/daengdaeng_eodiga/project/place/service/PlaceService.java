@@ -20,10 +20,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -371,7 +370,9 @@ public class PlaceService {
         }
         String lowerCaseResponse = response.trim().toLowerCase();
         return lowerCaseResponse.contains("요약할 수 없습니다") ||
-                lowerCaseResponse.contains("구체적인 내용이 없어");
+                lowerCaseResponse.contains("구체적인 내용이 없어") ||
+                lowerCaseResponse.contains("긍정적인 점을")||
+                lowerCaseResponse.contains("명확하지 않아");
     }
 
 
