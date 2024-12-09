@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
+import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
 import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.oauth.controller.OuathController;
 
@@ -42,6 +43,9 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 
                     }
                 }
+            } else if (errorMessage.startsWith("DELETED_USER:")) {
+                request.setAttribute("exception", new DuplicateUserException());
+
             }
         }
         if (email == null) {
