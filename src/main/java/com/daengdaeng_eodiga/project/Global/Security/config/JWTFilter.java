@@ -43,8 +43,8 @@ public class JWTFilter extends OncePerRequestFilter {
         String email = "user1@example.com";
         OauthProvider provider = OauthProvider.google;
         if(!testMode){
-            if((!request.getRequestURI().startsWith("/api/v1/")) || request.getCookies() ==null){
-                log.info("cookies is null or requestUri is not /api/v1/");
+            if((!request.getRequestURI().startsWith("/api/v1/") && !request.getRequestURI().startsWith("/api/v2/")) || request.getCookies() == null){
+                log.info("cookies is null or requestUri is not /api/v1/or/api/v2/");
                 filterChain.doFilter(request, response);
                 return;
             }
