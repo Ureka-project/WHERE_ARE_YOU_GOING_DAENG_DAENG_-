@@ -30,6 +30,11 @@ public class StoryService {
     private final RegionOwnerLogRepository regionOwnerLogRepository;
     private final UserService userService;
 
+    /**
+     * 유저 자신의 땅 목록 조회
+     * @param userId
+     * @return
+     */
     public UserMyLandsDto fetchUserLands(int userId) {
 
         String nickname = userService.findUser(userId).getNickname();
@@ -55,6 +60,11 @@ public class StoryService {
         return userMyLandsDto;
     }
 
+    /**
+     * 스토리 업로드
+     * @param userId
+     * @param storyRequestDto
+     */
     public void registerStory(int userId, StoryRequestDto storyRequestDto){
         if( storyRepository.countByTodayCreated() == 10 ) {
             throw new DailyStoryUploadLimitException();
@@ -84,6 +94,11 @@ public class StoryService {
         return null;
     }
 
+    /**
+     * 내 스토리 목록 조회
+     * @param userId
+     * @return
+     */
     public MyStoriesDto fetchMyStories(int userId) {
         List<Object[]> results = storyRepository.findMyActiveStoriesByUserId(userId);
         if( results.isEmpty() ) {
@@ -106,6 +121,13 @@ public class StoryService {
                 .build();
     }
 
+    /**
+     * 유저별 스토리 상세목록 조회
+     * @param landOwnerId
+     * @param city
+     * @param cityDetail
+     * @return
+     */
     public IndividualUserStoriesDto fetchIndividualUserStories(int landOwnerId, String city, String cityDetail){
         if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetail(landOwnerId, city, cityDetail).isEmpty() ) {
             throw new OwnerHistoryNotFoundException();
@@ -132,6 +154,11 @@ public class StoryService {
                 .build();
     }
 
+    /**
+     * 스토리 확인
+     * @param storyId
+     * @param userId
+     */
     public void viewStory(int storyId, int userId){
         StoryViewId storyViewId = StoryViewId.builder()
                 .userId(userId)
@@ -152,6 +179,10 @@ public class StoryService {
         storyViewRepository.save(storyView);
     }
 
+    /**
+     * 스토리 삭제
+     * @param storyId
+     */
     public void deleteStory(int storyId){
         storyRepository.deleteById(storyId);
     }
