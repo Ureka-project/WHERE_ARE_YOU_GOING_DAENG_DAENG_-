@@ -67,13 +67,17 @@ public class ReviewService {
 	}
 
 	private Review createAndSaveReview(ReviewRegisterRequest request, User user, Place place) {
+		String reviewType = (request.reviewType() != null) ? request.reviewType() : "REVIEW_TYP_01";
+
 		Review review = Review.builder()
-			.score(request.score())
-			.content(request.content())
-			.user(user)
-			.place(place)
-			.visitedAt(request.visitedAt())
-			.build();
+				.score(request.score())
+				.content(request.content())
+				.user(user)
+				.place(place)
+				.visitedAt(request.visitedAt())
+				.reviewtype(reviewType)
+				.build();
+
 		return reviewRepository.save(review);
 	}
 
@@ -112,7 +116,8 @@ public class ReviewService {
 			).toList(),
 			review.getVisitedAt(),
 			review.getCreatedAt(),
-			review.getPlace().getName()
+			review.getPlace().getName(),
+			review.getReviewtype()
 		);
 	}
 
@@ -180,7 +185,8 @@ public class ReviewService {
 				keywords,
 				visitedAt,
 				createdAt,
-				(String) result[12]
+				(String) result[12],
+				(String) result[13]
 
 			);
 			reviews.add(reviewDto);
