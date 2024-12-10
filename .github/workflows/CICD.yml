@@ -20,10 +20,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-          
-      - name: Get Public IP
-        id: ip
-        uses: haythem/public-ip@v1.3
 
       
       - name: Install Gradle
@@ -47,7 +43,16 @@ jobs:
       - name: Push Docker
         run: docker push ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
 
-        # AWS 인증 관련 옵션을 추가한다.
+    
+                    
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+              
+      - name: Get Public IP
+        id: ip
+        uses: haythem/public-ip@v1.3
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -70,11 +75,7 @@ jobs:
               --protocol tcp \
               --port 80 \
               --cidr ${{ steps.ip.outputs.ipv4 }}/32
-                    
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
+        
       - name: Set target IP
         run: |
           STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}/env")
