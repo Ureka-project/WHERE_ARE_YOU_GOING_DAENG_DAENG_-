@@ -57,7 +57,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             ));
         } else {
             if(existData.get().getDeletedAt()!=null){
-                throw new DuplicateUserException();
+
+                throw new OAuth2AuthenticationException(new OAuth2Error(
+                    "DELETED_USER",
+                    "DELETED_USER: email=" + email + ", provider=" + provider,
+                    null
+                ));
             }
             User user = existData.get();
             UserOauthDto userDTO = new UserOauthDto();

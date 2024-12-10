@@ -73,8 +73,10 @@ GROUP BY p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.lo
          p.street_addresses, p.tel_number, p.url, c.name, p.description,
          p.parking, p.indoor, p.outdoor, o.start_time, o.end_time, ps.score
 ORDER BY favorite_count DESC
-LIMIT 3;""", nativeQuery = true)
+LIMIT 3;
+""", nativeQuery = true)
     List<Object[]> findTopFavoritePlaces();
+
 
 
 
