@@ -253,7 +253,7 @@ public class PlaceService {
     }
 
 
-    @Scheduled(cron = "0 00 2 * * ?")
+    @Scheduled(cron = "0 0 2 * * ?")
     public void scheduledReviewSummaryUpdate() {
         logger.info("Scheduled task started.");
 
