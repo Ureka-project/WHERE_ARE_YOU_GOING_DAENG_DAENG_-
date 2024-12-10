@@ -52,7 +52,7 @@ public class OuathController {
         ResponseCookie emailCookie = ResponseCookie.from("email", email)
             .path("/")
             .sameSite("Lax")
-            .httpOnly(true)
+            .httpOnly(false)
             .secure(false)
             .maxAge(60 * 10)
             .domain(".daengdaeng-where.link")
@@ -62,13 +62,17 @@ public class OuathController {
         ResponseCookie provideCookie = ResponseCookie.from("provider", provider)
             .path("/")
             .sameSite("Lax")
-            .httpOnly(true)
+            .httpOnly(false)
             .secure(false)
             .maxAge(60 * 10)
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", provideCookie.toString());
         response.sendRedirect(frontUrl+"/user-register");
+    }
+
+    public void deletedUserRedirect(HttpServletResponse response) throws IOException {
+        response.sendRedirect(frontUrl+"/error?status=DELETE_USER");
     }
 
     @GetMapping("/loginSuccess")

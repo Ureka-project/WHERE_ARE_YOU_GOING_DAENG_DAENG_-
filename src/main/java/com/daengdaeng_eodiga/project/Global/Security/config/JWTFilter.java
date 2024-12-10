@@ -111,6 +111,7 @@ public class JWTFilter extends OncePerRequestFilter {
         User user= userService.findUserByemailAndProvider(email,provider);
         userDTO.setUserid(user.getUserId());
         userDTO.setEmail(user.getEmail());
+        userDTO.setProvider(provider);
         CustomOAuth2User customOAuth2User = new CustomOAuth2User(userDTO);
         Authentication authToken = new UsernamePasswordAuthenticationToken(customOAuth2User, null, customOAuth2User.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);

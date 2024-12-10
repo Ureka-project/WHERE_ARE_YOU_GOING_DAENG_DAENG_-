@@ -51,7 +51,7 @@ public class SecurityConfig {
     public CorsConfiguration corsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://pet.daengdaeng-where.link"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://pet.daengdaeng-where.link","https://daengdaeng-where-git-test-wldusdns-projects.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Set-Cookie","Access-Control-Allow-Origin"));
         configuration.setExposedHeaders(List.of("Set-Cookie","Access-Control-Allow-Origin"));
@@ -89,7 +89,7 @@ public class SecurityConfig {
 
         http
             .exceptionHandling(exception -> exception
-                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+                                .authenticationEntryPoint(authenticationEntryPoint));
 
 
         http

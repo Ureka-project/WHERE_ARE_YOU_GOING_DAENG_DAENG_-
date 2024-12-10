@@ -53,6 +53,16 @@ public class TokenService {
                 .build();
         response.addHeader("Set-Cookie", accessTokenCookie.toString());
 
+        ResponseCookie isLogin = ResponseCookie.from("loginSuccess", String.valueOf(true))
+            .path("/")
+            .sameSite("Lax")
+            .httpOnly(false)
+            .secure(true)
+            .maxAge(jwtUtil.getAccessTokenExpiration())
+            .domain(".daengdaeng-where.link")
+            .build();
+        response.addHeader("Set-Cookie", isLogin.toString());
+
     }
     public void deleteCookie(String email, HttpServletResponse response,Cookie Refresh) {
         try {
@@ -75,6 +85,17 @@ public class TokenService {
                     .domain(".daengdaeng-where.link")
                     .build();
             response.addHeader("Set-Cookie", accessTokenCookie.toString());
+
+            ResponseCookie isLogin = ResponseCookie.from("loginSuccess", String.valueOf(false))
+                .path("/")
+                .sameSite("Lax")
+                .httpOnly(false)
+                .secure(true)
+                .maxAge(0)
+                .domain(".daengdaeng-where.link")
+                .build();
+            response.addHeader("Set-Cookie", isLogin.toString());
+
             long expiration = jwtUtil.getExpiration(Refresh.getValue());
             if (expiration > 0) {
                 redisTokenRepository.addToBlacklist(Refresh.getValue(), expiration, email);
