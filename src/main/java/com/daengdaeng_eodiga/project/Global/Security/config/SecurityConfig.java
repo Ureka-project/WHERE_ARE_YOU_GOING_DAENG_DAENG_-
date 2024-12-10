@@ -75,6 +75,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/visit/place/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/region/**").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService,testMode), UsernamePasswordAuthenticationFilter.class);
 
