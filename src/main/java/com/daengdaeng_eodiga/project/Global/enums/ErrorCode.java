@@ -32,7 +32,11 @@ public enum ErrorCode {
 	NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 정보입니다."),
 	MISSING_COORDINATES(HttpStatus.BAD_REQUEST, "위도와 경도 값이 필요합니다."),
 	DUPLICATE_PREFERENCE(HttpStatus.CONFLICT, "이미 등록된 선호도입니다."),
-	DUPLICATE_FAVORITE(HttpStatus.CONFLICT, "이미 등록된 즐겨찾기입니다.");
+	DUPLICATE_FAVORITE(HttpStatus.CONFLICT, "이미 등록된 즐겨찾기입니다."),
+	DAILY_STORY_UPLOAD_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "오늘 업로드 가능한 데이터 개수를 초과했습니다."),
+	USER_STORY_NOT_FOUND(HttpStatus.NOT_FOUND, "스토리가 존재하지 않습니다."),
+	USER_LAND_NOT_FOUND(HttpStatus.NOT_FOUND, "유저의 땅이 존재하지 않습니다."),
+	OWNER_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "땅 주인 히스토리에 존재하지 않습니다.");
 	private final HttpStatus errorCode;
 	private final String message;
 
