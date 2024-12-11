@@ -31,6 +31,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "	   LEFT JOIN review_media rm ON rm.review_id = r.review_id "
 		+ "	   LEFT JOIN place pl ON r.place_id = pl.place_id "
 		+ "    WHERE r.place_id = :placeId "
+		+ "    AND u.deleted_at IS NULL "
 		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at, pl.name "
 		+ "	   ORDER BY createdAt desc ; ", nativeQuery = true)
 	Page<Object[]> findAllByPlaceOrderByLatest(int placeId, Pageable pageable);
@@ -52,6 +53,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "	   LEFT JOIN review_media rm ON rm.review_id = r.review_id "
 		+ "	   LEFT JOIN place pl ON r.place_id = pl.place_id "
 		+ "    WHERE r.place_id = :placeId "
+		+ "    AND u.deleted_at IS NULL "
 		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at, pl.name "
 		+ "	   ORDER BY r.score desc ; ", nativeQuery = true)
 	Page<Object[]> findAllByPlaceOrderByHighScore(int placeId, Pageable pageable);
@@ -73,6 +75,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "	   LEFT JOIN review_media rm ON rm.review_id = r.review_id "
 		+ "	   LEFT JOIN place pl ON r.place_id = pl.place_id "
 		+ "    WHERE r.place_id = :placeId "
+		+ "    AND u.deleted_at IS NULL "
 		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at, pl.name "
 		+ "	   ORDER BY r.score; ", nativeQuery = true)
 	Page<Object[]> findAllByPlaceOrderByLowScore(int placeId, Pageable pageable);
@@ -94,6 +97,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		+ "	   LEFT JOIN review_media rm ON rm.review_id = r.review_id "
 		+ "	   LEFT JOIN place pl ON r.place_id = pl.place_id "
 		+ "    WHERE r.user_id = :userId "
+		+ "    AND u.deleted_at IS NULL "
 		+ "    GROUP BY r.place_id, u.user_id, r.review_id, r.content,r.score,r.visited_at,r.created_at, pl.name "
 		+ "	   ORDER BY r.created_at desc; ", nativeQuery = true)
 	Page<Object[]> findAllByUserOrderByLatest(int userId, Pageable pageable);

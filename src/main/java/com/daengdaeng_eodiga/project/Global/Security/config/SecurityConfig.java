@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisTokenRepository;
+import com.daengdaeng_eodiga.project.oauth.controller.OuathController;
 import com.daengdaeng_eodiga.project.user.service.UserService;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,8 +31,10 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final Boolean testMode;
+    private final OuathController ouathController;
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
-    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode) {
+                          RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode,
+                          OuathController ouathController) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
@@ -42,12 +45,13 @@ public class SecurityConfig {
         this.accessDeniedHandler = accessDeniedHandler;
         this.testMode = testMode;
 
+        this.ouathController = ouathController;
     }
     @Bean
     public CorsConfiguration corsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://api.daengdaeng-where.link"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://pet.daengdaeng-where.link","https://daengdaeng-where-git-test-wldusdns-projects.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Set-Cookie","Access-Control-Allow-Origin"));
         configuration.setExposedHeaders(List.of("Set-Cookie","Access-Control-Allow-Origin"));
@@ -64,29 +68,29 @@ public class SecurityConfig {
         http.cors(cors -> cors.configurationSource(request -> corsConfiguration()));
 
         http
-            .authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/api/v1/loginSuccess","/login", "/hc" ,"/env","/favicon.ico","https://api.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/signup").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/user/duplicateNickname").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/visit/place/**").permitAll()
-                .anyRequest().authenticated())
-            .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService,testMode), UsernamePasswordAuthenticationFilter.class);
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://pet.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/user/duplicateNickname").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/visit/place/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/region/owners").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService,testMode), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler)
-                        .failureHandler(new CustomAuthenticationFailureHandler())
+                        .failureHandler(new CustomAuthenticationFailureHandler(ouathController))
                 );
 
 
         http
-            .exceptionHandling(exception -> exception
-                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint));
 
 
         http

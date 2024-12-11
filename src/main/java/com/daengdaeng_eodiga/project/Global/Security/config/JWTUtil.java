@@ -1,6 +1,8 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
 import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
+
 import io.jsonwebtoken.*;
 
 import io.jsonwebtoken.security.Keys;
@@ -45,6 +47,12 @@ public class JWTUtil {
         String email = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
         log.info("jwt - getEmail : " + email);
         return email;
+    }
+
+    public OauthProvider getProvider (String token) {
+        String provider = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("provider", String.class);
+        log.info("jwt - getProvider : " + provider);
+        return OauthProvider.valueOf(provider);
     }
     public long getExpiration(String token) {
         try {
@@ -91,20 +99,24 @@ public class JWTUtil {
     }
 
 
-    public String createJwt(String email, int expiredMs) {
+    public String createJwt(String email, String provider, int expiredMs) {
         log.info("jwt - createJwt email: " + email);
+        long now = new Date().getTime();
         return Jwts.builder()
                 .claim("email", email)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs* 1000L))
+                .claim("provider", provider)
+                .issuedAt(new Date(now))
+                .expiration(new Date(now+expiredMs))
                 .signWith(secretKey)
                 .compact();
     }
-    public String createRefreshToken(String email, int expiredMs) {
+    public String createRefreshToken(String email, String provider, int expiredMs) {
+        long now = new Date().getTime();
         return Jwts.builder()
                 .claim("email", email)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs* 1000L))
+                .claim("provider", provider)
+                .issuedAt(new Date(now))
+                .expiration(new Date(now+expiredMs))
                 .signWith(secretKey)
                 .compact();
     }
@@ -113,7 +125,7 @@ public class JWTUtil {
         return ResponseCookie.from(key, value)
                 .path("/")
                 .sameSite("Lax")
-                .httpOnly(false)
+                .httpOnly(true)
                 .secure(true)
                 .maxAge(expiredMs)
                 .domain(".daengdaeng-where.link")

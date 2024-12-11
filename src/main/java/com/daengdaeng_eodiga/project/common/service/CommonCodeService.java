@@ -24,6 +24,7 @@ public class CommonCodeService {
                 .orElseThrow(CommonCodeNotFoundException::new);
     }
 
+    @Cacheable(cacheNames = "checkCommonCodeExist", cacheManager = "commonCodeCacheManager")
     public void isCommonCode(String codeId) {
         if (!commonCodeRepository.findByCodeId(codeId).isPresent()) {
             throw new CommonCodeNotFoundException();

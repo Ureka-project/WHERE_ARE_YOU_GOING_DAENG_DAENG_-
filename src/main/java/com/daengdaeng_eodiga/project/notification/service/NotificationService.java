@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,6 +73,14 @@ public class NotificationService {
     public void cancelPush(int userId) {
         User user = userService.findUser(userId);
         pushTokenRepository.deleteByUser(user);
+    }
+
+    public Map isNotificationConsent(int userId) {
+
+        if(pushTokenRepository.findByUser_UserId(userId).isEmpty()){
+            return Map.of("isNotificationConsent", false);
+        }
+        return Map.of("isNotificationConsent", true);
     }
 
     public FcmRequestDto createFcmRequest(List<String> token, List<Integer> userId, PushType type, String petName, String placeName, String eventName) {

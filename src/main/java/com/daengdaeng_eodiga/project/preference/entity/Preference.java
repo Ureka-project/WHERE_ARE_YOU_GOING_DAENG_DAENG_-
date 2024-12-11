@@ -2,7 +2,6 @@
 
     import com.daengdaeng_eodiga.project.user.entity.User;
     import jakarta.persistence.*;
-    import lombok.Builder;
     import lombok.Getter;
     import lombok.RequiredArgsConstructor;
     import lombok.Setter;

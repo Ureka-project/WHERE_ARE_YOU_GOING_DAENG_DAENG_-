@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,5 +44,12 @@ public class NotificationController {
         int userId = customOAuth2User.getUserDTO().getUserid();
         notificationService.cancelPush(userId);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @GetMapping("/consent")
+    public ResponseEntity<ApiResponse<Map<String,Boolean>>> isNotificationConsent(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        int userId = customOAuth2User.getUserDTO().getUserid();
+        Map<String,Boolean> response = notificationService.isNotificationConsent(userId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

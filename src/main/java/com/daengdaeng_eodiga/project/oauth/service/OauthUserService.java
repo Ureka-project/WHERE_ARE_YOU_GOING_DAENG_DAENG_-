@@ -1,10 +1,13 @@
 package com.daengdaeng_eodiga.project.oauth.service;
 
+import java.time.LocalDateTime;
+
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
 import com.daengdaeng_eodiga.project.Global.exception.DuplicateUserException;
 import com.daengdaeng_eodiga.project.Global.exception.UserNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.notification.service.NotificationService;
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.user.dto.UserDto;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
@@ -25,8 +28,7 @@ public class OauthUserService {
     private final CommonCodeService commonCodeService;
     private final UserService userService;
     public void registerUser(SignUpForm userDTO) {
-        if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()||
-        userRepository.existsByNickname(userDTO.getNickname())) {
+        if (userRepository.findByEmailAndOauthProvider(userDTO.getEmail(), userDTO.getOauthProvider()).isPresent()) {
             throw new DuplicateUserException();
         }
         User user = new User();
@@ -39,8 +41,8 @@ public class OauthUserService {
         user.setOauthProvider(userDTO.getOauthProvider());
         userRepository.save(user);
     }
-    public void AdjustUser(SignUpForm AdjustuserDTO, String email) {
-        User user = userService.findUserByemail(email);
+    public void AdjustUser(SignUpForm AdjustuserDTO, String email, OauthProvider provider) {
+        User user = userService.findUserByemailAndProvider(email,provider);
         if (user!=null) {
             user.setNickname(AdjustuserDTO.getNickname());
             commonCodeService.isCommonCode(AdjustuserDTO.getGender());
@@ -54,10 +56,12 @@ public class OauthUserService {
             throw new UserNotFoundException();
     }
     public void deleteUser(int userId) {
-        userRepository.deleteById(userId);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.setDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
     }
-    public UserDto UserToDto(String email) {
-        User user =userService.findUserByemail(email);
+    public UserDto UserToDto(String email, OauthProvider provider) {
+        User user =userService.findUserByemailAndProvider(email,provider);
         if (user != null)
         {
             UserDto userDto = new UserDto();
