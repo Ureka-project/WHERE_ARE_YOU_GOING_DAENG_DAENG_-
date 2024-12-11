@@ -33,8 +33,11 @@ public class StoryService {
     /**
      * 유저 자신의 땅 목록 조회
      * @param userId
-     * @return
+     * @return UserMyLandsDto
+     * @deprecated
      */
+
+    // TODO :  지역별 주인 조회 로직 완성 후, cityDetail Null 수정
     public UserMyLandsDto fetchUserLands(int userId) {
 
         String nickname = userService.findUser(userId).getNickname();
@@ -51,7 +54,7 @@ public class StoryService {
             myLands.computeIfAbsent(city, k -> new ArrayList<>()).add(cityDetail);
         }
         List<MyLandsDto> myLandsDtos = myLands.entrySet().stream()
-                .map(entry -> new MyLandsDto(entry.getKey(), entry.getValue()))
+                .map(entry -> new MyLandsDto(entry.getKey(), null))
                 .collect(Collectors.toList());
         UserMyLandsDto userMyLandsDto = UserMyLandsDto.builder()
                 .nickname(nickname)

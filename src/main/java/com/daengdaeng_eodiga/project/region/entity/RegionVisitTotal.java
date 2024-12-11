@@ -14,29 +14,29 @@ import com.daengdaeng_eodiga.project.user.entity.User;
 @NoArgsConstructor
 public class RegionVisitTotal extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    @Column(name = "city")
-    private String city;
+	@Column(name = "city")
+	private String city;
 
-    @Column(name = "city detail")
-    private String cityDetail;
+	@Column(name = "city detail")
+	private String cityDetail;
 
-    @Column(name = "count")
-    private String count;
+	@Column(name = "count")
+	private String count;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
-    @Builder
-    public RegionVisitTotal(User user, String city, String cityDetail, String count) {
-        this.user = user;
-        this.city = city;
-        this.cityDetail = cityDetail;
-        this.count = count;
-    }
+	@Builder
+	public RegionVisitTotal(User user, String city, String cityDetail, String count) {
+		this.user = user;
+		this.city = city;
+		this.cityDetail = cityDetail;
+		this.count = count;
+	}
 
 }

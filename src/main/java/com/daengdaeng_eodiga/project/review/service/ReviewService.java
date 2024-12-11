@@ -23,6 +23,7 @@ import com.daengdaeng_eodiga.project.pet.service.PetService;
 import com.daengdaeng_eodiga.project.place.entity.Place;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
 
+import com.daengdaeng_eodiga.project.region.service.RegionService;
 import com.daengdaeng_eodiga.project.review.dto.ReviewDto;
 import com.daengdaeng_eodiga.project.review.dto.ReviewsResponse;
 import com.daengdaeng_eodiga.project.review.entity.ReviewKeyword;
@@ -50,6 +51,7 @@ public class ReviewService {
 	private final ReviewPetService reviewPetService;
 	private final ReviewMediaRepository reviewMediaRepository;
 	private final CommonCodeService commonCodeService;
+	private final RegionService regionService;
 
 	public ReviewDto registerReview(ReviewRegisterRequest request, int userId) {
 
@@ -62,20 +64,25 @@ public class ReviewService {
 		List<ReviewPet> savedReviewPets = saveReviewPetsIfPresent(review, pets);
 		List<ReviewKeyword> savedReviewKeywords = saveReviewKeywordsIfPresent(review, request.keywords().stream().toList());
 		List<ReviewMedia> savedReviewMedia = saveReviewMediaIfPresent(review, request.media());
-
+		addCountVisitRegion(userId, place, review);
 		return createReviewDto(review, savedReviewPets, savedReviewKeywords, savedReviewMedia);
 	}
 
-	private Review createAndSaveReview(ReviewRegisterRequest request, User user, Place place) {
-		String reviewType = (request.reviewType() != null) ? request.reviewType() : "REVIEW_TYP_01";
+	private void addCountVisitRegion(int userId, Place place, Review review) {
+		if(review.getReviewtype().equals("REVIEW_TYP_02")){
+			regionService.addCountVisitRegion(place.getCity(), place.getCityDetail(), userId);
+		}
+	}
 
+	private Review createAndSaveReview(ReviewRegisterRequest request, User user, Place place) {
+		commonCodeService.isCommonCode(request.reviewType());
 		Review review = Review.builder()
 				.score(request.score())
 				.content(request.content())
 				.user(user)
 				.place(place)
 				.visitedAt(request.visitedAt())
-				.reviewtype(reviewType)
+				.reviewtype(request.reviewType())
 				.build();
 
 		return reviewRepository.save(review);
@@ -117,7 +124,8 @@ public class ReviewService {
 			review.getVisitedAt(),
 			review.getCreatedAt(),
 			review.getPlace().getName(),
-			review.getReviewtype()
+			commonCodeService.getCommonCodeName(review.getReviewtype())
+
 		);
 	}
 

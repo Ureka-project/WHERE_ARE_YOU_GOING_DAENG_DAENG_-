@@ -6,6 +6,9 @@ import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 
 import com.daengdaeng_eodiga.project.preference.entity.Preference;
+import com.daengdaeng_eodiga.project.region.entity.RegionOwnerLog;
+import com.daengdaeng_eodiga.project.region.entity.RegionVisitDay;
+import com.daengdaeng_eodiga.project.region.entity.RegionVisitTotal;
 import com.daengdaeng_eodiga.project.review.entity.Review;
 import com.daengdaeng_eodiga.project.visit.entity.Visit;
 
@@ -72,5 +75,17 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Visit> visits = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<RegionOwnerLog> regionOwnerLogs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<RegionVisitDay> regionVisitDays = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<RegionVisitTotal> regionVisitTotals = new ArrayList<>();
 
 }
