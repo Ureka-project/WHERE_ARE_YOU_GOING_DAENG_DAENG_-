@@ -130,11 +130,8 @@ jobs:
             echo "AWS_S3_URL=${{ secrets.AWS_S3_URL }}" >> .env
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
             echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
-            echo "TEST=${{ secrets.TEST }}" >> .env
             echo "EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}" >> .env
             echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
-            echo "PROFILES=${{secrets.CURRENT_UPSTREAM}}" >> .env
-            echo "ENV=${{secrets.CURRENT_UPSTREAM}}" >> .env
             sudo docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
 
