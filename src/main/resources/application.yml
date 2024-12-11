@@ -175,7 +175,7 @@ cloud:
 
 frontend:
   url: ${FRONTEND_URL}
-  test : true
+  test : false
 
 jwt:
   token-expiration:

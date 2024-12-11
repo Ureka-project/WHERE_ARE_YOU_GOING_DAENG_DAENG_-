@@ -85,9 +85,9 @@ public class OuathController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue("RefreshToken") Cookie RefreshToken ,@AuthenticationPrincipal CustomOAuth2User principal,
+    public ResponseEntity<?> logout(@CookieValue("RefreshToken") Cookie RefreshToken ,@RequestBody  SignUpForm signUpForm,
                                          HttpServletResponse response) {
-        String userEmail = principal.getUserDTO().getEmail();
+        String userEmail = signUpForm.getEmail();
         tokenService.deleteCookie(userEmail, response,RefreshToken);
         return  ResponseEntity.ok(ApiResponse.success(null));
     }
