@@ -133,6 +133,8 @@ jobs:
             echo "TEST=${{ secrets.TEST }}" >> .env
             echo "EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}" >> .env
             echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
+            echo "PROFILES=${{ CURRENT_UPSTREAM }}" >> .env
+            echo "ENV=${{ CURRENT_UPSTREAM }}" >> .env
             sudo docker-compose -f /home/ubuntu/docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
 
