@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -69,7 +70,9 @@ public class StoryService {
      * @param storyRequestDto
      */
     public void registerStory(int userId, StoryRequestDto storyRequestDto){
-        if( storyRepository.countByTodayCreated() == 10 ) {
+        if( storyRepository.countByTodayCreated(
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().plusDays(1).atStartOfDay()) == 10 ) {
             throw new DailyStoryUploadLimitException();
         }
         if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetail(

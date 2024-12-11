@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,8 +14,9 @@ import java.util.Optional;
 public interface StoryRepository extends JpaRepository<Story, Integer> {
     Optional<Story> findByStoryId(int storyId);
 
-    @Query("SELECT COUNT(s) FROM Story s WHERE s.createdAt >= CURRENT_DATE AND s.createdAt < CURRENT_DATE + 1")
-    long countByTodayCreated();
+    @Query("SELECT COUNT(s) FROM Story s WHERE s.createdAt BETWEEN :todayStart AND :tomorrowStart")
+    long countByTodayCreated(@Param("todayStart") LocalDateTime todayStart,
+                             @Param("tomorrowStart") LocalDateTime  tomorrowStart);
 
     @Query("SELECT s.user.nickname, s.storyId, s.city, s.cityDetail, s.path " +
             "FROM Story s " +
