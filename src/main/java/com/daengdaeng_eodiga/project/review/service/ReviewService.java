@@ -75,18 +75,22 @@ public class ReviewService {
 	}
 
 	private Review createAndSaveReview(ReviewRegisterRequest request, User user, Place place) {
-		commonCodeService.isCommonCode(request.reviewType());
+		String reviewType = (request.reviewType() != null) ? request.reviewType() : "REVIEW_TYP_01";
+
+		commonCodeService.isCommonCode(reviewType);
+
 		Review review = Review.builder()
 				.score(request.score())
 				.content(request.content())
 				.user(user)
 				.place(place)
 				.visitedAt(request.visitedAt())
-				.reviewtype(request.reviewType())
+				.reviewtype(reviewType)
 				.build();
 
 		return reviewRepository.save(review);
 	}
+
 
 	private List<ReviewPet> saveReviewPetsIfPresent(Review review, List<Pet> pets) {
 		return pets == null || pets.isEmpty() ? List.of() : reviewPetService.saveReviewPet(review, pets);
