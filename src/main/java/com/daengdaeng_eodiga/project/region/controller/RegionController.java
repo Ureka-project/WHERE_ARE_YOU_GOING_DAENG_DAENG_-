@@ -23,7 +23,7 @@ public class RegionController {
 
 	@GetMapping("/owners")
 	public ResponseEntity<ApiResponse<RegionVisit>> fetchRegionOwner() {
-		RegionVisit response = regionService.fetchCountVisitAllRegion();
+		RegionVisit response = regionService.fetchRegionOwners();
 		return ResponseEntity.ok(ApiResponse.success(response) );
 	}
 

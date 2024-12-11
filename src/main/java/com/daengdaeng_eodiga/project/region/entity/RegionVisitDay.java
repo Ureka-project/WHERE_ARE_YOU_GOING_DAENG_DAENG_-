@@ -39,4 +39,8 @@ public class RegionVisitDay extends BaseEntity {
 		this.count = count;
 	}
 
+	public void addCount() {
+		this.count +=1;
+	}
+
 }
