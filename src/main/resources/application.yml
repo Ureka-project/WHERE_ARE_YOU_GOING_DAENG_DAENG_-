@@ -165,7 +165,7 @@ cloud:
 
 frontend:
   url: ${FRONTEND_URL}
-  test : ${TEST}
+  TEST : false
 jwt:
   token-expiration:
     access: 86400
