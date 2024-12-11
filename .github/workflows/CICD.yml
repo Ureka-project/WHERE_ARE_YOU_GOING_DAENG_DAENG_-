@@ -125,7 +125,6 @@ jobs:
           echo "EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}" >> $GITHUB_ENV
           echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> $GITHUB_ENV
       
-          
       - name: Docker compose
         uses: appleboy/ssh-action@master
         with:
@@ -134,8 +133,32 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script_stop: true
           script: |
+            # Exporting environment variables
+            export MYSQL_PWD_V2=${{ secrets.MYSQL_PWD_V2 }}
+            export GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }}
+            export GOOGLE_OAUTH_SECRET=${{ secrets.GOOGLE_OAUTH_SECRET }}
+            export KAKAO_OAUTH_ID=${{ secrets.KAKAO_OAUTH_ID }}
+            export KAKAO_OAUTH_SECRET=${{ secrets.KAKAO_OAUTH_SECRET }}
+            export KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}
+            export MYSQL_DOMAIN_V2=${{ secrets.MYSQL_DOMAIN_V2 }}
+            export REDIS_DOMAIN_V2=${{ secrets.REDIS_DOMAIN_V2 }}
+            export REDIS_PWD_V2=${{ secrets.REDIS_PWD_V2 }}
+            export SECURITY_SECRET=${{ secrets.SECURITY_SECRET }}
+            export DOMAIN=${{ secrets.DOMAIN }}
+            export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+            export AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+            export AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}
+            export AWS_S3_URL=${{ secrets.AWS_S3_URL }}
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            export FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            export TEST=${{ secrets.TEST }}
+            export EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            
+            # Pull the latest image and run the containers with the environment variables
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
             sudo docker-compose -f docker-compose-${{env.TARGET_UPSTREAM}}.yml up -d
+
 
 
 
