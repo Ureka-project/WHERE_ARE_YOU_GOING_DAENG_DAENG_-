@@ -124,7 +124,6 @@ jobs:
           echo "TEST=${{ secrets.TEST }}" >> $GITHUB_ENV
           echo "EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}" >> $GITHUB_ENV
           echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> $GITHUB_ENV
-          echo "TARGET_UPSTREAM=${{ secrets.TARGET_UPSTREAM }}" >> $GITHUB_ENV
       
           
       - name: Docker compose
