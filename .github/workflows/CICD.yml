@@ -112,29 +112,17 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY_V2 }}
           script_stop: true
           script: |
-            # 환경 변수 설정
-            export MYSQL_PWD_V2=${{ secrets.MYSQL_PWD_V2 }}
-            export GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }}
-            export GOOGLE_OAUTH_SECRET=${{ secrets.GOOGLE_OAUTH_SECRET }}
-            export KAKAO_OAUTH_ID=${{ secrets.KAKAO_OAUTH_ID }}
-            export KAKAO_OAUTH_SECRET=${{ secrets.KAKAO_OAUTH_SECRET }}
-            export KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}
-            export MYSQL_DOMAIN_V2=${{ secrets.MYSQL_DOMAIN_V2 }}
-            export REDIS_DOMAIN_V2=${{ secrets.REDIS_DOMAIN_V2 }}
-            export REDIS_PWD_V2=${{ secrets.REDIS_PWD_V2 }}
-            export SECURITY_SECRET=${{ secrets.SECURITY_SECRET }}
-            export DOMAIN=${{ secrets.EC2_DNS_ADDRESS }}
-            export AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }}
-            export AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            export AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}
-            export AWS_S3_URL=${{ secrets.AWS_S3_URL }}
-            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            export FRONTEND_URL=${{ secrets.FRONTEND_URL }}
-            export TEST=false
-            
-            # Docker Compose 실행
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
-            sudo docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
+            sudo env MYSQL_PWD_V2=${MYSQL_PWD_V2} GOOGLE_OAUTH_ID=${GOOGLE_OAUTH_ID} \
+              GOOGLE_OAUTH_SECRET=${GOOGLE_OAUTH_SECRET} KAKAO_OAUTH_ID=${KAKAO_OAUTH_ID} \
+              KAKAO_OAUTH_SECRET=${KAKAO_OAUTH_SECRET} KAKAO_REST_API_KEY=${KAKAO_REST_API_KEY} \
+              MYSQL_DOMAIN_V2=${MYSQL_DOMAIN_V2} REDIS_DOMAIN_V2=${REDIS_DOMAIN_V2} \
+              REDIS_PWD_V2=${REDIS_PWD_V2} SECURITY_SECRET=${SECURITY_SECRET} \
+              DOMAIN=${DOMAIN} AWS_ACCESS_KEY=${AWS_ACCESS_KEY} AWS_SECRET_KEY=${AWS_SECRET_KEY} \
+              AWS_S3_BUCKET=${AWS_S3_BUCKET} AWS_S3_URL=${AWS_S3_URL} OPENAI_API_KEY=${OPENAI_API_KEY} \
+              FRONTEND_URL=${FRONTEND_URL} TEST=${TEST} \
+              EC2_DNS_ADDRESS=${EC2_DNS_ADDRESS} DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME} \
+              TARGET_UPSTREAM=${TARGET_UPSTREAM} \
+              sudo docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
 
 
