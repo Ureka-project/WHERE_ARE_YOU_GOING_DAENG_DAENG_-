@@ -103,40 +103,6 @@ jobs:
             exit 1
           fi
           
-      - name: Create .env file
-        run: |
-          echo "MYSQL_PWD_V2=${{ secrets.MYSQL_PWD_V2 }}" > .env
-          echo "GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }}" >> .env
-          echo "GOOGLE_OAUTH_SECRET=${{ secrets.GOOGLE_OAUTH_SECRET }}" >> .env
-          echo "KAKAO_OAUTH_ID=${{ secrets.KAKAO_OAUTH_ID }}" >> .env
-          echo "KAKAO_OAUTH_SECRET=${{ secrets.KAKAO_OAUTH_SECRET }}" >> .env
-          echo "KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}" >> .env
-          echo "MYSQL_DOMAIN_V2=${{ secrets.MYSQL_DOMAIN_V2 }}" >> .env
-          echo "REDIS_DOMAIN_V2=${{ secrets.REDIS_DOMAIN_V2 }}" >> .env
-          echo "REDIS_PWD_V2=${{ secrets.REDIS_PWD_V2 }}" >> .env
-          echo "SECURITY_SECRET=${{ secrets.SECURITY_SECRET }}" >> .env
-          echo "DOMAIN=${{ secrets.DOMAIN }}" >> .env
-          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
-          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
-          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}" >> .env
-          echo "AWS_S3_URL=${{ secrets.AWS_S3_URL }}" >> .env
-          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-          echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
-          echo "TEST=${{ secrets.TEST }}" >> .env
-          echo "EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}" >> .env
-          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
-
-      - name: Copy .env to the server
-        uses: appleboy/ssh-action@master
-        with:
-          username: ubuntu
-          host: ${{ secrets.LIVE_SERVER_IP }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
-          script: |
-            # Copy the .env file to the server
-            scp -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.LIVE_SERVER_IP }}:/home/ubuntu/.env
-
       - name: Deploy Docker Compose with .env file
         uses: appleboy/ssh-action@master
         with:
@@ -145,11 +111,29 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script_stop: true
           script: |
-            # Pull the latest Docker image
+     
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
-            
-            # Run Docker Compose using the .env file
-            sudo docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
+            echo "MYSQL_PWD_V2=${{ secrets.MYSQL_PWD_V2 }}" > .env
+            echo "GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }}" >> .env
+            echo "GOOGLE_OAUTH_SECRET=${{ secrets.GOOGLE_OAUTH_SECRET }}" >> .env
+            echo "KAKAO_OAUTH_ID=${{ secrets.KAKAO_OAUTH_ID }}" >> .env
+            echo "KAKAO_OAUTH_SECRET=${{ secrets.KAKAO_OAUTH_SECRET }}" >> .env
+            echo "KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}" >> .env
+            echo "MYSQL_DOMAIN_V2=${{ secrets.MYSQL_DOMAIN_V2 }}" >> .env
+            echo "REDIS_DOMAIN_V2=${{ secrets.REDIS_DOMAIN_V2 }}" >> .env
+            echo "REDIS_PWD_V2=${{ secrets.REDIS_PWD_V2 }}" >> .env
+            echo "SECURITY_SECRET=${{ secrets.SECURITY_SECRET }}" >> .env
+            echo "DOMAIN=${{ secrets.DOMAIN }}" >> .env
+            echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env
+            echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> .env
+            echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}" >> .env
+            echo "AWS_S3_URL=${{ secrets.AWS_S3_URL }}" >> .env
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+            echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+            echo "TEST=${{ secrets.TEST }}" >> .env
+            echo "EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}" >> .env
+            echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
+            sudo docker-compose -f /home/ubuntu/docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
 
 
