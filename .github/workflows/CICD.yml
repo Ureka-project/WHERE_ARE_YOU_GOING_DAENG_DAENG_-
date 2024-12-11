@@ -72,12 +72,12 @@ jobs:
               --protocol tcp \
               --port 22 \
               --cidr ${{ steps.ip.outputs.ipv4 }}/32
-      - name: Add GitHub Actions IP 80
+      - name: Add GitHub Actions IP 443
         run: |
           aws ec2 authorize-security-group-ingress \
               --group-id ${{ secrets.SECURITY_GROUP_ID_V2 }} \
               --protocol tcp \
-              --port 80 \
+              --port 443 \
               --cidr ${{ steps.ip.outputs.ipv4 }}/32
         
       - name: Set target IP
