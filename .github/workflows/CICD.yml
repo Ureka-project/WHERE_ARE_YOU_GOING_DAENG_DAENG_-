@@ -99,7 +99,8 @@ jobs:
             echo "STOPPED_PORT=8080" >> $GITHUB_ENV
             echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
           fi
-            - name: Run Docker Container
+          
+          - name: Run Docker Container
           run: |
             docker run -d \
               -p ${{ env.CURRENT_PORT }}:8080 \
