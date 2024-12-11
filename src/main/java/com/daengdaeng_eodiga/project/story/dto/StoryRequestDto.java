@@ -1,13 +1,15 @@
 package com.daengdaeng_eodiga.project.story.dto;
 
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class StoryRequestDto {
-    // TODO : path에 영상 길이 제한 필요함
     private String city;
     private String cityDetail;
+
+    @Size(max = 1000, message = "미디어 길이는 최대 1000자까지 가능합니다.")
     private String path;
 
     @Builder
