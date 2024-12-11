@@ -194,7 +194,7 @@ public class ReviewService {
 				visitedAt,
 				createdAt,
 				(String) result[12],
-				(String) result[13]
+				commonCodeService.getCommonCodeName((String) result[13])
 
 			);
 			reviews.add(reviewDto);
