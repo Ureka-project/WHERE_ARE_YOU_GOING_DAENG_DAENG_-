@@ -1,0 +1,59 @@
+2024-12-08 21:57:25 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 82735
+2024-12-08 21:57:26 302 GET /login;jsessionid=1F67DC190D3809F0F48D0393DDE3E1D8 HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 - 6590
+2024-12-08 21:57:26 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/login;jsessionid=1F67DC190D3809F0F48D0393DDE3E1D8 0:0:0:0:0:0:0:1 1001 4131
+2024-12-08 21:57:51 302 GET / HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 - 0:0:0:0:0:0:0:1 - 4048
+2024-12-08 21:57:51 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 - 0:0:0:0:0:0:0:1 1001 1214
+2024-12-08 21:57:51 302 GET /favicon.ico HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 - 1450
+2024-12-08 21:57:51 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 1001 860
+2024-12-08 21:58:16 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 83322
+2024-12-08 21:58:16 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 5864
+2024-12-08 21:58:37 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 - 0:0:0:0:0:0:0:1 1001 2481
+2024-12-08 21:58:37 302 GET /favicon.ico HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 - 2469
+2024-12-08 21:58:37 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 1001 1141
+2024-12-08 21:59:09 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 83157
+2024-12-08 21:59:09 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 6121
+2024-12-08 21:59:11 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 1808
+2024-12-08 21:59:11 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 886
+2024-12-08 21:59:12 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 1795
+2024-12-08 21:59:12 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 1021
+2024-12-08 21:59:13 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 1620
+2024-12-08 21:59:13 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 924
+2024-12-08 21:59:39 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 1743
+2024-12-08 21:59:39 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 816
+2024-12-08 22:00:30 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 220627
+2024-12-08 22:04:08 302 GET / HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 - 0:0:0:0:0:0:0:1 - 85289
+2024-12-08 22:04:08 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 - 0:0:0:0:0:0:0:1 1001 4964
+2024-12-08 22:04:08 302 GET /favicon.ico HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 - 1891
+2024-12-08 22:04:08 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 1001 1357
+2024-12-08 22:04:50 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 - 0:0:0:0:0:0:0:1 1001 42799
+2024-12-08 22:04:50 302 GET /favicon.ico HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 - 5496
+2024-12-08 22:04:50 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 1001 1962
+2024-12-08 22:04:51 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 - 0:0:0:0:0:0:0:1 1001 1646
+2024-12-08 22:04:51 302 GET /favicon.ico HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 - 1555
+2024-12-08 22:04:51 200 GET /login HTTP/1.1 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 http://localhost:8080/login 0:0:0:0:0:0:0:1 1001 1205
+2024-12-08 22:04:54 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 45116
+2024-12-08 22:04:54 302 GET /login;jsessionid=7C3D158D25DE89DD75F50282FA32BAC6 HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 - 4761
+2024-12-08 22:04:54 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/login;jsessionid=7C3D158D25DE89DD75F50282FA32BAC6 0:0:0:0:0:0:0:1 1001 807
+2024-12-08 22:04:55 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 1685
+2024-12-08 22:04:55 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 718
+2024-12-08 22:07:32 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 1561
+2024-12-08 22:07:32 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 717
+2024-12-08 22:07:33 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 1321
+2024-12-08 22:07:33 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 584
+2024-12-08 22:07:33 302 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 - 1283
+2024-12-08 22:07:33 200 GET /login HTTP/1.1 PostmanRuntime/7.43.0 http://localhost:8080/api/v1/places/recommend 0:0:0:0:0:0:0:1 1001 570
+2024-12-08 22:07:57 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 193087
+2024-12-08 22:09:03 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 3711
+2024-12-08 22:11:38 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 3628
+2024-12-08 22:11:39 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 3588
+2024-12-08 22:11:39 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 3468
+2024-12-08 22:11:54 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 3464
+2024-12-08 22:11:55 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 3626
+2024-12-08 22:12:34 404 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 81 3702
+2024-12-08 22:13:26 401 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 73 515532
+2024-12-08 22:13:27 401 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 73 9103
+2024-12-08 22:13:56 200 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 1726 366769
+2024-12-08 22:22:38 200 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 1726 605683
+2024-12-08 22:29:59 200 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 1726 8080
+2024-12-08 22:31:13 200 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 2143 301083
+2024-12-08 22:34:17 200 POST /api/v1/places/recommend HTTP/1.1 PostmanRuntime/7.43.0 - 0:0:0:0:0:0:0:1 2143 565476
