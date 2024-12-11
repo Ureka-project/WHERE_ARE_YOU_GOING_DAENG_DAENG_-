@@ -12,7 +12,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 public class CacheConfig {
 	@Bean(name = "commonCodeCacheManager")
 	public CaffeineCacheManager commonCodeCacheManager() {
-		CaffeineCacheManager cacheManager = new CaffeineCacheManager( "commonCode");
+		CaffeineCacheManager cacheManager = new CaffeineCacheManager( "commonCode","checkCommonCodeExist");
 		cacheManager.setCaffeine(Caffeine.newBuilder().recordStats());
 		return cacheManager;
 	}

@@ -1,15 +1,29 @@
 package com.daengdaeng_eodiga.project.region.repository;
 
-import com.daengdaeng_eodiga.project.region.entity.RegionOwnerLog;
+import java.util.List;
+
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.daengdaeng_eodiga.project.region.dto.RegionOwnerInfo;
+import com.daengdaeng_eodiga.project.region.entity.RegionOwnerLog;
 
-@Repository
-public interface RegionOwnerLogRepository extends JpaRepository<RegionOwnerLog, Integer> {
+public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog, Integer> {
+
+
+
+	@Query(" SELECT rol.id as id, rol.city as city, rol.cityDetail as cityDetail, rol.count as count, rol.user.userId as userId, u.nickname as userNickname, " +
+		"        p.id as petId, p.name as petName, p.image as petImage "
+		+ "FROM RegionOwnerLog rol " +
+		" JOIN ( SELECT r.city AS city , r.cityDetail AS cityDetail , MAX(r.createdAt) AS createdAt " +
+		"        FROM RegionOwnerLog r " +
+		"        GROUP BY city, cityDetail ) AS ro "
+		+ "ON ro.city = rol.city AND ro.cityDetail = rol.cityDetail AND ro.createdAt = rol.createdAt "
+		+ "JOIN rol.user u ON rol.user.userId = u.userId " +
+		" LEFT JOIN Pet p ON rol.user.userId = p.user.userId")
+	List<RegionOwnerInfo> fetchRegionOwner();
 
     @Query("SELECT r.city, r.cityDetail " +
         "FROM RegionOwnerLog r " +
@@ -36,3 +50,4 @@ public interface RegionOwnerLogRepository extends JpaRepository<RegionOwnerLog, 
             @Param("city") String city,
             @Param("cityDetail") String cityDetail);
 }
+
