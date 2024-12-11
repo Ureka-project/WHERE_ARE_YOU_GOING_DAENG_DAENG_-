@@ -24,5 +24,6 @@ public record ReviewRegisterRequest(
 	@NotNull(message = "방문 날짜는 필수입니다.")
 	LocalDate visitedAt,
 	Set<Integer> pets,
+	@NotNull(message = "리뷰 타입은 필수입니다.")
 	String reviewType ) {
 }
