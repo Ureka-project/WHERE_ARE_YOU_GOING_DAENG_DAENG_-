@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.daengdaeng_eodiga.project.Global.exception.UserLandNotFoundException;
 import com.daengdaeng_eodiga.project.pet.dto.PetResponse;
 import com.daengdaeng_eodiga.project.region.dto.CityDetailVisit;
-import com.daengdaeng_eodiga.project.region.dto.RegionOwnerCity;
+import com.daengdaeng_eodiga.project.region.dto.RegionVisit;
 import com.daengdaeng_eodiga.project.region.dto.RegionOwnerCityDetail;
 import com.daengdaeng_eodiga.project.region.dto.RegionOwnerInfo;
 import com.daengdaeng_eodiga.project.region.enums.Regions;
@@ -40,7 +40,7 @@ public class RegionService {
 	 * @author 김가은
 	 */
 
-	public RegionOwnerCity fetchRegionOwners() {
+	public RegionVisit<RegionOwnerCityDetail> fetchRegionOwners() {
 		List<RegionOwnerInfo> regionOwnerInfos = regionOwnerLogRepository.fetchRegionOwner();
 		HashMap<String,HashMap<String, RegionOwnerCityDetail>> regionOwners = new HashMap<>();
 		Map<String, Set<Integer>> regionOwnerLogIdsByCity = new HashMap<>();
@@ -66,10 +66,10 @@ public class RegionService {
 			});
 			regionOwners.put(city,regionOwnerCities);
 		});
-		RegionOwnerCity regionOwnerCity = new RegionOwnerCity();
-		regionOwnerCity.setRegionOwners(regionOwners);
+		RegionVisit<RegionOwnerCityDetail> regionVisit = new RegionVisit();
+		regionVisit.setVisitInfo(regionOwners);
 
-		return regionOwnerCity;
+		return regionVisit;
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class RegionService {
 	 * @author 김가은
 	 */
 
-	public RegionOwnerCity fetchCountVisitAllRegion() {
+	public RegionVisit<RegionOwnerCityDetail> fetchCountVisitAllRegion() {
 		Map<String,Integer> cityDetailOwners = new HashMap<>();
 		Map<String, Integer> cityDetailOwnerVisitCount = new HashMap<>();
 		fetchCityDetailOwnerUserIds(cityDetailOwners,cityDetailOwnerVisitCount);
@@ -134,10 +134,10 @@ public class RegionService {
 			regionOwners.put(city, regionOwnerCities);
 		}
 
-		RegionOwnerCity regionOwnerCity = new RegionOwnerCity();
-		regionOwnerCity.setRegionOwners(regionOwners);
+		RegionVisit<RegionOwnerCityDetail> regionVisit = new RegionVisit();
+		regionVisit.setVisitInfo(regionOwners);
 
-		return regionOwnerCity;
+		return regionVisit;
 	}
 
 	/**
@@ -206,6 +206,33 @@ public class RegionService {
 		}
 		User user = userService.findUser(userId);
 		return new UserMyLandsDto(user.getNickname(), lands);
+
+	}
+
+	/**
+	 * 유저의 지역별(cityDetail) 방문횟수를 조회한다.
+	 *
+	 * @author 김가은
+	 */
+
+	public RegionVisit<Integer> fetchUserCityDetailVisitCount(int userId) {
+  		HashMap<String, HashMap<String, Integer>> cityVisitCount = new HashMap<>();
+		for (Regions region : Regions.values()) {
+			String city = region.name();
+			HashMap<String, Integer> cityDetailVisitCount = new HashMap<>();
+			region.getCityDetails().forEach(cityDetail -> {
+				String key = createCountVisitRegionKey(city, cityDetail);
+				cityDetailVisitCount.put(cityDetail, 0);
+				redisTemplate2.opsForZSet().reverseRangeWithScores(key, 0, -1).stream().filter(owner -> owner.getValue() == userId).findFirst().ifPresent(owner -> {
+					Integer visitCount = owner.getScore().intValue();
+					cityDetailVisitCount.put(cityDetail, visitCount);
+				});
+			});
+			cityVisitCount.put(region.name(),cityDetailVisitCount);
+		}
+		RegionVisit<Integer> regionVisit = new RegionVisit();
+		regionVisit.setVisitInfo(cityVisitCount);
+		return regionVisit;
 
 	}
 
