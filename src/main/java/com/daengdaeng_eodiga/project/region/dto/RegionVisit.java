@@ -6,6 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 @Getter
 @Setter
-public class RegionOwnerCity {
-	private HashMap<String,HashMap<String,RegionOwnerCityDetail>> regionOwners;
+public class RegionVisit<T> {
+	private HashMap<String,HashMap<String,T>> visitInfo;
 }
