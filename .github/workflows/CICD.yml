@@ -49,6 +49,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
               
       - name: Get Public IP
         id: ip
@@ -118,39 +122,17 @@ jobs:
               -e FRONTEND_URL=${{ secrets.FRONTEND_URL }} \
               -e TEST=false \
           
-      - name: Install Docker Compose
-        run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
           
-      - name: Docker Compose Up and Pull Image on AWS
+      - name: Docker compose
         uses: appleboy/ssh-action@master
         with:
           username: ubuntu
           host: ${{ secrets.LIVE_SERVER_IP }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
           script: |
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME_V2 }}/live_server:latest
-            cd /home/ubuntu
-            sudo docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d \
-              -e MYSQL_PWD_V2=${{ secrets.MYSQL_PWD_V2 }} \
-              -e GOOGLE_OAUTH_ID=${{ secrets.GOOGLE_OAUTH_ID }} \
-              -e GOOGLE_OAUTH_SECRET=${{ secrets.GOOGLE_OAUTH_SECRET }} \
-              -e KAKAO_OAUTH_ID=${{ secrets.KAKAO_OAUTH_ID }} \
-              -e KAKAO_OAUTH_SECRET=${{ secrets.KAKAO_OAUTH_SECRET }} \
-              -e KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }} \
-              -e MYSQL_DOMAIN_V2=${{ secrets.MYSQL_DOMAIN_V2 }} \
-              -e REDIS_DOMAIN_V2=${{ secrets.REDIS_DOMAIN_V2 }} \
-              -e REDIS_PWD_V2=${{ secrets.REDIS_PWD_V2 }} \
-              -e SECURITY_SECRET=${{ secrets.SECURITY_SECRET }} \
-              -e DOMAIN=${{ secrets.EC2_DNS_ADDRESS }} \
-              -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }} \
-              -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
-              -e AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }} \
-              -e AWS_S3_URL=${{ secrets.AWS_S3_URL }} \
-              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
-              -e FRONTEND_URL=${{ secrets.FRONTEND_URL }} \
-              -e TEST=false
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
+            sudo docker-compose -f docker-compose-${{env.TARGET_UPSTREAM}}.yml up -d
 
 
 
