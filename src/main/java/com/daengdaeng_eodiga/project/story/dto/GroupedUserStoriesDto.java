@@ -10,13 +10,15 @@ public class GroupedUserStoriesDto {
     private String city;
     private String cityDetail;
     private String petImage;
+    private String storyType;
 
     @Builder
-    public GroupedUserStoriesDto(int landOwnerId, String nickname, String city, String cityDetail, String petImage) {
+    public GroupedUserStoriesDto(int landOwnerId, String nickname, String city, String cityDetail, String petImage, String storyType) {
         this.landOwnerId = landOwnerId;
         this.nickname = nickname;
         this.city = city;
         this.cityDetail = cityDetail;
         this.petImage = petImage;
+        this.storyType = storyType;
     }
 }

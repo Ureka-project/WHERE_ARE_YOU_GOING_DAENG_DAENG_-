@@ -38,10 +38,12 @@ public class StoryController {
         return ResponseEntity.ok(ApiResponse.success("story inserted successfully"));
     }
 
-    // TODO : 전체 유저 스토리 목록 조회
     @GetMapping
-    public ResponseEntity<ApiResponse<List<GroupedUserStoriesDto>>> fetchGroupedUserStories(){
-        List<GroupedUserStoriesDto> response = storyService.fetchGroupedUserStories();
+    public ResponseEntity<ApiResponse<List<GroupedUserStoriesDto>>> fetchGroupedUserStories(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
+    ){
+        int userId = customOAuth2User.getUserDTO().getUserid();
+        List<GroupedUserStoriesDto> response = storyService.fetchGroupedUserStories(userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

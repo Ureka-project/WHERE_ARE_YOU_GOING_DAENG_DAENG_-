@@ -91,10 +91,24 @@ public class StoryService {
         storyRepository.save(story);
     }
 
-    // TODO(3) : 전체 유저 스토리 목록 조회 (내스토리는 제외)
-    public List<GroupedUserStoriesDto> fetchGroupedUserStories(){
+    /**
+     * 본인 제외 전체 유저 스토리 목록 조회
+     * @param userId
+     * @return
+     */
+    public List<GroupedUserStoriesDto> fetchGroupedUserStories(int userId){
+        List<Object[]> results = storyRepository.findMainPriorityStories(userId);
 
-        return null;
+        return results.stream()
+                .map(row -> GroupedUserStoriesDto.builder()
+                        .landOwnerId((Integer) row[0])
+                        .nickname((String) row[1])
+                        .city((String) row[2])
+                        .cityDetail((String) row[3])
+                        .petImage((String) row[4])
+                        .storyType((String) row[5])
+                        .build())
+                .collect(Collectors.toList());
     }
 
     /**
