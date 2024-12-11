@@ -102,6 +102,7 @@ jobs:
             echo "error"
             exit 1
           fi
+          
       - name: Create .env file
         run: |
           echo "MYSQL_PWD_V2=${{ secrets.MYSQL_PWD_V2 }}" > .env
@@ -124,8 +125,8 @@ jobs:
           echo "TEST=${{ secrets.TEST }}" >> .env
           echo "EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}" >> .env
           echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
-          
-      - name: Docker compose
+
+      - name: Copy .env to the server
         uses: appleboy/ssh-action@master
         with:
           username: ubuntu
@@ -133,8 +134,22 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script_stop: true
           script: |
+            # Copy the .env file to the server
+            scp -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.LIVE_SERVER_IP }}:/home/ubuntu/.env
+
+      - name: Deploy Docker Compose with .env file
+        uses: appleboy/ssh-action@master
+        with:
+          username: ubuntu
+          host: ${{ secrets.LIVE_SERVER_IP }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            # Pull the latest Docker image
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
-            sudo docker-compose --env-file .env -f docker-compose-${{env.TARGET_UPSTREAM}}.yml up -d
+            
+            # Run Docker Compose using the .env file
+            sudo docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
 
 
