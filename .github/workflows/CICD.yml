@@ -135,7 +135,7 @@ jobs:
             echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
             echo "PROFILES=${{secrets.CURRENT_UPSTREAM}}" >> .env
             echo "ENV=${{secrets.CURRENT_UPSTREAM}}" >> .env
-            sudo -E docker-compose -f /home/ubuntu/docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
+            sudo docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
 
 
