@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface StoryRepository extends JpaRepository<Story, Integer> {
     Optional<Story> findByStoryId(int storyId);
 
-    @Query("SELECT COUNT(s) FROM Story s WHERE DATE(s.createdAt) = CURRENT_DATE")
+    @Query("SELECT COUNT(s) FROM Story s WHERE s.createdAt >= CURRENT_DATE")
     long countByTodayCreated();
 
     @Query("SELECT s.user.nickname, s.storyId, s.city, s.cityDetail, s.path " +
