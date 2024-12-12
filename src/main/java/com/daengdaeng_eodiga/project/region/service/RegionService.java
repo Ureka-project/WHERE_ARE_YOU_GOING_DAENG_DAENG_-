@@ -117,7 +117,9 @@ public class RegionService {
 			String cityDetail = (String) row[1];
 			int count = (int) row[2];
 			CityDetailVisit cityDetailVisit = new CityDetailVisit(cityDetail, count);
-			myLands.getOrDefault(city, new ArrayList<>()).add(cityDetailVisit);
+			List<CityDetailVisit> cityDetailVisits = myLands.getOrDefault(city, new ArrayList<>());
+			cityDetailVisits.add(cityDetailVisit);
+			myLands.put(city,cityDetailVisits);
 		}
 		List<MyLandsDto> myLandsDtos = myLands.entrySet().stream()
 			.map(entry -> new MyLandsDto(entry.getKey(), entry.getValue()))

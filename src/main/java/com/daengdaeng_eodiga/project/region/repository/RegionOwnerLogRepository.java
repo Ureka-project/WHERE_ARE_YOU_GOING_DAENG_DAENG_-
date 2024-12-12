@@ -25,14 +25,14 @@ public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog,
 		" LEFT JOIN Pet p ON rol.user.userId = p.user.userId")
 	List<RegionOwnerInfo> findRegionOwner();
 
-    @Query("SELECT r.city, r.cityDetail " +
+	// TODO : JOIN과 WHERE 성능 비교하기
+    @Query("SELECT r.city, r.cityDetail, r.count " +
         "FROM RegionOwnerLog r " +
         "WHERE r.user.userId = :userId AND r.createdAt = (" +
         "   SELECT MAX(r2.createdAt) " +
         "   FROM RegionOwnerLog r2 " +
         "   WHERE r2.city = r.city AND r2.cityDetail = r.cityDetail " +
-        ") " +
-        "GROUP BY r.city, r.cityDetail")
+        ") ")
     List<Object[]> findCityAndCityDetailByUserId(@Param("userId") Integer userId);
 
     @Query("SELECT r " +
