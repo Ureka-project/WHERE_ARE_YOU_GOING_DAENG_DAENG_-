@@ -22,7 +22,6 @@ import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.pet.service.PetService;
 import com.daengdaeng_eodiga.project.place.entity.Place;
-import com.daengdaeng_eodiga.project.place.entity.PlaceScore;
 import com.daengdaeng_eodiga.project.place.repository.PlaceScoreRepository;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
 
@@ -69,7 +68,11 @@ public class ReviewService {
 		List<ReviewKeyword> savedReviewKeywords = saveReviewKeywordsIfPresent(review, request.keywords().stream().toList());
 		List<ReviewMedia> savedReviewMedia = saveReviewMediaIfPresent(review, request.media());
 		addCountVisitRegion(user, place, review);
+		calculatePlaceReviewScore(place, review);
+		return createReviewDto(review, savedReviewPets, savedReviewKeywords, savedReviewMedia);
+	}
 
+	private void calculatePlaceReviewScore(Place place, Review review) {
 		placeScoreRepository.findById(place.getPlaceId()).ifPresentOrElse(
 			placeScore -> {
 				placeScore.updateScore(review.getScore());
@@ -79,8 +82,6 @@ public class ReviewService {
 				throw new PlaceNotFoundException("PlaceScore");
 			}
 		);
-
-		return createReviewDto(review, savedReviewPets, savedReviewKeywords, savedReviewMedia);
 	}
 
 	private void addCountVisitRegion(User user, Place place, Review review) {
@@ -227,5 +228,8 @@ public class ReviewService {
 		}
 		return pets;
 	}
+
+
+
 
 }

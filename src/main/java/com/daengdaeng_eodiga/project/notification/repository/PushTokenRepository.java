@@ -12,6 +12,7 @@ public interface PushTokenRepository extends JpaRepository<PushToken, Integer> {
 	List<PushToken> findByTokenAndUserAndPushType(String token, User user, String pushType);
 	List<PushToken> findByUser(User user);
 	List<PushToken> findByUser_UserId(int userId);
+	List<PushToken> findByUser_UserIdInAndPushType(List<Integer> userIds, String pushType);
 
 	void deleteByUser(User user);
 }

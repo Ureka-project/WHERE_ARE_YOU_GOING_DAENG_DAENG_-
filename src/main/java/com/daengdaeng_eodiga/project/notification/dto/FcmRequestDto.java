@@ -17,15 +17,17 @@ public class FcmRequestDto {
 	private String petName;
 	private String placeName;
 	private String eventName;
+	private String region;
 
 	@Builder
-	public FcmRequestDto(List<String> token, List<Integer> userId, PushType type, String petName, String placeName, String eventName) {
+	public FcmRequestDto(List<String> token, List<Integer> userId, PushType type, String petName, String placeName, String eventName, String region) {
 		this.token = token;
 		this.userId = userId;
 		this.type = type;
 		this.petName = petName;
 		this.placeName = placeName;
 		this.eventName = eventName;
+		this.region = region;
 	}
 
 
