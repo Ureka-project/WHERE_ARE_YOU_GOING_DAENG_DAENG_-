@@ -32,7 +32,7 @@ public class RegionController {
 		@AuthenticationPrincipal CustomOAuth2User customOAuth2User
 	){
 		int userId = customOAuth2User.getUserDTO().getUserid();
-		UserMyLandsDto response = regionService.fetchUserCityDetail(userId);
+		UserMyLandsDto response = regionService.fetchUserLands(userId);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 

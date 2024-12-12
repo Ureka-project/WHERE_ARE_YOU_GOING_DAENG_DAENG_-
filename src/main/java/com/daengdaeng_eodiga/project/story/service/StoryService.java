@@ -31,38 +31,6 @@ public class StoryService {
     private final RegionOwnerLogRepository regionOwnerLogRepository;
     private final UserService userService;
 
-    /**
-     * 유저 자신의 땅 목록 조회
-     * @param userId
-     * @return UserMyLandsDto
-     * @deprecated
-     */
-
-    // TODO :  지역별 주인 조회 로직 완성 후, cityDetail Null 수정
-    public UserMyLandsDto fetchUserLands(int userId) {
-
-        String nickname = userService.findUser(userId).getNickname();
-        List<Object[]> results = regionOwnerLogRepository.findCityAndCityDetailByUserId(userId);
-        if( results.isEmpty() ) {
-            throw new UserLandNotFoundException();
-        }
-
-        Map<String, List<String>> myLands = new LinkedHashMap<>();
-        for (Object[] row : results) {
-            String city = (String) row[0];
-            String cityDetail = (String) row[1];
-
-            myLands.computeIfAbsent(city, k -> new ArrayList<>()).add(cityDetail);
-        }
-        List<MyLandsDto> myLandsDtos = myLands.entrySet().stream()
-                .map(entry -> new MyLandsDto(entry.getKey(), null))
-                .collect(Collectors.toList());
-        UserMyLandsDto userMyLandsDto = UserMyLandsDto.builder()
-                .nickname(nickname)
-                .lands(myLandsDtos)
-                .build();
-        return userMyLandsDto;
-    }
 
     /**
      * 스토리 업로드

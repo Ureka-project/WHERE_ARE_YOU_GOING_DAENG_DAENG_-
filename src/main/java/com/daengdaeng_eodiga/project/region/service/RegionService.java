@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -94,6 +96,41 @@ public class RegionService {
 
 		return regionVisit;
 	}
+
+	/**
+	 * 유저 자신의 땅 목록 조회
+	 * @param userId
+	 * @return UserMyLandsDto
+	 * @author 하진서, 김가은
+	 */
+	public UserMyLandsDto fetchUserLands(int userId) {
+
+		String nickname = userService.findUser(userId).getNickname();
+		List<Object[]> results = regionOwnerLogRepository.findCityAndCityDetailByUserId(userId);
+		if( results.isEmpty() ) {
+			throw new UserLandNotFoundException();
+		}
+
+		Map<String, List<CityDetailVisit>> myLands = new LinkedHashMap<>();
+		for (Object[] row : results) {
+			String city = (String) row[0];
+			String cityDetail = (String) row[1];
+			int count = (int) row[2];
+			CityDetailVisit cityDetailVisit = new CityDetailVisit(cityDetail, count);
+			myLands.getOrDefault(city, new ArrayList<>()).add(cityDetailVisit);
+		}
+		List<MyLandsDto> myLandsDtos = myLands.entrySet().stream()
+			.map(entry -> new MyLandsDto(entry.getKey(), entry.getValue()))
+			.collect(Collectors.toList());
+		UserMyLandsDto userMyLandsDto = UserMyLandsDto.builder()
+			.nickname(nickname)
+			.lands(myLandsDtos)
+			.build();
+		return userMyLandsDto;
+	}
+
+
+
 
 	/**
 	 * 유저의 지역 방문횟수를 증가시킨다.
@@ -270,6 +307,7 @@ public class RegionService {
 	 * 유저가 주인인 cityDetail을 조회한다.
 	 *
 	 * @author 김가은
+	 * @deprecated
 	 */
 
 	public UserMyLandsDto fetchUserCityDetail(int userId) {
