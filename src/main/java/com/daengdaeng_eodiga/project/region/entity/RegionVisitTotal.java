@@ -21,7 +21,7 @@ public class RegionVisitTotal extends BaseEntity {
 	@Column(name = "city")
 	private String city;
 
-	@Column(name = "city detail")
+	@Column(name = "city_detail")
 	private String cityDetail;
 
 	@Column(name = "count")
