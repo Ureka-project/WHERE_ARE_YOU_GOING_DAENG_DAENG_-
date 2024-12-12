@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.daengdaeng_eodiga.project.Global.exception.UserLandNotFoundException;
+import com.daengdaeng_eodiga.project.notification.service.NotificationService;
 import com.daengdaeng_eodiga.project.pet.dto.PetResponse;
 import com.daengdaeng_eodiga.project.region.dto.CityDetailVisit;
 import com.daengdaeng_eodiga.project.region.dto.RegionVisit;
@@ -41,6 +42,7 @@ public class RegionService {
 	private final UserService userService;
 	private final RegionVisitDayRepository regionVisitDayRepository;
 	private final RegionVisitTotalRepository regionVisitTotalRepository;
+	private final NotificationService notificationService;
 	
 	private final String REGION_VISIT_KEY_PREFIX = "RegionVisit";
 
@@ -214,6 +216,10 @@ public class RegionService {
 					.user(user)
 					.build();
 				regionOwnerLogRepository.save(newRegionOwnerLog);
+				if(regionOwnerLog.getUser().getUserId() != user.getUserId()) {
+					String region = city + " " + cityDetail;
+					notificationService.sendOwnerNotification(user.getUserId(), regionOwnerLog.getUser().getUserId(), region);
+				}
 			}
 		}, () -> {
 			RegionOwnerLog regionOwnerLog = RegionOwnerLog.builder()

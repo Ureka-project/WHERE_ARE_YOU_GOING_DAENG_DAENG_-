@@ -3,10 +3,13 @@ package com.daengdaeng_eodiga.project.place.entity;
 import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "Place_Score")
 public class PlaceScore extends BaseEntity {
 
@@ -23,5 +26,16 @@ public class PlaceScore extends BaseEntity {
 
     @Column(name = "review_count")
     private int reviewCount;
+
+    public void updateScore(int score) {
+        this.score = (this.score * this.reviewCount + score) / (this.reviewCount + 1);
+    }
+
+    @Builder
+    public PlaceScore(Place place, Double score, int reviewCount) {
+        this.place = place;
+        this.score = score;
+        this.reviewCount = reviewCount;
+    }
 
 }
