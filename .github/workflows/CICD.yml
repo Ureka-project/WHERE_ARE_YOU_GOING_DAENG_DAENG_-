@@ -143,17 +143,7 @@ jobs:
         with:
           url: https://${{ secrets.LIVE_SERVER_IP }}:${{ env.STOPPED_PORT }}/env
           max-attempts: 10
-          retry-delay: 10s
-
-      - name: Change nginx upstream
-        uses: appleboy/ssh-action@master
-        with:
-          username: ubuntu
-          host: ${{ secrets.LIVE_SERVER_IP }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
-          script: |
-            sudo docker exec -i nginxserver bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc && nginx -s reload' 
+          retry-delay: 10s 
 
       - name: Stop current server
         uses: appleboy/ssh-action@master
@@ -165,6 +155,17 @@ jobs:
           script: |
             sudo docker stop ${{ env.CURRENT_UPSTREAM }}
             sudo docker rm ${{ env.CURRENT_UPSTREAM }}
+
+
+      - name: Change nginx upstream
+        uses: appleboy/ssh-action@master
+        with:
+          username: ubuntu
+          host: ${{ secrets.LIVE_SERVER_IP }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            sudo docker exec -i nginxserver bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc && nginx -s reload'
 
       - name: Remove GitHub Actions IP
         run: |
