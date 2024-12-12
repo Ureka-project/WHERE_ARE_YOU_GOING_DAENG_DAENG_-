@@ -1,7 +1,13 @@
 package com.daengdaeng_eodiga.project.Global.controller;
 
 
+import com.daengdaeng_eodiga.project.oauth.OauthProvider;
+import com.daengdaeng_eodiga.project.oauth.service.TokenService;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +19,11 @@ import java.util.TreeMap;
 @RestController
 
 public class RollingController {
+    private final TokenService tokenService;
+    @Autowired
+    RollingController(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
     @Value("${server.env}")
     String env;
     @Value("${server.port}")
@@ -20,15 +31,19 @@ public class RollingController {
     @Value("${server.serverAddress}")
     String serverAddress;
     @Value("${serverName}")
-    @GetMapping("/hc")
-    public ResponseEntity<?> getHC() {
-        Map<String,String> response = new TreeMap<>();
-        response.put("env",env);
-        response.put("port",port);
-        response.put("serverAddress",serverAddress);
-        response.put("serverName",serverAddress);
+    String serverName;
 
-        return ResponseEntity.ok(response);
+    @GetMapping("/hc")
+    public ResponseEntity<?> getHC(HttpServletResponse response) {
+        // 응답 헤더 설정
+        response.addHeader("env", env);
+        response.addHeader("port", port);
+        response.addHeader("serverAddress", serverAddress);
+        response.addHeader("serverName", serverName);
+
+        tokenService.generateTokensAndSetCookies("lixxce5017@gmail.com", OauthProvider.google, response);
+
+        return ResponseEntity.ok(env);
     }
 
     @GetMapping("/env")
