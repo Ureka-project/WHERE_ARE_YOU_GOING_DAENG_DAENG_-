@@ -64,13 +64,13 @@ public class ReviewService {
 		List<ReviewPet> savedReviewPets = saveReviewPetsIfPresent(review, pets);
 		List<ReviewKeyword> savedReviewKeywords = saveReviewKeywordsIfPresent(review, request.keywords().stream().toList());
 		List<ReviewMedia> savedReviewMedia = saveReviewMediaIfPresent(review, request.media());
-		addCountVisitRegion(userId, place, review);
+		addCountVisitRegion(user, place, review);
 		return createReviewDto(review, savedReviewPets, savedReviewKeywords, savedReviewMedia);
 	}
 
-	private void addCountVisitRegion(int userId, Place place, Review review) {
+	private void addCountVisitRegion(User user, Place place, Review review) {
 		if(review.getReviewtype().equals("REVIEW_TYP_02")){
-			regionService.addCountVisitRegion(place.getCity(), place.getCityDetail(), userId);
+			regionService.addCountVisitRegionForDB(place.getCity(), place.getCityDetail(), user);
 		}
 	}
 
@@ -194,7 +194,7 @@ public class ReviewService {
 				visitedAt,
 				createdAt,
 				(String) result[12],
-				(String) result[13]
+				commonCodeService.getCommonCodeName((String) result[13])
 
 			);
 			reviews.add(reviewDto);

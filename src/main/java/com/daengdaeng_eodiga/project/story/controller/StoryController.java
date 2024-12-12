@@ -19,14 +19,6 @@ import java.util.List;
 public class StoryController {
     private final StoryService storyService;
 
-    @GetMapping("/mylands")
-    public ResponseEntity<ApiResponse<UserMyLandsDto>> fetchUserLands(
-            @AuthenticationPrincipal CustomOAuth2User customOAuth2User
-    ){
-        int userId = customOAuth2User.getUserDTO().getUserid();
-        UserMyLandsDto response = storyService.fetchUserLands(userId);
-        return ResponseEntity.ok(ApiResponse.success(response));
-    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<String>> registerStory(

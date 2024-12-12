@@ -1,7 +1,7 @@
 package com.daengdaeng_eodiga.project.region.repository;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,16 +23,16 @@ public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog,
 		+ "ON ro.city = rol.city AND ro.cityDetail = rol.cityDetail AND ro.createdAt = rol.createdAt "
 		+ "JOIN rol.user u ON rol.user.userId = u.userId " +
 		" LEFT JOIN Pet p ON rol.user.userId = p.user.userId")
-	List<RegionOwnerInfo> fetchRegionOwner();
+	List<RegionOwnerInfo> findRegionOwner();
 
-    @Query("SELECT r.city, r.cityDetail " +
+	// TODO : JOIN과 WHERE 성능 비교하기
+    @Query("SELECT r.city, r.cityDetail, r.count " +
         "FROM RegionOwnerLog r " +
         "WHERE r.user.userId = :userId AND r.createdAt = (" +
         "   SELECT MAX(r2.createdAt) " +
         "   FROM RegionOwnerLog r2 " +
         "   WHERE r2.city = r.city AND r2.cityDetail = r.cityDetail " +
-        ") " +
-        "GROUP BY r.city, r.cityDetail")
+        ") ")
     List<Object[]> findCityAndCityDetailByUserId(@Param("userId") Integer userId);
 
     @Query("SELECT r " +
@@ -49,5 +49,12 @@ public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog,
             @Param("userId") Integer userId,
             @Param("city") String city,
             @Param("cityDetail") String cityDetail);
+
+
+	@Query("  SELECT r "+
+		" FROM RegionOwnerLog r " +
+		" WHERE r.city = :city AND r.cityDetail = :cityDetail "
+		+ "order by r.count desc limit 1")
+	Optional<RegionOwnerLog> findRegionOwnerByCityAndCityDetail(String city, String cityDetail);
 }
 
