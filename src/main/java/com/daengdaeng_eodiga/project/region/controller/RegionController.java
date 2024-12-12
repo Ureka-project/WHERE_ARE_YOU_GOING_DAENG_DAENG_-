@@ -41,7 +41,7 @@ public class RegionController {
 		@AuthenticationPrincipal CustomOAuth2User customOAuth2User
 	){
 		int userId = customOAuth2User.getUserDTO().getUserid();
-		RegionVisit response = regionService.fetchUserCityDetailVisitCount(userId);
+		RegionVisit response = regionService.fetchUserCityDetailVisitCountForDB(userId);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 

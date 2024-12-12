@@ -131,6 +131,40 @@ public class RegionService {
 		return userMyLandsDto;
 	}
 
+	/**
+	 * 유저의 지역별(cityDetail) 방문횟수를 조회한다.
+	 *
+	 * @author 김가은
+	 */
+
+	public RegionVisit<Integer> fetchUserCityDetailVisitCountForDB(int userId) {
+		User user = userService.findUser(userId);
+		HashMap<String, HashMap<String, Integer>> cityVisitCount = new HashMap<>();
+		List<RegionVisitTotal> regionVisitTotals = regionVisitTotalRepository.findByUser(user);
+		regionVisitTotals.stream().forEach(regionVisitTotal -> {
+			String city = regionVisitTotal.getCity();
+			String cityDetail = regionVisitTotal.getCityDetail();
+			Integer count = regionVisitTotal.getCount();
+			HashMap<String, Integer> cityDetailVisitCount = cityVisitCount.getOrDefault(city, new HashMap<>());
+			cityDetailVisitCount.put(cityDetail, count);
+			cityVisitCount.put(city, cityDetailVisitCount);
+		});
+
+
+
+		for (Regions region : Regions.values()) {
+			String city = region.name();
+			cityVisitCount.putIfAbsent(city, new HashMap<>());
+			region.getCityDetails().forEach(cityDetail -> {
+				cityVisitCount.get(city).putIfAbsent(cityDetail, 0);
+			});
+		}
+		RegionVisit<Integer> regionVisit = new RegionVisit();
+		regionVisit.setVisitInfo(cityVisitCount);
+		return regionVisit;
+
+	}
+
 
 
 
