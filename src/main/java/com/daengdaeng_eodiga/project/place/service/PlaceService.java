@@ -112,13 +112,9 @@ public class PlaceService {
     }
 
     public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
-        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude);
+        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude, userId);
         return results.stream()
-                .map(row -> {
-                    PlaceDto dto = PlaceDtoMapper.convertToPlaceDto(row);
-                    dto.setIsFavorite(userId != null && checkIfUserFavoritedPlace(dto.getPlaceId(), userId));
-                    return dto;
-                })
+                .map(PlaceDtoMapper::convertToPlaceDto)
                 .collect(Collectors.toList());
     }
 
