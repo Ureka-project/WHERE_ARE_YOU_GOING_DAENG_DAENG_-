@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -231,6 +232,45 @@ public class RegionService {
 			regionOwnerLogRepository.save(regionOwnerLog);
 		}
 		);
+	}
+
+
+	/**
+	 * 유저의 지역 방문횟수를 감소시킨다.
+	 *
+	 * 만약, 감소시켰을 때 순위가 바뀐다면 유저에게 알림 메시지를 보낸다.
+	 *
+	 * @author 김가은
+	 */
+
+
+	public void decrementCountVisitRegionForDB(String city, String cityDetail, User user,LocalDate createdAt) {
+		LocalDate endDate  = createdAt.plusDays(1);
+		regionVisitDayRepository.findByCityAndCityDetailAndUserAndCreatedAt(city, cityDetail, user, createdAt.atStartOfDay(),endDate.atStartOfDay()).ifPresent(regionVisitDay -> {
+			regionVisitDay.decrementCount();
+			regionVisitDayRepository.save(regionVisitDay);
+		});
+
+		Optional<RegionVisitTotal> total = regionVisitTotalRepository.findByCityAndCityDetailAndUser(city, cityDetail, user);
+
+		if(total.isPresent()) {
+			RegionVisitTotal regionVisitTotal = total.get();
+			regionVisitTotal.decrementCount();
+			regionVisitTotalRepository.save(regionVisitTotal);
+			Optional<RegionOwnerLog> userRecentLog = regionOwnerLogRepository.findTop1UserRegionOwnerLogAtCreated(user.getUserId(),city, cityDetail);
+
+			List<RegionOwnerLog> logs = regionOwnerLogRepository.findTop2RegionOwnerByCityAndCityDetail(city,cityDetail);
+
+			userRecentLog.ifPresent(regionOwnerLogRepository::delete);
+			if(logs.size() == 2) {
+				if(userRecentLog.get().getId() == logs.get(0).getId()) {
+					if(userRecentLog.get().getUser() != logs.get(1).getUser()){
+						String region = city + " " + cityDetail;
+						notificationService.sendOwnerNotification(logs.get(1).getUser().getUserId(),userRecentLog.get().getUser().getUserId(), region);
+					}
+				}
+			}
+		}
 	}
 
 

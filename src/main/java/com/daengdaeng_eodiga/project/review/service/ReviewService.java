@@ -147,7 +147,12 @@ public class ReviewService {
 
 
 	public void deleteReview(int reviewId) {
-		reviewRepository.deleteById(reviewId);
+		reviewRepository.findById(reviewId).ifPresent(review -> {
+			reviewRepository.delete(review);
+			if(review.getReviewtype().equals("REVIEW_TYP_02")) {
+				regionService.decrementCountVisitRegionForDB(review.getPlace().getCity(), review.getPlace().getCityDetail(), review.getUser(), review.getCreatedAt().toLocalDate());
+			}
+		});
 	}
 
 	public ReviewsResponse fetchPlaceReviews(int placeId, int page, int size, OrderType orderType) {
