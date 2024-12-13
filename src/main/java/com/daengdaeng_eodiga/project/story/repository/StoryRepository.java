@@ -54,6 +54,7 @@ WITH RecentStory AS (
 StoryStatus AS (
     SELECT
         rs.*,
+        sv.created_at AS story_viewed_at,
         CASE
             WHEN sv.story_id IS NOT NULL THEN 'viewed'
             ELSE 'unviewed'
@@ -72,7 +73,8 @@ GroupedStoryStatus AS (
             WHEN COUNT(CASE WHEN story_type = 'unviewed' THEN 1 END) = 0 THEN 'viewed'
             ELSE 'unviewed'
         END AS group_story_type,
-        MIN(created_at) AS group_created_at
+        MIN(created_at) AS group_created_at,
+        MAX(CASE WHEN story_type = 'viewed' THEN story_viewed_at ELSE NULL END) AS latest_story_viewed_at
     FROM
         StoryStatus
     GROUP BY
@@ -85,6 +87,7 @@ FinalStories AS (
         gss.city_detail,
         gss.group_story_type AS story_type,
         gss.group_created_at,
+        gss.latest_story_viewed_at,
         (SELECT p.image FROM pet p WHERE p.user_id = gss.landOwnerId ORDER BY p.pet_id ASC LIMIT 1) AS petImage
     FROM
         GroupedStoryStatus gss
@@ -96,7 +99,8 @@ SELECT DISTINCT
     fs.city_detail,
     fs.petImage,
     fs.story_type,
-    fs.group_created_at
+    fs.group_created_at,
+    fs.latest_story_viewed_at
 FROM
     FinalStories fs
 JOIN
@@ -106,7 +110,14 @@ ORDER BY
         WHEN fs.story_type = 'unviewed' THEN 1
         WHEN fs.story_type = 'viewed' THEN 2
     END,
-    fs.group_created_at DESC;
+    CASE
+        WHEN fs.story_type = 'unviewed' THEN fs.group_created_at
+        ELSE NULL
+    END DESC,
+    CASE
+        WHEN fs.story_type = 'viewed' THEN fs.latest_story_viewed_at
+        ELSE NULL
+    END ASC
 """, nativeQuery = true)
     List<Object[]> findMainPriorityStories(@Param("userId") Integer userId);
 }
