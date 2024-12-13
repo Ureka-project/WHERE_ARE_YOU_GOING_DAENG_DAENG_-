@@ -67,5 +67,20 @@ public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog,
 		" WHERE r.city = :city AND r.cityDetail = :cityDetail "
 		+ "order by r.count desc limit 1")
 	Optional<RegionOwnerLog> findRegionOwnerByCityAndCityDetail(String city, String cityDetail);
+
+	@Query("  SELECT r "+
+		" FROM RegionOwnerLog r " +
+		" WHERE r.city = :city AND r.cityDetail = :cityDetail "
+		+ "order by r.count desc limit 2")
+	List<RegionOwnerLog> findTop2RegionOwnerByCityAndCityDetail(String city, String cityDetail);
+
+	@Query("SELECT r " +
+		"FROM RegionOwnerLog r " +
+		"WHERE r.user.userId = :userId " +
+		"AND r.city = :city " +
+		"AND r.cityDetail = :cityDetail "
+		+ "order by r.createdAt desc limit 1 "
+	)
+	Optional<RegionOwnerLog> findTop1UserRegionOwnerLogAtCreated(int userId,String city, String cityDetail);
 }
 

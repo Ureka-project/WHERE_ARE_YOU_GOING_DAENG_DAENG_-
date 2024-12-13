@@ -42,5 +42,8 @@ public class RegionVisitTotal extends BaseEntity {
 	public void addCount() {
 		this.count +=1;
 	}
+	public void decrementCount() {
+		this.count -=1;
+	}
 
 }
