@@ -45,10 +45,21 @@ public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog,
             "   FROM RegionOwnerLog r2 " +
             "   WHERE r2.city = :city AND r2.cityDetail = :cityDetail )"
             )
-    List<Object[]> findByUserIdAndCityAndCityDetail(
+    List<Object[]> findByUserIdAndCityAndCityDetailForUpload(
             @Param("userId") Integer userId,
             @Param("city") String city,
             @Param("cityDetail") String cityDetail);
+
+	@Query("SELECT r " +
+			"FROM RegionOwnerLog r " +
+			"WHERE r.user.userId = :userId " +
+			"AND r.city = :city " +
+			"AND r.cityDetail = :cityDetail "
+	)
+	List<Object[]> findByUserIdAndCityAndCityDetailForDetail(
+			@Param("userId") Integer userId,
+			@Param("city") String city,
+			@Param("cityDetail") String cityDetail);
 
 
 	@Query("  SELECT r "+

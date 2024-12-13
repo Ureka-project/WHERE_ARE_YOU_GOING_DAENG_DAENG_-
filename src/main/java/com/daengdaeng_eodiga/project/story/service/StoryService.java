@@ -16,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +40,7 @@ public class StoryService {
                 LocalDate.now().plusDays(1).atStartOfDay()) == 10 ) {
             throw new DailyStoryUploadLimitException();
         }
-        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetail(
+        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetailForUpload(
                 userId,
                 storyRequestDto.getCity(),
                 storyRequestDto.getCityDetail()).isEmpty() ){
@@ -117,7 +114,7 @@ public class StoryService {
      * @return
      */
     public IndividualUserStoriesDto fetchIndividualUserStories(int landOwnerId, String city, String cityDetail){
-        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetail(landOwnerId, city, cityDetail).isEmpty() ) {
+        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetailForDetail(landOwnerId, city, cityDetail).isEmpty() ) {
             throw new OwnerHistoryNotFoundException();
         }
 
