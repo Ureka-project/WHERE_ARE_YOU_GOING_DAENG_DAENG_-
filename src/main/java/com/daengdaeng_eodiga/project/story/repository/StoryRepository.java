@@ -51,94 +51,62 @@ WITH RecentStory AS (
         s.end_at > NOW()
         AND s.user_id != :userId
 ),
-UnviewedStories AS (
+StoryStatus AS (
     SELECT
         rs.*,
-        NULL AS viewed_at
+        CASE
+            WHEN sv.story_id IS NOT NULL THEN 'viewed'
+            ELSE 'unviewed'
+        END AS story_type
     FROM
         RecentStory rs
     LEFT JOIN
         story_view sv ON rs.story_id = sv.story_id AND sv.user_id = :userId
-    WHERE
-        sv.story_id IS NULL
 ),
-ViewedStories AS (
-    SELECT
-        rs.*,
-        sv.created_at AS viewed_at
-    FROM
-        RecentStory rs
-    INNER JOIN
-        story_view sv ON rs.story_id = sv.story_id
-    WHERE
-        sv.user_id = :userId
-),
-GroupedStories AS (
+GroupedStoryStatus AS (
     SELECT
         landOwnerId,
         city,
         city_detail,
-        MIN(created_at) AS earliest_created_at
-    FROM (
-        SELECT landOwnerId, city, city_detail, created_at FROM UnviewedStories
-        UNION ALL
-        SELECT landOwnerId, city, city_detail, created_at FROM ViewedStories
-    ) grouped
-    GROUP BY landOwnerId, city, city_detail
+        CASE
+            WHEN COUNT(CASE WHEN story_type = 'unviewed' THEN 1 END) = 0 THEN 'viewed'
+            ELSE 'unviewed'
+        END AS group_story_type,
+        MIN(created_at) AS group_created_at
+    FROM
+        StoryStatus
+    GROUP BY
+        landOwnerId, city, city_detail
 ),
-CombinedStories AS (
+FinalStories AS (
     SELECT
-        us.landOwnerId,
-        us.city,
-        us.city_detail,
-        gs.earliest_created_at AS group_created_at,
-        us.created_at,
-        us.viewed_at,
-        (SELECT p.image FROM pet p WHERE p.user_id = us.landOwnerId ORDER BY p.pet_id ASC LIMIT 1) AS petImage,
-        'unviewed' AS story_type
+        gss.landOwnerId,
+        gss.city,
+        gss.city_detail,
+        gss.group_story_type AS story_type,
+        gss.group_created_at,
+        (SELECT p.image FROM pet p WHERE p.user_id = gss.landOwnerId ORDER BY p.pet_id ASC LIMIT 1) AS petImage
     FROM
-        UnviewedStories us
-    INNER JOIN
-        GroupedStories gs ON us.landOwnerId = gs.landOwnerId AND us.city = gs.city AND us.city_detail = gs.city_detail
-    UNION ALL
-    SELECT
-        vs.landOwnerId,
-        vs.city,
-        vs.city_detail,
-        gs.earliest_created_at AS group_created_at,
-        vs.created_at,
-        vs.viewed_at,
-        (SELECT p.image FROM pet p WHERE p.user_id = vs.landOwnerId ORDER BY p.pet_id ASC LIMIT 1) AS petImage,
-        'viewed' AS story_type
-    FROM
-        ViewedStories vs
-    INNER JOIN
-        GroupedStories gs ON vs.landOwnerId = gs.landOwnerId AND vs.city = gs.city AND vs.city_detail = gs.city_detail
+        GroupedStoryStatus gss
 )
 SELECT DISTINCT
-    cs.landOwnerId,
+    fs.landOwnerId,
     u.nickname,
-    cs.city,
-    cs.city_detail,
-    cs.petImage,
-    cs.story_type,
-    cs.viewed_at,
-    cs.group_created_at
+    fs.city,
+    fs.city_detail,
+    fs.petImage,
+    fs.story_type,
+    fs.group_created_at
 FROM
-    CombinedStories cs
+    FinalStories fs
 JOIN
-    users u ON cs.landOwnerId = u.user_id
+    users u ON fs.landOwnerId = u.user_id
 ORDER BY
     CASE
-        WHEN cs.story_type = 'unviewed' THEN 1
-        WHEN cs.story_type = 'viewed' THEN 2
+        WHEN fs.story_type = 'unviewed' THEN 1
+        WHEN fs.story_type = 'viewed' THEN 2
     END,
-    CASE
-        WHEN cs.viewed_at IS NULL THEN 0
-        ELSE 1
-    END ASC,
-    cs.viewed_at ASC,
-    cs.group_created_at DESC;
+    fs.group_created_at DESC;
 """, nativeQuery = true)
     List<Object[]> findMainPriorityStories(@Param("userId") Integer userId);
 }
