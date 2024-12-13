@@ -97,11 +97,11 @@ public class PlaceController {
     }
 
     @PostMapping("/nearest")
-    public ResponseEntity<ApiResponse<List<PlaceDto>>> getNearestPlaces(
+    public ResponseEntity<ApiResponse<List<NearestPlaceDto>>> getNearestPlaces(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @Valid @RequestBody NearestRequest request) {
         Integer userId = customOAuth2User != null ? customOAuth2User.getUserDTO().getUserid() : null;
-        List<PlaceDto> places = placeService.getNearestPlaces(
+        List<NearestPlaceDto> places = placeService.getNearestPlaces(
                 request.getLatitude(), request.getLongitude(), userId);
         return ResponseEntity.ok(ApiResponse.success(places));
     }
