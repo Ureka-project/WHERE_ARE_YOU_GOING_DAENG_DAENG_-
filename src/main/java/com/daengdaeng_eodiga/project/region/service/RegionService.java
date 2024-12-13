@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.daengdaeng_eodiga.project.Global.exception.UserLandNotFoundException;
+import com.daengdaeng_eodiga.project.notification.service.NotificationService;
 import com.daengdaeng_eodiga.project.pet.dto.PetResponse;
 import com.daengdaeng_eodiga.project.region.dto.CityDetailVisit;
 import com.daengdaeng_eodiga.project.region.dto.RegionVisit;
@@ -41,6 +42,7 @@ public class RegionService {
 	private final UserService userService;
 	private final RegionVisitDayRepository regionVisitDayRepository;
 	private final RegionVisitTotalRepository regionVisitTotalRepository;
+	private final NotificationService notificationService;
 	
 	private final String REGION_VISIT_KEY_PREFIX = "RegionVisit";
 
@@ -131,6 +133,40 @@ public class RegionService {
 		return userMyLandsDto;
 	}
 
+	/**
+	 * 유저의 지역별(cityDetail) 방문횟수를 조회한다.
+	 *
+	 * @author 김가은
+	 */
+
+	public RegionVisit<Integer> fetchUserCityDetailVisitCountForDB(int userId) {
+		User user = userService.findUser(userId);
+		HashMap<String, HashMap<String, Integer>> cityVisitCount = new HashMap<>();
+		List<RegionVisitTotal> regionVisitTotals = regionVisitTotalRepository.findByUser(user);
+		regionVisitTotals.stream().forEach(regionVisitTotal -> {
+			String city = regionVisitTotal.getCity();
+			String cityDetail = regionVisitTotal.getCityDetail();
+			Integer count = regionVisitTotal.getCount();
+			HashMap<String, Integer> cityDetailVisitCount = cityVisitCount.getOrDefault(city, new HashMap<>());
+			cityDetailVisitCount.put(cityDetail, count);
+			cityVisitCount.put(city, cityDetailVisitCount);
+		});
+
+
+
+		for (Regions region : Regions.values()) {
+			String city = region.name();
+			cityVisitCount.putIfAbsent(city, new HashMap<>());
+			region.getCityDetails().forEach(cityDetail -> {
+				cityVisitCount.get(city).putIfAbsent(cityDetail, 0);
+			});
+		}
+		RegionVisit<Integer> regionVisit = new RegionVisit();
+		regionVisit.setVisitInfo(cityVisitCount);
+		return regionVisit;
+
+	}
+
 
 
 
@@ -180,6 +216,10 @@ public class RegionService {
 					.user(user)
 					.build();
 				regionOwnerLogRepository.save(newRegionOwnerLog);
+				if(regionOwnerLog.getUser().getUserId() != user.getUserId()) {
+					String region = city + " " + cityDetail;
+					notificationService.sendOwnerNotification(user.getUserId(), regionOwnerLog.getUser().getUserId(), region);
+				}
 			}
 		}, () -> {
 			RegionOwnerLog regionOwnerLog = RegionOwnerLog.builder()

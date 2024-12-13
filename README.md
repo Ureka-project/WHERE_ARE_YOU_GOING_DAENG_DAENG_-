@@ -74,5 +74,6 @@
 
 
 ## ERD
-![댕댕어디가](https://github.com/user-attachments/assets/7e555644-e7e4-4af0-b0d4-cbcffc8ffd54)
+![댕댕어디가](https://github.com/user-attachments/assets/3065ae19-25aa-486d-9dea-58034e7cc590)
+
 

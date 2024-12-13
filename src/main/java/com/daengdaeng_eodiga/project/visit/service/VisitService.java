@@ -190,7 +190,7 @@ public class VisitService {
 		List<Integer> userIds = pushTokens.stream().map(pushToken -> {
 			return pushToken.getUser().getUserId();
 		}).toList();
-		FcmRequestDto fcmRequestDto = notificationService.createFcmRequest(tokens, userIds, PushType.VISIT, petName, placeName, null);
+		FcmRequestDto fcmRequestDto = notificationService.createFcmRequest(tokens, userIds, PushType.VISIT, petName, placeName, null,null);
 		publisher.publish(NotificationTopic.FCM, fcmRequestDto);
 	}
 
