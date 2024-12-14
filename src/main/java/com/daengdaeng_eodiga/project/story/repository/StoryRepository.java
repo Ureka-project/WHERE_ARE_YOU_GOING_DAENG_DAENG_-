@@ -117,7 +117,8 @@ ORDER BY
     CASE
         WHEN fs.story_type = 'viewed' THEN fs.latest_story_viewed_at
         ELSE NULL
-    END ASC
+    END ASC,
+    fs.landOwnerId
 """, nativeQuery = true)
     List<Object[]> findMainPriorityStories(@Param("userId") Integer userId);
 }
