@@ -3,10 +3,7 @@ package com.daengdaeng_eodiga.project.place.service;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisLocationRepository;
 import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
-import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
-import com.daengdaeng_eodiga.project.place.dto.PlaceDtoMapper;
-import com.daengdaeng_eodiga.project.place.dto.PlaceRcommendDto;
-import com.daengdaeng_eodiga.project.place.dto.PlaceWithScore;
+import com.daengdaeng_eodiga.project.place.dto.*;
 import com.daengdaeng_eodiga.project.place.entity.Place;
 import com.daengdaeng_eodiga.project.place.entity.ReviewSummary;
 import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
@@ -111,11 +108,11 @@ public class PlaceService {
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
-        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude, userId);
-        return results.stream()
-                .map(PlaceDtoMapper::convertToPlaceDto)
-                .collect(Collectors.toList());
+    public List<NearestPlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
+        return placeRepository.findNearestPlaces(latitude, longitude, userId)
+                .stream()
+                .map(NearestPlaceDtoMapper::convertToNearestPlaceDto)
+                .toList();
     }
 
 
