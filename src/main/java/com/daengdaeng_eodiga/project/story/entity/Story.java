@@ -31,7 +31,7 @@ public class Story {
     @Column(name = "city_detail")
     private String cityDetail;
 
-    @Column(name = "path")
+    @Column(name = "path", length = 700)
     private String path;
 
     @Column(name = "created_at")
