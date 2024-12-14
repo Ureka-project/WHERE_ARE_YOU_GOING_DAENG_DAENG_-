@@ -67,8 +67,11 @@ public class RegionService {
 			cityDetailByRegionOwnerLogIds.put(roi.getId(),roi.getCityDetail());
 			regionOwnerCityDetails.put(roi.getId(),new RegionOwnerCityDetail(roi.getUserId(),roi.getUserNickname(),roi.getCount(),null));
 			List<PetResponse> pets = petsByRegionOwnerLogIds.getOrDefault(roi.getId(),new ArrayList<>());
-			pets.add(new PetResponse(roi.getPetId(),roi.getPetName(),roi.getPetImage()));
-			petsByRegionOwnerLogIds.put(roi.getId(),pets);
+			if(roi.getPetId() != null) {
+				pets.add(new PetResponse(roi.getPetId(),roi.getPetName(),roi.getPetImage()));
+				petsByRegionOwnerLogIds.put(roi.getId(),pets);
+			}
+
 		});
 		regionOwnerLogIdsByCity.forEach((city,ids) ->{
 			HashMap<String,RegionOwnerCityDetail> regionOwnerCities = new HashMap<>();
