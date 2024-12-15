@@ -98,6 +98,7 @@ jobs:
             echo "CURRENT_PORT=8081" >> $GITHUB_ENV
             echo "STOPPED_PORT=8080" >> $GITHUB_ENV
             echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
+          fi
           
           
       - name: Deploy Docker Compose with .env file
