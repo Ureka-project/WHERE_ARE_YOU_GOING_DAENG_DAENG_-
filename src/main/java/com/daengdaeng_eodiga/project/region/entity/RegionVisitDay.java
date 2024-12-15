@@ -21,7 +21,7 @@ public class RegionVisitDay extends BaseEntity {
 	@Column(name = "city")
 	private String city;
 
-	@Column(name = "city detail")
+	@Column(name = "city_detail")
 	private String cityDetail;
 
 	@Column(name = "count")
@@ -39,4 +39,11 @@ public class RegionVisitDay extends BaseEntity {
 		this.count = count;
 	}
 
+	public void addCount() {
+		this.count +=1;
+	}
+
+	public void decrementCount() {
+		this.count -=1;
+	}
 }

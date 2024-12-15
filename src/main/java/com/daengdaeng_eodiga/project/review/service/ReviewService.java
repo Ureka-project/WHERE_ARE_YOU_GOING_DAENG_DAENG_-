@@ -17,10 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daengdaeng_eodiga.project.Global.enums.OrderType;
+import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
 import com.daengdaeng_eodiga.project.pet.service.PetService;
 import com.daengdaeng_eodiga.project.place.entity.Place;
+import com.daengdaeng_eodiga.project.place.repository.PlaceScoreRepository;
 import com.daengdaeng_eodiga.project.place.service.PlaceService;
 
 import com.daengdaeng_eodiga.project.region.service.RegionService;
@@ -52,6 +54,7 @@ public class ReviewService {
 	private final ReviewMediaRepository reviewMediaRepository;
 	private final CommonCodeService commonCodeService;
 	private final RegionService regionService;
+	private final PlaceScoreRepository placeScoreRepository;
 
 	public ReviewDto registerReview(ReviewRegisterRequest request, int userId) {
 
@@ -64,13 +67,26 @@ public class ReviewService {
 		List<ReviewPet> savedReviewPets = saveReviewPetsIfPresent(review, pets);
 		List<ReviewKeyword> savedReviewKeywords = saveReviewKeywordsIfPresent(review, request.keywords().stream().toList());
 		List<ReviewMedia> savedReviewMedia = saveReviewMediaIfPresent(review, request.media());
-		addCountVisitRegion(userId, place, review);
+		addCountVisitRegion(user, place, review);
+		calculatePlaceReviewScore(place, review);
 		return createReviewDto(review, savedReviewPets, savedReviewKeywords, savedReviewMedia);
 	}
 
-	private void addCountVisitRegion(int userId, Place place, Review review) {
+	private void calculatePlaceReviewScore(Place place, Review review) {
+		placeScoreRepository.findById(place.getPlaceId()).ifPresentOrElse(
+			placeScore -> {
+				placeScore.updateScore(review.getScore());
+				placeScoreRepository.save(placeScore);
+			},
+			() -> {
+				throw new PlaceNotFoundException("PlaceScore");
+			}
+		);
+	}
+
+	private void addCountVisitRegion(User user, Place place, Review review) {
 		if(review.getReviewtype().equals("REVIEW_TYP_02")){
-			regionService.addCountVisitRegion(place.getCity(), place.getCityDetail(), userId);
+			regionService.addCountVisitRegionForDB(place.getCity(), place.getCityDetail(), user);
 		}
 	}
 
@@ -131,7 +147,12 @@ public class ReviewService {
 
 
 	public void deleteReview(int reviewId) {
-		reviewRepository.deleteById(reviewId);
+		reviewRepository.findById(reviewId).ifPresent(review -> {
+			reviewRepository.delete(review);
+			if(review.getReviewtype().equals("REVIEW_TYP_02")) {
+				regionService.decrementCountVisitRegionForDB(review.getPlace().getCity(), review.getPlace().getCityDetail(), review.getUser(), review.getCreatedAt().toLocalDate());
+			}
+		});
 	}
 
 	public ReviewsResponse fetchPlaceReviews(int placeId, int page, int size, OrderType orderType) {
@@ -194,7 +215,7 @@ public class ReviewService {
 				visitedAt,
 				createdAt,
 				(String) result[12],
-				(String) result[13]
+				commonCodeService.getCommonCodeName((String) result[13])
 
 			);
 			reviews.add(reviewDto);
@@ -212,5 +233,8 @@ public class ReviewService {
 		}
 		return pets;
 	}
+
+
+
 
 }

@@ -49,7 +49,7 @@ public class FavoriteService {
                 .build();
         favoriteRepository.save(favorite);
         
-        return makeFavoriteResponseDto(place, placeImage, favorite);
+        return makeRegisterFavoriteDto(place, placeImage, favorite);
     }
 
     public void deleteFavorite(int favoriteId) {
@@ -60,27 +60,42 @@ public class FavoriteService {
     }
 
     public Page<FavoriteResponseDto> fetchFavoriteList(int userId, Pageable pageable) {
-        Page<Favorite> favoritesPage = favoriteRepository.findByUser_UserIdOrderByUpdatedAtDesc(userId, pageable);
-
-        return favoritesPage.map(favorite -> {
-            Place place = placeRepository.findById(favorite.getPlace().getPlaceId())
-                    .orElseThrow(PlaceNotFoundException::new);
-            String placeImage = placeMediaRepository.findByPlace_PlaceId(place.getPlaceId())
-                    .map(PlaceMedia::getPath)
-                    .orElse("");
-
-            return makeFavoriteResponseDto(place, placeImage, favorite);
-        });
+        Page<Object[]> favoritesPage = favoriteRepository.findFavoriteResponse(userId, pageable);
+        return favoritesPage.map(favorite -> makeFetchFavoriteDto(favorite));
     }
 
     /**
-     * 즐겨찾기 응답 dto 생성 메소드
+     * 즐겨찾기 조회 시, 응답 DTO 생성 메소드
+     * @param favorite
+     * @return FavoriteResponseDto
+     */
+    private FavoriteResponseDto makeFetchFavoriteDto(Object[] favorite) {
+
+        String startTime = favorite[8] != null ? (String) favorite[8] : OpenHoursType.NO_INFO.getDescription();
+        String endTime = favorite[9] != null ? (String) favorite[9] : OpenHoursType.NO_INFO.getDescription();
+
+        return FavoriteResponseDto.builder()
+                .favoriteId((Integer) favorite[0])
+                .placeId((Integer) favorite[1])
+                .name((String) favorite[2])
+                .placeImage((String) favorite[3])
+                .placeType(commonCodeService.getCommonCodeName((String) favorite[4]))
+                .streetAddresses((String) favorite[5])
+                .latitude((Double) favorite[6])
+                .longitude((Double) favorite[7])
+                .startTime(startTime)
+                .endTime(endTime)
+                .build();
+    }
+
+    /**
+     * 즐겨찾기 등록 시, 응답 dto 생성 메소드
      * @param place
      * @param favorite
      * @return FavoriteResponseDto
      */
-    private FavoriteResponseDto makeFavoriteResponseDto(Place place, String placeImage, Favorite favorite) {
-        
+    private FavoriteResponseDto makeRegisterFavoriteDto(Place place, String placeImage, Favorite favorite) {
+
         OpeningDate openingDate = openingDateRepository.findByPlace_PlaceId(place.getPlaceId())
                 .stream()
                 .findFirst()

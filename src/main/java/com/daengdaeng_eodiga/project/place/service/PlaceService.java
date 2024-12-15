@@ -3,10 +3,7 @@ package com.daengdaeng_eodiga.project.place.service;
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisLocationRepository;
 import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
-import com.daengdaeng_eodiga.project.place.dto.PlaceDto;
-import com.daengdaeng_eodiga.project.place.dto.PlaceDtoMapper;
-import com.daengdaeng_eodiga.project.place.dto.PlaceRcommendDto;
-import com.daengdaeng_eodiga.project.place.dto.PlaceWithScore;
+import com.daengdaeng_eodiga.project.place.dto.*;
 import com.daengdaeng_eodiga.project.place.entity.Place;
 import com.daengdaeng_eodiga.project.place.entity.ReviewSummary;
 import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
@@ -20,15 +17,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.min;
@@ -46,6 +43,7 @@ public class PlaceService {
     private final OpenAiService openAiService;
     private final CommonCodeService commonCodeService;
     private final RedisLocationRepository redisLocationRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PlaceService.class);
 
     public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude, Integer userId) {
         Integer effectiveUserId = userId != null ? userId : -1;
@@ -110,15 +108,11 @@ public class PlaceService {
                 .collect(Collectors.toList());
     }
 
-    public List<PlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
-        List<Object[]> results = placeRepository.findNearestPlaces(latitude, longitude);
-        return results.stream()
-                .map(row -> {
-                    PlaceDto dto = PlaceDtoMapper.convertToPlaceDto(row);
-                    dto.setIsFavorite(userId != null && checkIfUserFavoritedPlace(dto.getPlaceId(), userId));
-                    return dto;
-                })
-                .collect(Collectors.toList());
+    public List<NearestPlaceDto> getNearestPlaces(Double latitude, Double longitude, Integer userId) {
+        return placeRepository.findNearestPlaces(latitude, longitude, userId)
+                .stream()
+                .map(NearestPlaceDtoMapper::convertToNearestPlaceDto)
+                .toList();
     }
 
 
@@ -252,9 +246,8 @@ public class PlaceService {
     }
 
 
-    @Scheduled(cron = "0 0 11 * * ?")
+    @Scheduled(cron = "0 0 2 * * ?")
     public void scheduledReviewSummaryUpdate() {
-        Logger logger = LoggerFactory.getLogger(PlaceService.class);
         logger.info("Scheduled task started.");
 
         LocalDateTime lastDay = LocalDateTime.now().minusDays(1);
@@ -276,8 +269,6 @@ public class PlaceService {
     }
 
     public void generateReviewSummary(int placeId) {
-        Logger logger = LoggerFactory.getLogger(PlaceService.class);
-
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new PlaceNotFoundException("Place not found with id: " + placeId));
 
@@ -286,24 +277,37 @@ public class PlaceService {
         String existingGoodSummary = existingSummary != null ? existingSummary.getGoodSummary() : "";
         String existingBadSummary = existingSummary != null ? existingSummary.getBadSummary() : "";
 
+
         List<String> recentReviewContents = reviewRepository.findByPlace_PlaceId(placeId).stream()
                 .map(Review::getContent)
+                .filter(this::isValidReview)
                 .collect(Collectors.toList());
 
-        if (recentReviewContents.isEmpty() && existingSummary == null) {
-            logger.info("No reviews or existing summary found for placeId: {}. Creating default summary.", placeId);
-            String defaultSummary = "리뷰 데이터가 없습니다.";
-            ReviewSummary newSummary = new ReviewSummary();
-            newSummary.setPlace(place);
-            newSummary.setGoodSummary(defaultSummary);
-            newSummary.setBadSummary(defaultSummary);
-            newSummary.setUpdateDate(LocalDateTime.now());
-            reviewSummaryRepository.save(newSummary);
+        if (recentReviewContents.size() > 100) {
+            recentReviewContents = getRandomReviews(recentReviewContents, 100);
+        }
+
+
+        List<String> validReviews = new ArrayList<>();
+        for (String review : recentReviewContents) {
+            String pros = openAiService.summarizePros(review);
+            String cons = openAiService.summarizeCons(review);
+
+            if (!isInvalidAiResponse(pros) && !isInvalidAiResponse(cons)) {
+                validReviews.add(review);
+            } else {
+                logger.info("Excluding invalid review: {}", review);
+            }
+        }
+
+        if (validReviews.isEmpty() && existingSummary == null) {
+            logger.info("No valid reviews or existing summary found for placeId: {}. Creating default summary.", placeId);
+            saveDefaultSummary(place);
             return;
         }
 
-        String combinedGoodContent = existingGoodSummary + " " + String.join(" ", recentReviewContents);
-        String combinedBadContent = existingBadSummary + " " + String.join(" ", recentReviewContents);
+        String combinedGoodContent = existingGoodSummary + " " + String.join(" ", validReviews);
+        String combinedBadContent = existingBadSummary + " " + String.join(" ", validReviews);
 
         String pros = openAiService.summarizePros(combinedGoodContent);
         String cons = openAiService.summarizeCons(combinedBadContent);
@@ -315,47 +319,58 @@ public class PlaceService {
             cons = "단점 요약을 생성할 수 없습니다.";
         }
 
-        logger.info("Review contents for placeId {}: {}", placeId, recentReviewContents);
-        logger.info("Generated Pros: {}", pros);
-        logger.info("Generated Cons: {}", cons);
-
         if (existingSummary == null) {
-            ReviewSummary newSummary = new ReviewSummary();
-            newSummary.setPlace(place);
-            newSummary.setGoodSummary(pros);
-            newSummary.setBadSummary(cons);
-            newSummary.setUpdateDate(LocalDateTime.now());
-            reviewSummaryRepository.save(newSummary);
-            logger.info("New review summary created for placeId: {}", placeId);
+            saveNewSummary(place, pros, cons);
         } else {
-            existingSummary.setGoodSummary(pros);
-            existingSummary.setBadSummary(cons);
-            existingSummary.setUpdateDate(LocalDateTime.now());
-            reviewSummaryRepository.save(existingSummary);
-            logger.info("Review summary updated for placeId: {}", placeId);
+            updateExistingSummary(existingSummary, pros, cons);
         }
     }
 
-    private String summarizeInChunks(List<String> reviews, boolean isPros) {
-        int chunkSize = 10;
-        List<String> chunks = new ArrayList<>();
-        for (int i = 0; i < reviews.size(); i += chunkSize) {
-            List<String> chunk = reviews.subList(i, Math.min(i + chunkSize, reviews.size()));
-            String combinedReviews = String.join(" ", chunk);
-            if (isPros) {
-                chunks.add(openAiService.summarizePros(combinedReviews));
-            } else {
-                chunks.add(openAiService.summarizeCons(combinedReviews));
-            }
-        }
-
-
-        String finalSummary = String.join(" ", chunks);
-        if (isPros) {
-            return openAiService.summarizePros(finalSummary);
-        } else {
-            return openAiService.summarizeCons(finalSummary);
-        }
+    private void saveDefaultSummary(Place place) {
+        ReviewSummary newSummary = new ReviewSummary();
+        newSummary.setPlace(place);
+        newSummary.setGoodSummary("리뷰 데이터가 없습니다.");
+        newSummary.setBadSummary("리뷰 데이터가 없습니다.");
+        newSummary.setUpdateDate(LocalDateTime.now());
+        reviewSummaryRepository.save(newSummary);
     }
 
+    private void saveNewSummary(Place place, String pros, String cons) {
+        ReviewSummary newSummary = new ReviewSummary();
+        newSummary.setPlace(place);
+        newSummary.setGoodSummary(pros);
+        newSummary.setBadSummary(cons);
+        newSummary.setUpdateDate(LocalDateTime.now());
+        reviewSummaryRepository.save(newSummary);
+    }
+
+    private void updateExistingSummary(ReviewSummary summary, String pros, String cons) {
+        summary.setGoodSummary(pros);
+        summary.setBadSummary(cons);
+        summary.setUpdateDate(LocalDateTime.now());
+        reviewSummaryRepository.save(summary);
+    }
+
+
+    private boolean isValidReview(String review) {
+        return review.length() >= 3 && !Pattern.matches("^[^a-zA-Z0-9가-힣]*$", review) && !Pattern.matches("^(.)\\1+$", review);
+    }
+
+
+    private boolean isInvalidAiResponse(String response) {
+        if (response == null) {
+            return true;
+        }
+        String lowerCaseResponse = response.trim().toLowerCase();
+        return lowerCaseResponse.contains("요약할 수 없습니다") ||
+                lowerCaseResponse.contains("구체적인 내용이 없어") ||
+                lowerCaseResponse.contains("긍정적인 점을")||
+                lowerCaseResponse.contains("명확하지 않아");
+    }
+
+
+    private List<String> getRandomReviews(List<String> reviews, int limit) {
+        Collections.shuffle(reviews);
+        return reviews.subList(0, limit);
+    }
 }

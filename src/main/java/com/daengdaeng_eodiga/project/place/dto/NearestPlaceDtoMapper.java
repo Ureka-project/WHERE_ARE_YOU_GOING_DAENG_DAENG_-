@@ -1,14 +1,11 @@
 package com.daengdaeng_eodiga.project.place.dto;
 
-import java.util.Arrays;
-import java.util.List;
+public class NearestPlaceDtoMapper {
 
-public class PlaceDtoMapper {
+    private NearestPlaceDtoMapper() {}
 
-    private PlaceDtoMapper() {}
-
-    public static PlaceDto convertToPlaceDto(Object[] result) {
-        PlaceDto dto = new PlaceDto();
+    public static NearestPlaceDto convertToNearestPlaceDto(Object[] result) {
+        NearestPlaceDto dto = new NearestPlaceDto();
         try {
             dto.setPlaceId(result[0] != null ? ((Number) result[0]).intValue() : null);
             dto.setName(result[1] != null ? result[1].toString() : null);
@@ -29,25 +26,16 @@ public class PlaceDtoMapper {
             dto.setIsFavorite(result.length > 16 && result[16] != null && parseBoolean(result[16]));
             dto.setStartTime(result.length > 17 && result[17] != null ? result[17].toString() : null);
             dto.setEndTime(result.length > 18 && result[18] != null ? result[18].toString() : null);
-            dto.setFavoriteCount(result.length > 19 && result[19] != null ? ((Number) result[19]).intValue() : 0);
-            dto.setPlaceScore(result.length > 20 && result[20] != null ? ((Number) result[20]).doubleValue() : null);
-            dto.setImageurl(result.length > 21 && result[21] != null ? result[21].toString() : null);
+            dto.setPlaceScore(result.length > 19 && result[19] != null ? ((Number) result[19]).doubleValue() : null);
+            dto.setImageurl(result.length > 20 && result[20] != null ? result[20].toString() : null);
 
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to map result to PlaceDto. Ensure data types and query structure are correct.", e);
+            throw new IllegalArgumentException("Failed to map result to NearestPlaceDto. Ensure data types and query structure are correct.", e);
         }
         return dto;
     }
 
     private static boolean parseBoolean(Object value) {
         return Boolean.parseBoolean(value.toString()) || "1".equals(value.toString());
-    }
-
-    private static boolean parseIntegerToBoolean(Object value) {
-        try {
-            return Integer.parseInt(value.toString()) == 1;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 }

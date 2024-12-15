@@ -21,22 +21,29 @@ public class RegionVisitTotal extends BaseEntity {
 	@Column(name = "city")
 	private String city;
 
-	@Column(name = "city detail")
+	@Column(name = "city_detail")
 	private String cityDetail;
 
 	@Column(name = "count")
-	private String count;
+	private int count;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@Builder
-	public RegionVisitTotal(User user, String city, String cityDetail, String count) {
+	public RegionVisitTotal(User user, String city, String cityDetail, int count) {
 		this.user = user;
 		this.city = city;
 		this.cityDetail = cityDetail;
 		this.count = count;
+	}
+
+	public void addCount() {
+		this.count +=1;
+	}
+	public void decrementCount() {
+		this.count -=1;
 	}
 
 }

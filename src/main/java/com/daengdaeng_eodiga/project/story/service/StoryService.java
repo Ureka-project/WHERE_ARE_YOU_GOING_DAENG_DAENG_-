@@ -14,11 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,38 +28,6 @@ public class StoryService {
     private final RegionOwnerLogRepository regionOwnerLogRepository;
     private final UserService userService;
 
-    /**
-     * 유저 자신의 땅 목록 조회
-     * @param userId
-     * @return UserMyLandsDto
-     * @deprecated
-     */
-
-    // TODO :  지역별 주인 조회 로직 완성 후, cityDetail Null 수정
-    public UserMyLandsDto fetchUserLands(int userId) {
-
-        String nickname = userService.findUser(userId).getNickname();
-        List<Object[]> results = regionOwnerLogRepository.findCityAndCityDetailByUserId(userId);
-        if( results.isEmpty() ) {
-            throw new UserLandNotFoundException();
-        }
-
-        Map<String, List<String>> myLands = new LinkedHashMap<>();
-        for (Object[] row : results) {
-            String city = (String) row[0];
-            String cityDetail = (String) row[1];
-
-            myLands.computeIfAbsent(city, k -> new ArrayList<>()).add(cityDetail);
-        }
-        List<MyLandsDto> myLandsDtos = myLands.entrySet().stream()
-                .map(entry -> new MyLandsDto(entry.getKey(), null))
-                .collect(Collectors.toList());
-        UserMyLandsDto userMyLandsDto = UserMyLandsDto.builder()
-                .nickname(nickname)
-                .lands(myLandsDtos)
-                .build();
-        return userMyLandsDto;
-    }
 
     /**
      * 스토리 업로드
@@ -69,10 +35,12 @@ public class StoryService {
      * @param storyRequestDto
      */
     public void registerStory(int userId, StoryRequestDto storyRequestDto){
-        if( storyRepository.countByTodayCreated() == 10 ) {
+        if( storyRepository.countByTodayCreated(
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().plusDays(1).atStartOfDay()) == 10 ) {
             throw new DailyStoryUploadLimitException();
         }
-        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetail(
+        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetailForUpload(
                 userId,
                 storyRequestDto.getCity(),
                 storyRequestDto.getCityDetail()).isEmpty() ){
@@ -91,10 +59,24 @@ public class StoryService {
         storyRepository.save(story);
     }
 
-    // TODO(3) : 전체 유저 스토리 목록 조회 (내스토리는 제외)
-    public List<GroupedUserStoriesDto> fetchGroupedUserStories(){
+    /**
+     * 본인 제외 전체 유저 스토리 목록 조회
+     * @param userId
+     * @return
+     */
+    public List<GroupedUserStoriesDto> fetchGroupedUserStories(int userId){
+        List<Object[]> results = storyRepository.findMainPriorityStories(userId);
 
-        return null;
+        return results.stream()
+                .map(row -> GroupedUserStoriesDto.builder()
+                        .landOwnerId((Integer) row[0])
+                        .nickname((String) row[1])
+                        .city((String) row[2])
+                        .cityDetail((String) row[3])
+                        .petImage((String) row[4])
+                        .storyType((String) row[5])
+                        .build())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -132,7 +114,7 @@ public class StoryService {
      * @return
      */
     public IndividualUserStoriesDto fetchIndividualUserStories(int landOwnerId, String city, String cityDetail){
-        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetail(landOwnerId, city, cityDetail).isEmpty() ) {
+        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetailForDetail(landOwnerId, city, cityDetail).isEmpty() ) {
             throw new OwnerHistoryNotFoundException();
         }
 
