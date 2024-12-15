@@ -7,7 +7,7 @@ spring:
       green: green,common,secret
 
 server:
-    env: blue
+  env: ${ENV:local}
 
 ---
 
