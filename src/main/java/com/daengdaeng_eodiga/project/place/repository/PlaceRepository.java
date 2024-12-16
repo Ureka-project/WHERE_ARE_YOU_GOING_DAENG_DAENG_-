@@ -58,6 +58,10 @@ GROUP BY p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.lo
 SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
        p.street_addresses, p.tel_number, p.url, c.name AS place_type, p.description,
        p.parking, p.indoor, p.outdoor,
+       NULL AS distance,
+       CASE WHEN COUNT(f.favorite_id) > 0 THEN 1 ELSE 0 END AS is_favorite,
+       o.start_time AS start_time,   -- MIN 제거
+       o.end_time AS end_time,       -- MAX 제거
        COUNT(f.favorite_id) AS favorite_count,
        ps.score AS place_score,
        p.thumb_img_path AS imageurl
@@ -68,15 +72,12 @@ LEFT JOIN common_code c ON p.place_type = c.code_id
 LEFT JOIN place_score ps ON p.place_id = ps.place_id
 GROUP BY p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
          p.street_addresses, p.tel_number, p.url, c.name, p.description,
-         p.parking, p.indoor, p.outdoor, ps.score, p.thumb_img_path
+         p.parking, p.indoor, p.outdoor, ps.score, p.thumb_img_path, o.start_time, o.end_time
 ORDER BY favorite_count DESC
 LIMIT 3;
+
 """, nativeQuery = true)
     List<Object[]> findTopFavoritePlaces();
-
-
-
-
 
 
     @Query(value = """
