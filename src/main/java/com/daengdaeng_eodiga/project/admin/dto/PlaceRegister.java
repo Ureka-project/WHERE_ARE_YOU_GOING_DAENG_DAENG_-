@@ -33,4 +33,10 @@ public class PlaceRegister {
 	private String thumbImgPath;
 
 	private String imgPath;
+
+	private Double latitude;
+
+	private Double longitude;
+
+	private String townShip;
 }

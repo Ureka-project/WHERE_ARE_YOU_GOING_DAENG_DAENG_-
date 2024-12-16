@@ -61,6 +61,9 @@ public class AdminService {
 			.indoor(placeRegister.getIndoor())
 			.outdoor(placeRegister.getOutdoor())
 			.thumbImgPath(placeRegister.getThumbImgPath())
+			.latitude(placeRegister.getLatitude())
+			.longitude(placeRegister.getLongitude())
+			.township(placeRegister.getTownShip())
 			.build();
 		Place savedPlace = placeService.savePlace(place);
 		placeService.savePlaceMedia(savedPlace, placeRegister.getImgPath());
