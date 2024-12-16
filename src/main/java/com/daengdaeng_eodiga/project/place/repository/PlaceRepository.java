@@ -176,7 +176,7 @@ SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.long
        CAST(o.end_time AS CHAR) AS end_time,
        (SELECT COUNT(f2.favorite_id) FROM favorite f2 WHERE f2.place_id = p.place_id) AS favorite_count,
        ps.score AS place_score,
-       p.thumb_img_path AS imageurl -- 수정된 부분: thumb_img_path 사용
+       p.thumb_img_path AS imageurl
 FROM place p
 LEFT JOIN common_code c ON p.place_type = c.code_id
 LEFT JOIN favorite f ON p.place_id = f.place_id AND f.user_id = :userId
