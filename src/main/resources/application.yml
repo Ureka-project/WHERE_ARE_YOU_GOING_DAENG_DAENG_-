@@ -87,8 +87,12 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+        dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
+        dialect=dialect.MySQL8Dialect
+
+
     defer-datasource-initialization: true
     show-sql: true
 
@@ -97,6 +101,7 @@ spring:
     username: root
     password: ${MYSQL_PWD_V2}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
 
 
 
