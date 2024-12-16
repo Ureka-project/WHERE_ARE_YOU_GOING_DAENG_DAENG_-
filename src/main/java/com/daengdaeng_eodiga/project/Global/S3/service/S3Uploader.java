@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.daengdaeng_eodiga.project.Global.S3.enums.S3Prefix;
 
 @Component
@@ -53,6 +56,22 @@ public class S3Uploader {
 		);
 
 		return generatePresignedUrlRequest;
+	}
+
+	/**
+	 * S3에 이미지 업로드
+	 *
+	 * @author 김가은
+	 *
+	 * */
+
+	public String putObject(String filePath,String fileName, InputStream inputStream, ObjectMetadata metadata) {
+		String key = filePath + "/" + fileName;
+
+		PutObjectRequest request = new PutObjectRequest(bucket, key,inputStream, metadata)
+			.withCannedAcl(CannedAccessControlList.PublicRead);
+		amazonS3.putObject(request);
+		return amazonS3.getUrl(bucket, key).toString();
 	}
 
 	private Date getPresignedUrlExpiration() {
