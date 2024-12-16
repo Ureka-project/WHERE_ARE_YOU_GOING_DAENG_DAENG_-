@@ -90,7 +90,6 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-        dialect=dialect.MySQL8Dialect
 
 
     defer-datasource-initialization: true
