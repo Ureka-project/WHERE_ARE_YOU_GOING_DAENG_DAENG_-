@@ -4,6 +4,7 @@ import com.daengdaeng_eodiga.project.Global.entity.BaseEntity;
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
 import com.daengdaeng_eodiga.project.review.entity.Review;
 import com.daengdaeng_eodiga.project.visit.entity.Visit;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Table(name = "Place")
 @Setter
+@JsonIgnoreProperties({"placeScores"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Place extends BaseEntity {
@@ -66,13 +68,18 @@ public class Place extends BaseEntity {
 
     private Boolean outdoor;
 
-    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Column(name = "thumb_img_path",length = 700)
+    private String thumbImgPath;
+
+    @OneToMany(mappedBy = "place", orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "place", orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Visit> visits = new ArrayList<>();
 
-    @OneToOne(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "place", cascade = CascadeType.PERSIST, orphanRemoval = true,optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private PlaceScore placeScores = new PlaceScore();
 
@@ -80,15 +87,28 @@ public class Place extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<OpeningDate> openingDates = new ArrayList<>();
 
-    @OneToOne(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private ReviewSummary reviewSummaries = new ReviewSummary();
-
-    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "place", orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Favorite> favorite = new ArrayList<>();
 
-    @OneToOne(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private PlaceMedia placeMedia = new PlaceMedia();
+    @Builder
+    public Place(String name, String city, String cityDetail, String township, Double latitude, Double longitude, String postCode, String streetAddresses, String telNumber, String url, String placeType, String description, String weightLimit, Boolean parking, Boolean indoor, Boolean outdoor, String thumbImgPath) {
+        this.name = name;
+        this.city = city;
+        this.cityDetail = cityDetail;
+        this.township = township;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.postCode = postCode;
+        this.streetAddresses = streetAddresses;
+        this.telNumber = telNumber;
+        this.url = url;
+        this.placeType = placeType;
+        this.description = description;
+        this.weightLimit = weightLimit;
+        this.parking = parking;
+        this.indoor = indoor;
+        this.outdoor = outdoor;
+        this.thumbImgPath = thumbImgPath;
+    }
 }

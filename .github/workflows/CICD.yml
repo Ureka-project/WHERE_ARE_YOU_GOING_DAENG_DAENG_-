@@ -92,6 +92,7 @@ jobs:
           url: https://${{ secrets.LIVE_SERVER_IP }}:${{env.STOPPED_PORT}}/env
           max-attempts: 10
           retry-delay: 10s
+          success-status-codes: '200,401'  
 
       - name: Change nginx upstream
         uses: appleboy/ssh-action@master
