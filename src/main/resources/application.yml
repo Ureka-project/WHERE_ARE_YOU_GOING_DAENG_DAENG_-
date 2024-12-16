@@ -93,16 +93,10 @@ spring:
     show-sql: true
 
   datasource:
-    write-url: jdbc:mysql://${EC2_DNS_PUBLICE_V2}:6033/lixxce?rewriteBatchedStatements=true
-    write-username: root
-    write-password: ${MYSQL_PWD_V2}
-    write-driver-class-name: com.mysql.cj.jdbc.Driver
-
-
-    read-url: jdbc:mysql://${EC2_DNS_PUBLICE_V2}:6033/lixxce?rewriteBatchedStatements=true
-    read-username: root
-    read-password: ${MYSQL_PWD_V2}
-    read-driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${EC2_DNS_PUBLICE_V2}:6033/lixxce?&rewriteBatchedStatements=true
+    username: root
+    password: ${MYSQL_PWD_V2}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
 
 
