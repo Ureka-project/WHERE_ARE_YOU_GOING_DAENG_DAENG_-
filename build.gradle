@@ -59,7 +59,12 @@ dependencies {
 
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+	//Thumbnailator
+	implementation 'net.coobird:thumbnailator:0.4.20'
+
 
 }
 

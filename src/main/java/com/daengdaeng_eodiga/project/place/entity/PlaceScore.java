@@ -6,8 +6,10 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @Table(name = "Place_Score")
@@ -17,15 +19,15 @@ public class PlaceScore extends BaseEntity {
     @Column(name = "place_id")
     private int placeId;
 
-    @MapsId("placeId")
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id", nullable = false, referencedColumnName = "place_id")
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "place_id", nullable = false)
     private Place place;
 
-    private Double score;
+    private Double score = 0.0;
 
     @Column(name = "review_count")
-    private int reviewCount;
+    private int reviewCount = 0;
 
     public void updateScore(int score) {
         this.score = (this.score * this.reviewCount + score) / (this.reviewCount + 1);
@@ -34,6 +36,7 @@ public class PlaceScore extends BaseEntity {
     @Builder
     public PlaceScore(Place place, Double score, int reviewCount) {
         this.place = place;
+        this.placeId = place.getPlaceId();
         this.score = score;
         this.reviewCount = reviewCount;
     }

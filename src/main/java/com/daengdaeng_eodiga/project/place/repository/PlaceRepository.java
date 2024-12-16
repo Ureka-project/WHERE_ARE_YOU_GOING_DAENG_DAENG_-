@@ -107,26 +107,26 @@ LIMIT 3;
 
 
     @Query(value = """
-SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
-       p.street_addresses, p.tel_number, p.url, c.name AS place_type, p.description,
-       p.parking, p.indoor, p.outdoor,
-       (6371 * acos(cos(radians(:latitude)) * cos(radians(p.latitude)) *
-       cos(radians(p.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(p.latitude)))) AS distance,
-       CASE WHEN f.user_id = :userId THEN 1 ELSE 0 END AS is_favorite,
-       o.start_time, o.end_time,
-       (SELECT COUNT(*) FROM favorite f WHERE f.place_id = p.place_id) AS favorite_count,
-       ps.score AS place_score,
-       pm.path AS imageurl
-FROM place p
-LEFT JOIN opening_date o ON p.place_id = o.place_id
-LEFT JOIN common_code c ON p.place_type = c.code_id
-LEFT JOIN place_score ps ON p.place_id = ps.place_id
-LEFT JOIN place_media pm ON pm.place_id = p.place_id
-LEFT JOIN favorite f ON f.place_id = p.place_id AND f.user_id = :userId
-ORDER BY distance ASC
-LIMIT 30;
-""", nativeQuery = true)
+    SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
+           p.street_addresses, p.tel_number, p.url, c.name AS place_type, p.description,
+           p.parking, p.indoor, p.outdoor,
+           (6371 * acos(cos(radians(:latitude)) * cos(radians(p.latitude)) *
+           cos(radians(p.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(p.latitude)))) AS distance,
+           CASE WHEN f.user_id = :userId THEN 1 ELSE 0 END AS is_favorite,
+           o.start_time, o.end_time,
+           ps.score AS place_score,
+           pm.path AS imageurl
+    FROM place p
+    LEFT JOIN opening_date o ON p.place_id = o.place_id
+    LEFT JOIN common_code c ON p.place_type = c.code_id
+    LEFT JOIN place_score ps ON p.place_id = ps.place_id
+    LEFT JOIN place_media pm ON pm.place_id = p.place_id
+    LEFT JOIN favorite f ON f.place_id = p.place_id AND f.user_id = :userId
+    ORDER BY distance ASC
+    LIMIT 30;
+    """, nativeQuery = true)
     List<Object[]> findNearestPlaces(@Param("latitude") Double latitude, @Param("longitude") Double longitude, @Param("userId") Integer userId);
+
 
 
 
