@@ -11,7 +11,6 @@ import com.daengdaeng_eodiga.project.favorite.repository.FavoriteRepository;
 import com.daengdaeng_eodiga.project.place.entity.*;
 import com.daengdaeng_eodiga.project.place.entity.QOpeningDate;
 import com.daengdaeng_eodiga.project.place.entity.QPlace;
-import com.daengdaeng_eodiga.project.place.entity.QPlaceMedia;
 import com.daengdaeng_eodiga.project.place.repository.OpeningDateRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceMediaRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
@@ -89,7 +88,7 @@ public class FavoriteService {
                     .favoriteId(favorite.get(QFavorite.favorite.favoriteId))
                     .placeId(favorite.get(QPlace.place.placeId))
                     .name(favorite.get(QPlace.place.name))
-                    .placeImage(favorite.get(QPlaceMedia.placeMedia.path))
+                    .placeImage(favorite.get(QPlace.place.thumbImgPath))
                     .placeType(favorite.get(QPlace.place.placeType))
                     .streetAddresses(favorite.get(QPlace.place.streetAddresses))
                     .latitude(favorite.get(QPlace.place.latitude))

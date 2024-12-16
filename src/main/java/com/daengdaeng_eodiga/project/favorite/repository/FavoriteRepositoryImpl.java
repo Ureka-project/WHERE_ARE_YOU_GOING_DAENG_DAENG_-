@@ -25,15 +25,13 @@ public class FavoriteRepositoryImpl implements FavoriteRepositoryCustom {
     public List<Tuple> findCustomFavorites(int userId, LocalDateTime lastUpdatedAt, int lastFavoriteId, int size) {
         QFavorite f = QFavorite.favorite;
         QPlace p = QPlace.place;
-        QPlaceMedia pm = QPlaceMedia.placeMedia;
         QOpeningDate od = QOpeningDate.openingDate;
 
         return queryFactory
-                .select(f.favoriteId, p.placeId, p.name, pm.path, p.placeType, p.streetAddresses,
+                .select(f.favoriteId, p.placeId, p.name, p.thumbImgPath, p.placeType, p.streetAddresses,
                         p.latitude, p.longitude, od.startTime, od.endTime, f.updatedAt)
                 .from(f)
                 .join(f.place, p)
-                .leftJoin(p.placeMedia, pm)
                 .leftJoin(p.openingDates, od)
                 .where(
                         f.user.userId.eq(userId),
