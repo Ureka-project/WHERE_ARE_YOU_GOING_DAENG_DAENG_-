@@ -90,7 +90,8 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-
+      properties:
+        hibernate.cache.use_query_cache: false
 
     defer-datasource-initialization: true
     show-sql: true
