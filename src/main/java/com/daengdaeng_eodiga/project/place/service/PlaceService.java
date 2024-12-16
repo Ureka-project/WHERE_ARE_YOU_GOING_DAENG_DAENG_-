@@ -53,7 +53,12 @@ public class PlaceService {
 
     public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, Integer userId) {
         Integer effectiveUserId = userId != null ? userId : -1;
-        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, latitude, longitude, effectiveUserId);
+
+        String formattedKeyword = Arrays.stream(keyword.split("\\s+"))
+                .map(word -> word + "*")
+                .collect(Collectors.joining(" "));
+
+        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, formattedKeyword, latitude, longitude, effectiveUserId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 

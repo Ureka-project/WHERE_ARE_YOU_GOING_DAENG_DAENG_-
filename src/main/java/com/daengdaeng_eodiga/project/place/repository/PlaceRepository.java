@@ -187,16 +187,21 @@ LEFT JOIN favorite f ON p.place_id = f.place_id AND f.user_id = :userId
 LEFT JOIN opening_date o ON o.place_id = p.place_id
 LEFT JOIN place_score ps ON ps.place_id = p.place_id
 LEFT JOIN place_media pm ON pm.place_id = p.place_id
-WHERE (:keyword IS NULL OR p.name LIKE CONCAT('%', :keyword, '%'))
+WHERE (:keyword IS NULL 
+       OR MATCH(p.name) AGAINST(:formattedKeyword IN BOOLEAN MODE) 
+       OR p.name LIKE CONCAT('%', :keyword, '%'))
 ORDER BY distance ASC
 LIMIT 30;
 """, nativeQuery = true)
     List<Object[]> findByKeywordAndLocation(
             @Param("keyword") String keyword,
+            @Param("formattedKeyword") String formattedKeyword,
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude,
             @Param("userId") Integer userId
     );
+
+
 
 
 
