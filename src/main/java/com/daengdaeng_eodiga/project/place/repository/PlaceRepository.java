@@ -34,24 +34,24 @@ WHERE p.place_id = :placeId;
 
 
 
-    @Query(value =
-            "SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude, " +
-                    "p.post_code, p.street_addresses, p.tel_number, p.url, p.place_type, p.description, " +
-                    "p.weight_limit, p.parking, p.indoor, p.outdoor, " +
-                    "COALESCE(ps.score, 2) AS score, " +
-                    "GROUP_CONCAT(DISTINCT rk.keyword) AS keywords, " +
-                    "COUNT(DISTINCT r.review_id) AS review_count, " +
-                    "GROUP_CONCAT(DISTINCT pm.path) AS imageurl " +
-                    "FROM place p " +
-                    "LEFT JOIN review r ON p.place_id = r.place_id " +
-                    "LEFT JOIN review_keyword rk ON rk.review_id = r.review_id " +
-                    "LEFT JOIN place_score ps ON ps.place_id = p.place_id " +
-                    "LEFT JOIN place_media pm ON pm.place_id = p.place_id " +
-                    "GROUP BY p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude, " +
-                    "p.post_code, p.street_addresses, p.tel_number, p.url, p.place_type, p.description, " +
-                    "p.weight_limit, p.parking, p.indoor, p.outdoor, pm.path",
-            nativeQuery = true)
+    @Query(value = """
+SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
+       p.post_code, p.street_addresses, p.tel_number, p.url, p.place_type, p.description,
+       p.weight_limit, p.parking, p.indoor, p.outdoor,
+       COALESCE(ps.score, 2) AS score,
+       GROUP_CONCAT(DISTINCT rk.keyword) AS keywords,
+       COUNT(DISTINCT r.review_id) AS review_count,
+       p.thumb_img_path AS imageurl 
+FROM place p
+LEFT JOIN review r ON p.place_id = r.place_id
+LEFT JOIN review_keyword rk ON rk.review_id = r.review_id
+LEFT JOIN place_score ps ON ps.place_id = p.place_id
+GROUP BY p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.longitude,
+         p.post_code, p.street_addresses, p.tel_number, p.url, p.place_type, p.description,
+         p.weight_limit, p.parking, p.indoor, p.outdoor, p.thumb_img_path
+""", nativeQuery = true)
     List<Object[]> findPlaceRecommendationsWithKeywords();
+
 
 
     @Query(value = """
