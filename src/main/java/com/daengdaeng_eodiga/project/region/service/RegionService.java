@@ -233,6 +233,9 @@ public class RegionService {
 				.user(user)
 				.build();
 			regionOwnerLogRepository.save(regionOwnerLog);
+			String region = city + " " + cityDetail;
+			notificationService.sendOwnerNotification(user.getUserId(), null, region);
+
 		}
 		);
 	}

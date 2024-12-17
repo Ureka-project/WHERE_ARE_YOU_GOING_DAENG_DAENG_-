@@ -104,8 +104,14 @@ public class NotificationService {
     }
 
     @Async
-    public void sendOwnerNotification(int ownerUserId, int pastOwnerUserId, String region ) {
-        List<Integer> users = List.of(ownerUserId, pastOwnerUserId);
+    public void sendOwnerNotification(Integer ownerUserId, Integer pastOwnerUserId, String region ) {
+        List<Integer> users = new ArrayList<>();
+        if(ownerUserId != null){
+            users.add(ownerUserId);
+        }
+        if(pastOwnerUserId != null){
+            users.add(pastOwnerUserId);
+        }
         List<PushToken> pushTokens = pushTokenService.fetchOwnerPushTokens(users,"PUSH_TYP_01");
         Map<Integer,List<String>> ownerTokens = new HashMap<>();
         pushTokens.forEach(pushToken -> {
@@ -114,9 +120,14 @@ public class NotificationService {
             tokens.add(pushToken.getToken());
             ownerTokens.put(userId, tokens);
         });
-        FcmRequestDto ownerFcmRequest = createFcmRequest(ownerTokens.get(ownerUserId), List.of(ownerUserId), PushType.OWNER, null, null, null,region);
-        publisher.publish(NotificationTopic.FCM, ownerFcmRequest);
-        FcmRequestDto pastOwnerFcmRequest = createFcmRequest(ownerTokens.get(pastOwnerUserId), List.of(pastOwnerUserId), PushType.PAST_OWNER, null, null, null,region);
-        publisher.publish(NotificationTopic.FCM, pastOwnerFcmRequest);
+        if(ownerUserId != null&&ownerTokens.get(ownerUserId)!=null){
+            FcmRequestDto ownerFcmRequest = createFcmRequest(ownerTokens.get(ownerUserId), List.of(ownerUserId), PushType.OWNER, null, null, null,region);
+            publisher.publish(NotificationTopic.FCM, ownerFcmRequest);
+        }
+        if(pastOwnerUserId != null&&ownerTokens.get(pastOwnerUserId)!=null){
+            FcmRequestDto pastOwnerFcmRequest = createFcmRequest(ownerTokens.get(pastOwnerUserId), List.of(pastOwnerUserId), PushType.PAST_OWNER, null, null, null,region);
+            publisher.publish(NotificationTopic.FCM, pastOwnerFcmRequest);
+        }
+
     }
 }
