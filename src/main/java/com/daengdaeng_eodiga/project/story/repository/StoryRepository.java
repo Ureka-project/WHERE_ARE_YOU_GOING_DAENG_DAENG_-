@@ -14,8 +14,11 @@ import java.util.Optional;
 public interface StoryRepository extends JpaRepository<Story, Integer> {
     Optional<Story> findByStoryId(int storyId);
 
-    @Query("SELECT COUNT(s) FROM Story s WHERE s.createdAt BETWEEN :todayStart AND :tomorrowStart")
-    long countByTodayCreated(@Param("todayStart") LocalDateTime todayStart,
+    @Query("SELECT COUNT(s) FROM Story s " +
+            "WHERE s.createdAt BETWEEN :todayStart AND :tomorrowStart " +
+            "AND s.user.userId = :userId ")
+    long countByTodayCreated(@Param("userId") Integer userId,
+                             @Param("todayStart") LocalDateTime todayStart,
                              @Param("tomorrowStart") LocalDateTime  tomorrowStart);
 
     @Query("SELECT s.user.nickname, s.storyId, s.city, s.cityDetail, s.path " +

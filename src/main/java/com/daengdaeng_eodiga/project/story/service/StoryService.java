@@ -36,6 +36,7 @@ public class StoryService {
      */
     public void registerStory(int userId, StoryRequestDto storyRequestDto){
         if( storyRepository.countByTodayCreated(
+                userId,
                 LocalDate.now().atStartOfDay(),
                 LocalDate.now().plusDays(1).atStartOfDay()) == 10 ) {
             throw new DailyStoryUploadLimitException();
