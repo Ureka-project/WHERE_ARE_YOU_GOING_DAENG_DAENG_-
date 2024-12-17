@@ -66,6 +66,7 @@ public class PlaceService {
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
+
     private boolean checkIfUserFavoritedPlace(int placeId, Integer userId) {
         return placeRepository.existsFavoriteByPlaceIdAndUserId(placeId, userId);
     }
@@ -203,7 +204,7 @@ public class PlaceService {
 
         }
         for(PlaceWithScore place : placeArr) {
-           PlaceRcommendDto placeDto = place.getPlaceRcommendDto();
+            PlaceRcommendDto placeDto = place.getPlaceRcommendDto();
             String placeType=commonCodeService.getCommonCodeName(placeDto.getPlaceType());
             placeDto.setPlaceType(placeType);
         }
@@ -244,11 +245,11 @@ public class PlaceService {
             if (region1 != null && region1.equals(place1)) {
                 score= 0.5;
             }
-             if (region2 != null && region2.equals(place2)) {
+            if (region2 != null && region2.equals(place2)) {
                 score=1;
             }
-             if (region3 != null && region3.equals(place3)) {
-                 score=2;
+            if (region3 != null && region3.equals(place3)) {
+                score=2;
             }
         }
         return score;
