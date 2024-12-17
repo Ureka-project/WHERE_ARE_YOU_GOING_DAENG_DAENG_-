@@ -70,6 +70,7 @@ public class PlaceService {
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
+
     private boolean checkIfUserFavoritedPlace(int placeId, Integer userId) {
         return placeRepository.existsFavoriteByPlaceIdAndUserId(placeId, userId);
     }
