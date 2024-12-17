@@ -49,7 +49,7 @@ spring:
 
 server:
   port: 8080
-  serverAddress: 52.79.50.171
+  serverAddress: ${ELASTIC_IP_V2}
 
 serverName: blue_server
 ---
@@ -71,7 +71,7 @@ spring:
 
 server:
   port: 8081
-  serverAddress: 52.79.50.171
+  serverAddress: ${ELASTIC_IP_V2}
 
 serverName: green_server
 ---
@@ -116,14 +116,12 @@ spring:
           google:
             client-id: ${GOOGLE_OAUTH_ID}
             client-secret: ${GOOGLE_OAUTH_SECRET}
-            redirect-uri: ${DOMAIN_V2}/login/oauth2/code/google
             scope:
               - profile
               - email
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
             client-secret: ${KAKAO_OAUTH_SECRET}
-            redirect-uri: ${DOMAIN_V2}/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
             scope: profile_nickname, profile_image, account_email
