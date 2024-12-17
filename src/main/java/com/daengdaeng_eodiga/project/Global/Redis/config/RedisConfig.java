@@ -9,6 +9,8 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.util.List;
+
 @Configuration
 public class RedisConfig {
 
@@ -43,8 +45,8 @@ public class RedisConfig {
     public RedisTemplate<String, Integer> redisTemplate2(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Integer> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setKeySerializer(new StringRedisSerializer()); // key 직렬화 방식 정의
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // 저장되는 데이터값의 JSON 직렬화 방식을 정의
         return redisTemplate;
     }
 }

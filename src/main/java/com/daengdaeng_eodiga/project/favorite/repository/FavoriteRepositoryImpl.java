@@ -3,7 +3,6 @@ package com.daengdaeng_eodiga.project.favorite.repository;
 import com.daengdaeng_eodiga.project.favorite.entity.QFavorite;
 import com.daengdaeng_eodiga.project.place.entity.QOpeningDate;
 import com.daengdaeng_eodiga.project.place.entity.QPlace;
-import com.daengdaeng_eodiga.project.place.entity.QPlaceMedia;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.DateTimePath;

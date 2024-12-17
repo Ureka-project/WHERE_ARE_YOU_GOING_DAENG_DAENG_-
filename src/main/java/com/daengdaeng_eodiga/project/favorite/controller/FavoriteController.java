@@ -8,14 +8,13 @@ import com.daengdaeng_eodiga.project.favorite.service.FavoriteService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 @RestController
 @RequestMapping("/api/v1/favorites")
@@ -42,19 +41,13 @@ public class FavoriteController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<FavoriteResponseDto>>> fetchFavoriteList(
+    public ResponseEntity<ApiResponse<Page<FavoriteResponseDto>>> fetchFavoriteList(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
-            @RequestParam(name = "lastUpdatedAt", required = false) String lastUpdatedAt,
-            @RequestParam(name = "lastFavoriteId", required = false) Integer lastFavoriteId,
-            @RequestParam(name = "size", defaultValue = "10") int size) {
-
+            @RequestParam int page,
+            @RequestParam int size) {
         int userId = customOAuth2User.getUserDTO().getUserid();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime parsedDate = (lastUpdatedAt != null && !lastUpdatedAt.isEmpty()) ? LocalDateTime.parse(lastUpdatedAt, formatter) : null;
-        Integer parsedId = (lastFavoriteId != null) ? lastFavoriteId : 0;
-
-        List<FavoriteResponseDto> response = favoriteService.fetchFavoriteList(userId, parsedDate, parsedId, size);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<FavoriteResponseDto> response = favoriteService.fetchFavoriteList(userId, pageable);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

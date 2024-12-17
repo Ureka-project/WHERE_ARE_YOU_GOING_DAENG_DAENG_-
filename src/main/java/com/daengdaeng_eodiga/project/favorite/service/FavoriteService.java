@@ -6,24 +6,19 @@ import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.favorite.dto.FavoriteRequestDto;
 import com.daengdaeng_eodiga.project.favorite.dto.FavoriteResponseDto;
 import com.daengdaeng_eodiga.project.favorite.entity.Favorite;
-import com.daengdaeng_eodiga.project.favorite.entity.QFavorite;
 import com.daengdaeng_eodiga.project.favorite.repository.FavoriteRepository;
-import com.daengdaeng_eodiga.project.place.entity.*;
-import com.daengdaeng_eodiga.project.place.entity.QOpeningDate;
-import com.daengdaeng_eodiga.project.place.entity.QPlace;
+import com.daengdaeng_eodiga.project.place.entity.OpeningDate;
+import com.daengdaeng_eodiga.project.place.entity.Place;
+import com.daengdaeng_eodiga.project.place.entity.PlaceMedia;
 import com.daengdaeng_eodiga.project.place.repository.OpeningDateRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceMediaRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
 import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.user.repository.UserRepository;
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -64,40 +59,33 @@ public class FavoriteService {
         favoriteRepository.deleteById(favoriteId);
     }
 
-    public List<FavoriteResponseDto> fetchFavoriteList(int userId, LocalDateTime lastUpdatedAt, int lastFavoriteId, int size) {
-        return makeFetchFavoriteDto(favoriteRepository.findCustomFavorites(userId, lastUpdatedAt, lastFavoriteId, size));
+    public Page<FavoriteResponseDto> fetchFavoriteList(int userId, Pageable pageable) {
+        Page<Object[]> favoritesPage = favoriteRepository.findFavoriteResponse(userId, pageable);
+        return favoritesPage.map(favorite -> makeFetchFavoriteDto(favorite));
     }
 
     /**
      * 즐겨찾기 조회 시, 응답 DTO 생성 메소드
-     * @param favorites
+     * @param favorite
      * @return FavoriteResponseDto
      */
-    private List<FavoriteResponseDto> makeFetchFavoriteDto(List<Tuple> favorites) {
-        return favorites.stream().map(favorite -> {
+    private FavoriteResponseDto makeFetchFavoriteDto(Object[] favorite) {
 
-            String startTime = favorite.get(QOpeningDate.openingDate.startTime) != null
-                    ? favorite.get(QOpeningDate.openingDate.startTime) : OpenHoursType.NO_INFO.getDescription();
-            String endTime = favorite.get(QOpeningDate.openingDate.endTime) != null
-                    ? favorite.get(QOpeningDate.openingDate.endTime) : OpenHoursType.NO_INFO.getDescription();
+        String startTime = favorite[8] != null ? (String) favorite[8] : OpenHoursType.NO_INFO.getDescription();
+        String endTime = favorite[9] != null ? (String) favorite[9] : OpenHoursType.NO_INFO.getDescription();
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String updatedAt = (favorite.get(QFavorite.favorite.updatedAt)).format(formatter);
-
-            return FavoriteResponseDto.builder()
-                    .favoriteId(favorite.get(QFavorite.favorite.favoriteId))
-                    .placeId(favorite.get(QPlace.place.placeId))
-                    .name(favorite.get(QPlace.place.name))
-                    .placeImage(favorite.get(QPlace.place.thumbImgPath))
-                    .placeType(favorite.get(QPlace.place.placeType))
-                    .streetAddresses(favorite.get(QPlace.place.streetAddresses))
-                    .latitude(favorite.get(QPlace.place.latitude))
-                    .longitude(favorite.get(QPlace.place.longitude))
-                    .startTime(startTime)
-                    .endTime(endTime)
-                    .updatedAt(updatedAt)
-                    .build();
-        }).collect(Collectors.toList());
+        return FavoriteResponseDto.builder()
+                .favoriteId((Integer) favorite[0])
+                .placeId((Integer) favorite[1])
+                .name((String) favorite[2])
+                .placeImage((String) favorite[3])
+                .placeType(commonCodeService.getCommonCodeName((String) favorite[4]))
+                .streetAddresses((String) favorite[5])
+                .latitude((Double) favorite[6])
+                .longitude((Double) favorite[7])
+                .startTime(startTime)
+                .endTime(endTime)
+                .build();
     }
 
     /**
@@ -112,9 +100,9 @@ public class FavoriteService {
                 .stream()
                 .findFirst()
                 .orElseThrow(OpeningDateNotFoundException::new);
+
         String startTime = openingDate != null ? openingDate.getStartTime() : OpenHoursType.NO_INFO.getDescription();
         String endTime = openingDate != null ? openingDate.getEndTime() : OpenHoursType.NO_INFO.getDescription();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         return FavoriteResponseDto.builder()
                 .favoriteId(favorite.getFavoriteId())
@@ -127,7 +115,6 @@ public class FavoriteService {
                 .longitude(place.getLongitude())
                 .startTime(startTime)
                 .endTime(endTime)
-                .updatedAt((favorite.getUpdatedAt()).format(formatter))
                 .build();
     }
 }

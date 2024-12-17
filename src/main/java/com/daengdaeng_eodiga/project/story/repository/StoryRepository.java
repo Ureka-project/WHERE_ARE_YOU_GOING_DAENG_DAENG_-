@@ -80,7 +80,7 @@ GroupedStoryStatus AS (
         MIN(group_created_at) DESC,
         MAX(CASE WHEN story_type = 'viewed' THEN story_viewed_at ELSE NULL END) ASC
 )
-SELECT
+SELECT DISTINCT
     gss.landOwnerId,
     u.nickname,
     gss.city,
@@ -105,7 +105,7 @@ ORDER BY
     CASE
         WHEN gss.group_story_type = 'viewed' THEN gss.latest_story_viewed_at
         ELSE NULL
-    END ASC
+    END ASC;
 """, nativeQuery = true)
     List<Object[]> findMainPriorityStories(@Param("userId") Integer userId);
 }
