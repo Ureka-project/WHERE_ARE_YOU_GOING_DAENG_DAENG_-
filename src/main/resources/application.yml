@@ -43,9 +43,9 @@ spring:
         registration:
           google:
             redirect-uri:
-              "http://52.79.50.171/login/oauth2/code/google"
+              ${DOMAIN_V2}/login/oauth2/code/google
           kakao:
-            redirect-uri: "http://52.79.50.171/login/oauth2/code/kakao"
+            redirect-uri: ${DOMAIN_V2}/login/oauth2/code/kakao
 
 server:
   port: 8080
@@ -65,9 +65,9 @@ spring:
         registration:
           google:
             redirect-uri:
-              "http://52.79.50.171/login/oauth2/code/google"
+              ${DOMAIN_V2}/login/oauth2/code/google
           kakao:
-            redirect-uri: "http://52.79.50.171/login/oauth2/code/kakao"
+            redirect-uri: ${DOMAIN_V2}/login/oauth2/code/kakao
 
 server:
   port: 8081
@@ -116,14 +116,14 @@ spring:
           google:
             client-id: ${GOOGLE_OAUTH_ID}
             client-secret: ${GOOGLE_OAUTH_SECRET}
-            redirect-uri: ${DOMAIN}/login/oauth2/code/google
+            redirect-uri: ${DOMAIN_V2}/login/oauth2/code/google
             scope:
               - profile
               - email
           kakao:
             client-id: ${KAKAO_OAUTH_ID}
             client-secret: ${KAKAO_OAUTH_SECRET}
-            redirect-uri: ${DOMAIN}/login/oauth2/code/kakao
+            redirect-uri: ${DOMAIN_V2}/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
             scope: profile_nickname, profile_image, account_email
