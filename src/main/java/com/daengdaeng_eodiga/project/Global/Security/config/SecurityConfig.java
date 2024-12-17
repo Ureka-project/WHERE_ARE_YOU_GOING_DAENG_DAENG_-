@@ -75,7 +75,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/visit/place/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/region/owners").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v2/region/owners").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v2/story").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v2/story/detail/**").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService,testMode), UsernamePasswordAuthenticationFilter.class);
 
