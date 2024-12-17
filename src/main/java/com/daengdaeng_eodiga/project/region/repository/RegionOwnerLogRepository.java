@@ -12,10 +12,8 @@ import com.daengdaeng_eodiga.project.region.entity.RegionOwnerLog;
 
 public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog, Integer> {
 
-
-
 	@Query(" SELECT rol.id as id, rol.city as city, rol.cityDetail as cityDetail, rol.count as count, rol.user.userId as userId, u.nickname as userNickname, " +
-		"        p.id as petId, p.name as petName, p.image as petImage "
+		"        p.petId as petId, p.name as petName, p.image as petImage "
 		+ "FROM RegionOwnerLog rol " +
 		" JOIN ( SELECT r.city AS city , r.cityDetail AS cityDetail , MAX(r.createdAt) AS createdAt " +
 		"        FROM RegionOwnerLog r " +
@@ -50,18 +48,6 @@ public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog,
             @Param("city") String city,
             @Param("cityDetail") String cityDetail);
 
-	@Query("SELECT r " +
-			"FROM RegionOwnerLog r " +
-			"WHERE r.user.userId = :userId " +
-			"AND r.city = :city " +
-			"AND r.cityDetail = :cityDetail "
-	)
-	List<Object[]> findByUserIdAndCityAndCityDetailForDetail(
-			@Param("userId") Integer userId,
-			@Param("city") String city,
-			@Param("cityDetail") String cityDetail);
-
-
 	@Query("  SELECT r "+
 		" FROM RegionOwnerLog r " +
 		" WHERE r.city = :city AND r.cityDetail = :cityDetail "
@@ -83,4 +69,3 @@ public interface RegionOwnerLogRepository  extends JpaRepository<RegionOwnerLog,
 	)
 	Optional<RegionOwnerLog> findTop1UserRegionOwnerLogAtCreated(int userId,String city, String cityDetail);
 }
-

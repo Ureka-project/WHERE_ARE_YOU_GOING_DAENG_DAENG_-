@@ -114,10 +114,6 @@ public class StoryService {
      * @return
      */
     public IndividualUserStoriesDto fetchIndividualUserStories(int landOwnerId, String city, String cityDetail){
-        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetailForDetail(landOwnerId, city, cityDetail).isEmpty() ) {
-            throw new OwnerHistoryNotFoundException();
-        }
-
         List<Object[]> results = storyRepository.findActiveStoriesByLandOwnerId(landOwnerId, city, cityDetail);
         if( results.isEmpty() ) {
             throw new UserStoryNotFoundException();
