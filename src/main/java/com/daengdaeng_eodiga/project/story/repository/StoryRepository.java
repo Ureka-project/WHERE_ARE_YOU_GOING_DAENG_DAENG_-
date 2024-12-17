@@ -36,7 +36,7 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
                                                   @Param("city") String city,
                                                   @Param("cityDetail") String cityDetail);
 
-@Query(value = """
+    @Query(value = """
 WITH StoryStatus AS (
     SELECT
         s.user_id AS landOwnerId,
@@ -108,4 +108,34 @@ ORDER BY
     END ASC
 """, nativeQuery = true)
     List<Object[]> findMainPriorityStories(@Param("userId") Integer userId);
+
+    @Query(value = """
+    WITH StoryStatus AS (
+        SELECT
+            s.user_id AS landOwnerId,
+            s.city,
+            s.city_detail,
+            MIN(s.created_at) AS group_created_at
+        FROM
+            story s
+        WHERE
+            s.end_at > NOW()
+        GROUP BY
+            s.user_id, s.city, s.city_detail
+    )
+    SELECT
+        ss.landOwnerId,
+        u.nickname,
+        ss.city,
+        ss.city_detail,
+        (SELECT p.image FROM pet p WHERE p.user_id = ss.landOwnerId ORDER BY p.pet_id ASC LIMIT 1) AS petImage,
+        ss.group_created_at
+    FROM
+        StoryStatus ss
+    JOIN
+        users u ON ss.landOwnerId = u.user_id
+    ORDER BY
+        ss.group_created_at DESC
+    """, nativeQuery = true)
+    List<Object[]> findMainPriorityStoriesForNotUser();
 }
