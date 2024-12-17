@@ -19,7 +19,6 @@ import java.util.List;
 public class StoryController {
     private final StoryService storyService;
 
-
     @PostMapping
     public ResponseEntity<ApiResponse<String>> registerStory(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
@@ -34,8 +33,9 @@ public class StoryController {
     public ResponseEntity<ApiResponse<List<GroupedUserStoriesDto>>> fetchGroupedUserStories(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
-        int userId = customOAuth2User.getUserDTO().getUserid();
-        List<GroupedUserStoriesDto> response = storyService.fetchGroupedUserStories(userId);
+        Integer userId = customOAuth2User == null ? null : customOAuth2User.getUserDTO().getUserid();
+        List<GroupedUserStoriesDto> response;
+        response = (userId == null) ? storyService.fetchGroupedUserStoriesForNotUser() : storyService.fetchGroupedUserStories(userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -48,7 +48,7 @@ public class StoryController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @GetMapping("/{landOwnerId}")
+    @GetMapping("/detail/{landOwnerId}")
     public ResponseEntity<ApiResponse<IndividualUserStoriesDto>> fetchIndividualUserStories(
             @PathVariable int landOwnerId,
             @RequestParam String city,

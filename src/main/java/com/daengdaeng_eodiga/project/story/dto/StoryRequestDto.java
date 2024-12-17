@@ -18,4 +18,5 @@ public class StoryRequestDto {
         this.city = city;
         this.cityDetail = cityDetail;
     }
+    public StoryRequestDto() {}
 }
