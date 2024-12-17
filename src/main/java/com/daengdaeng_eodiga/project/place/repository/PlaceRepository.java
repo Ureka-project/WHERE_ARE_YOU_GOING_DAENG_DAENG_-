@@ -208,6 +208,9 @@ LIMIT 30;
             "FROM Favorite f WHERE f.place.placeId = :placeId AND f.user.userId = :userId")
     boolean existsFavoriteByPlaceIdAndUserId(@Param("placeId") int placeId, @Param("userId") int userId);
 
+    @Query(value = "SELECT DISTINCT p.name FROM place p WHERE p.name LIKE CONCAT('%', :keyword, '%') LIMIT 10", nativeQuery = true)
+    List<String> findPlaceNamesByPartialKeyword(@Param("keyword") String keyword);
+
 }
 
 

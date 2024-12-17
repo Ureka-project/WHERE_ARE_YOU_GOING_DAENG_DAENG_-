@@ -55,6 +55,10 @@ public class PlaceService {
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
+    public List<String> getAutocompleteSuggestions(String keyword) {
+        return placeRepository.findPlaceNamesByPartialKeyword(keyword);
+    }
+
     public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, Integer userId) {
         Integer effectiveUserId = userId != null ? userId : -1;
 
