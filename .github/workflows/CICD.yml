@@ -132,6 +132,7 @@ jobs:
             echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
             echo "EC2_DNS_PUBLICE_V2=${{ secrets.EC2_DNS_PUBLICE_V2 }}" >> .env
             echo "DOMAIN_V2=${{ secrets.DOMAIN_V2 }}" >> .env
+            echo "ELASTIC_IP_V2=${{ secrets.ELASTIC_IP_V2 }}" >> .env
             sudo docker-compose --env-file /home/ubuntu/.env -f /home/ubuntu/docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d
 
       - name: Change nginx upstream
