@@ -33,8 +33,8 @@ public class SecurityConfig {
     private final Boolean testMode;
     private final OuathController ouathController;
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
-                          RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode,
-                          OuathController ouathController) {
+    RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode,
+        OuathController ouathController) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
@@ -51,13 +51,14 @@ public class SecurityConfig {
     public CorsConfiguration corsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://pet.daengdaeng-where.link","https://daengdaeng-where-git-test-wldusdns-projects.vercel.app"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:5173","https://pet.daengdaeng-where.link","https://daengdaeng-where-git-test-wldusdns-projects.vercel.app","https://fronttest.daengdaeng-where.link"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Set-Cookie","Access-Control-Allow-Origin"));
         configuration.setExposedHeaders(List.of("Set-Cookie","Access-Control-Allow-Origin"));
 
         return configuration;
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -67,16 +68,18 @@ public class SecurityConfig {
         http.cors(cors -> cors.configurationSource(request -> corsConfiguration()));
 
         http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/v1/loginSuccess","/login","/env","/hc", "/favicon.ico","https://pet.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/user/duplicateNickname").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/visit/place/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/region/owners").permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService,testMode), UsernamePasswordAuthenticationFilter.class);
+            .authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/api/v1/loginSuccess","/login", "/favicon.ico","https://pet.daengdaeng-where.link/login","/api/v1/places/**","/login/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/user/duplicateNickname").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/banners/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/reviews/place/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/visit/place/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v2/region/owners").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v2/story").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v2/story/detail/**").permitAll()
+                .anyRequest().authenticated())
+            .addFilterBefore(new JWTFilter(jwtUtil,redisTokenRepository,userService,testMode), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .oauth2Login((oauth2) -> oauth2
@@ -88,8 +91,8 @@ public class SecurityConfig {
 
 
         http
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(authenticationEntryPoint));
+            .exceptionHandling(exception -> exception
+                                .authenticationEntryPoint(authenticationEntryPoint));
 
 
         http

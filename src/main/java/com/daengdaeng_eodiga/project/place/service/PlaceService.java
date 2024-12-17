@@ -5,7 +5,10 @@ import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.place.dto.*;
 import com.daengdaeng_eodiga.project.place.entity.Place;
+import com.daengdaeng_eodiga.project.place.entity.PlaceMedia;
+import com.daengdaeng_eodiga.project.place.entity.PlaceScore;
 import com.daengdaeng_eodiga.project.place.entity.ReviewSummary;
+import com.daengdaeng_eodiga.project.place.repository.PlaceMediaRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceRepository;
 import com.daengdaeng_eodiga.project.place.repository.PlaceScoreRepository;
 import com.daengdaeng_eodiga.project.preference.dto.UserRequsetPrefernceDto;
@@ -43,6 +46,7 @@ public class PlaceService {
     private final OpenAiService openAiService;
     private final CommonCodeService commonCodeService;
     private final RedisLocationRepository redisLocationRepository;
+    private final PlaceMediaRepository placeMediaRepository;
     private static final Logger logger = LoggerFactory.getLogger(PlaceService.class);
 
     public List<PlaceDto> filterPlaces(String city, String cityDetail, String placeTypeCode, Double latitude, Double longitude, Integer userId) {
@@ -51,11 +55,21 @@ public class PlaceService {
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
+    public List<String> getAutocompleteSuggestions(String keyword) {
+        return placeRepository.findPlaceNamesByPartialKeyword(keyword);
+    }
+
     public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, Integer userId) {
         Integer effectiveUserId = userId != null ? userId : -1;
-        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, latitude, longitude, effectiveUserId);
+
+        String formattedKeyword = Arrays.stream(keyword.split("\\s+"))
+                .map(word -> word + "*")
+                .collect(Collectors.joining(" "));
+
+        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, formattedKeyword, latitude, longitude, effectiveUserId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
+
 
     private boolean checkIfUserFavoritedPlace(int placeId, Integer userId) {
         return placeRepository.existsFavoriteByPlaceIdAndUserId(placeId, userId);
@@ -372,5 +386,17 @@ public class PlaceService {
     private List<String> getRandomReviews(List<String> reviews, int limit) {
         Collections.shuffle(reviews);
         return reviews.subList(0, limit);
+    }
+
+    public Place savePlace(Place place) {
+        PlaceScore placeScore = new PlaceScore();
+        placeScore.setPlace(place);
+        place.setPlaceScores(placeScore);
+        Place savedPlace = placeRepository.save(place);
+        return savedPlace;
+    }
+    public void savePlaceMedia(Place place, String imagePath) {
+        PlaceMedia placeMedia = PlaceMedia.builder().place(place).path(imagePath).build();
+        placeMediaRepository.save(placeMedia);
     }
 }

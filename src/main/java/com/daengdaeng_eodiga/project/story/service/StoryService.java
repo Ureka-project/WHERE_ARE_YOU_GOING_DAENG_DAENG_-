@@ -36,6 +36,7 @@ public class StoryService {
      */
     public void registerStory(int userId, StoryRequestDto storyRequestDto){
         if( storyRepository.countByTodayCreated(
+                userId,
                 LocalDate.now().atStartOfDay(),
                 LocalDate.now().plusDays(1).atStartOfDay()) == 10 ) {
             throw new DailyStoryUploadLimitException();
@@ -80,6 +81,25 @@ public class StoryService {
     }
 
     /**
+     * 비회원 전용 전체 유저 스토리 목록 조회
+     * @param
+     * @return
+     */
+    public List<GroupedUserStoriesDto> fetchGroupedUserStoriesForNotUser(){
+        List<Object[]> results = storyRepository.findMainPriorityStoriesForNotUser();
+
+        return results.stream()
+                .map(row -> GroupedUserStoriesDto.builder()
+                        .landOwnerId((Integer) row[0])
+                        .nickname((String) row[1])
+                        .city((String) row[2])
+                        .cityDetail((String) row[3])
+                        .petImage((String) row[4])
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 내 스토리 목록 조회
      * @param userId
      * @return
@@ -114,10 +134,6 @@ public class StoryService {
      * @return
      */
     public IndividualUserStoriesDto fetchIndividualUserStories(int landOwnerId, String city, String cityDetail){
-        if( regionOwnerLogRepository.findByUserIdAndCityAndCityDetailForDetail(landOwnerId, city, cityDetail).isEmpty() ) {
-            throw new OwnerHistoryNotFoundException();
-        }
-
         List<Object[]> results = storyRepository.findActiveStoriesByLandOwnerId(landOwnerId, city, cityDetail);
         if( results.isEmpty() ) {
             throw new UserStoryNotFoundException();

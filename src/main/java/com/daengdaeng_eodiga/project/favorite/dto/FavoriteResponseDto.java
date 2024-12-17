@@ -15,9 +15,10 @@ public class FavoriteResponseDto {
     private Double longitude;
     private String startTime;
     private String endTime;
+    private String updatedAt;
 
     @Builder
-    public FavoriteResponseDto(int favoriteId, int placeId, String name, String placeImage, String placeType, String streetAddresses, Double latitude, Double longitude, String startTime, String endTime) {
+    public FavoriteResponseDto(int favoriteId, int placeId, String name, String placeImage, String placeType, String streetAddresses, Double latitude, Double longitude, String startTime, String endTime, String updatedAt) {
         this.favoriteId = favoriteId;
         this.placeId = placeId;
         this.name = name;
@@ -28,5 +29,6 @@ public class FavoriteResponseDto {
         this.longitude = longitude;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.updatedAt = updatedAt;
     }
 }

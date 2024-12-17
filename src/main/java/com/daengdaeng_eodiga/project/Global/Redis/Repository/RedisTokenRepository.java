@@ -1,19 +1,19 @@
 package com.daengdaeng_eodiga.project.Global.Redis.Repository;
 
 import com.daengdaeng_eodiga.project.Global.Security.config.JWTUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
-import java.util.Set;
+import org.springframework.stereotype.Repository;
 import java.util.concurrent.TimeUnit;
 
-@Component
+@Repository
 public class RedisTokenRepository {
     public final RedisTemplate<String, String> redisTemplate;
     public final  JWTUtil jwtUtil;
-    public RedisTokenRepository(RedisTemplate<String, String> redisTemplate,JWTUtil jwtUtil) {
+
+    @Autowired
+    public RedisTokenRepository(@Qualifier(value = "redisTemplate")RedisTemplate<String, String> redisTemplate, JWTUtil jwtUtil) {
         this.redisTemplate = redisTemplate;
         this.jwtUtil = jwtUtil;
     }
@@ -25,7 +25,6 @@ public class RedisTokenRepository {
             redisTemplate.opsForValue().set("refreshToken:" +refreshToken, email, expiration, TimeUnit.MILLISECONDS);
             String storedToken =  redisTemplate.opsForValue().get("refreshToken:" + refreshToken);
     }
-
 
     public String getToken(String email) {
         return redisTemplate.opsForValue().get("refreshToken:" + email);
@@ -42,5 +41,4 @@ public class RedisTokenRepository {
     public boolean isBlacklisted(String token) {
         return Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:" + token));
     }
-
 }

@@ -14,8 +14,11 @@ import java.util.Optional;
 public interface StoryRepository extends JpaRepository<Story, Integer> {
     Optional<Story> findByStoryId(int storyId);
 
-    @Query("SELECT COUNT(s) FROM Story s WHERE s.createdAt BETWEEN :todayStart AND :tomorrowStart")
-    long countByTodayCreated(@Param("todayStart") LocalDateTime todayStart,
+    @Query("SELECT COUNT(s) FROM Story s " +
+            "WHERE s.createdAt BETWEEN :todayStart AND :tomorrowStart " +
+            "AND s.user.userId = :userId ")
+    long countByTodayCreated(@Param("userId") Integer userId,
+                             @Param("todayStart") LocalDateTime todayStart,
                              @Param("tomorrowStart") LocalDateTime  tomorrowStart);
 
     @Query("SELECT s.user.nickname, s.storyId, s.city, s.cityDetail, s.path " +
@@ -36,7 +39,7 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
                                                   @Param("city") String city,
                                                   @Param("cityDetail") String cityDetail);
 
-@Query(value = """
+    @Query(value = """
 WITH StoryStatus AS (
     SELECT
         s.user_id AS landOwnerId,
@@ -80,7 +83,7 @@ GroupedStoryStatus AS (
         MIN(group_created_at) DESC,
         MAX(CASE WHEN story_type = 'viewed' THEN story_viewed_at ELSE NULL END) ASC
 )
-SELECT DISTINCT
+SELECT
     gss.landOwnerId,
     u.nickname,
     gss.city,
@@ -105,7 +108,37 @@ ORDER BY
     CASE
         WHEN gss.group_story_type = 'viewed' THEN gss.latest_story_viewed_at
         ELSE NULL
-    END ASC;
+    END ASC
 """, nativeQuery = true)
     List<Object[]> findMainPriorityStories(@Param("userId") Integer userId);
+
+    @Query(value = """
+    WITH StoryStatus AS (
+        SELECT
+            s.user_id AS landOwnerId,
+            s.city,
+            s.city_detail,
+            MIN(s.created_at) AS group_created_at
+        FROM
+            story s
+        WHERE
+            s.end_at > NOW()
+        GROUP BY
+            s.user_id, s.city, s.city_detail
+    )
+    SELECT
+        ss.landOwnerId,
+        u.nickname,
+        ss.city,
+        ss.city_detail,
+        (SELECT p.image FROM pet p WHERE p.user_id = ss.landOwnerId ORDER BY p.pet_id ASC LIMIT 1) AS petImage,
+        ss.group_created_at
+    FROM
+        StoryStatus ss
+    JOIN
+        users u ON ss.landOwnerId = u.user_id
+    ORDER BY
+        ss.group_created_at DESC
+    """, nativeQuery = true)
+    List<Object[]> findMainPriorityStoriesForNotUser();
 }

@@ -21,4 +21,13 @@ public class GroupedUserStoriesDto {
         this.petImage = petImage;
         this.storyType = storyType;
     }
+
+    @Builder
+    public GroupedUserStoriesDto(int landOwnerId, String nickname, String city, String cityDetail, String petImage) {
+        this.landOwnerId = landOwnerId;
+        this.nickname = nickname;
+        this.city = city;
+        this.cityDetail = cityDetail;
+        this.petImage = petImage;
+    }
 }
