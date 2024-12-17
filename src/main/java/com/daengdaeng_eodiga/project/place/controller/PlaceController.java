@@ -55,6 +55,12 @@ public class PlaceController {
         return ResponseEntity.ok(ApiResponse.success(places));
     }
 
+    @GetMapping("/autocomplete")
+    public ResponseEntity<ApiResponse<List<String>>> getAutocompleteSuggestions(@RequestParam String keyword) {
+        List<String> suggestions = placeService.getAutocompleteSuggestions(keyword);
+        return ResponseEntity.ok(ApiResponse.success(suggestions));
+    }
+
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<List<PlaceDto>>> searchPlaces(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
