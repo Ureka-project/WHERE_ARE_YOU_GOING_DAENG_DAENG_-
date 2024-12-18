@@ -25,8 +25,10 @@ import java.util.Optional;
         private final UserRepository userRepository; // UserRepository 추가
         private final RedisTokenRepository redisTokenRepository;
 
+
         @Value("${frontend.url}")
         private String frontUrl;
+
 
         public CustomSuccessHandler(JWTUtil jwtUtil,UserRepository userRepository, RedisTokenRepository redisTokenRepository) {
             this.jwtUtil = jwtUtil;
