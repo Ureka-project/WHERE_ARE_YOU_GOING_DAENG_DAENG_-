@@ -1,8 +1,11 @@
 package com.daengdaeng_eodiga.project.review.service;
 
+import static com.daengdaeng_eodiga.project.Global.enums.ErrorCode.*;
+
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daengdaeng_eodiga.project.Global.enums.OrderType;
+import com.daengdaeng_eodiga.project.Global.exception.DuplicateReviewException;
 import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
@@ -62,6 +66,12 @@ public class ReviewService {
 		Place place = placeService.findPlace(request.placeId());
 		List<Pet> pets = petService.confirmUserPet(user, request.pets());
 
+		LocalDate today = LocalDate.now();
+		LocalDateTime startOfDay = today.atStartOfDay();
+		LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+		checkDuplicateReviewTodayForPlace(user, place, startOfDay, endOfDay);
+
 		Review review = createAndSaveReview(request, user, place);
 
 		List<ReviewPet> savedReviewPets = saveReviewPetsIfPresent(review, pets);
@@ -70,6 +80,12 @@ public class ReviewService {
 		addCountVisitRegion(user, place, review);
 		calculatePlaceReviewScore(place, review);
 		return createReviewDto(review, savedReviewPets, savedReviewKeywords, savedReviewMedia);
+	}
+
+	private void checkDuplicateReviewTodayForPlace(User user, Place place, LocalDateTime startOfDay, LocalDateTime endOfDay) {
+		reviewRepository.findByUserAndPlaceAndCreatedAt(user, place, startOfDay, endOfDay).ifPresent(review -> {
+			throw new DuplicateReviewException();
+		});
 	}
 
 	private void calculatePlaceReviewScore(Place place, Review review) {
@@ -157,7 +173,7 @@ public class ReviewService {
 
 	public ReviewsResponse fetchPlaceReviews(int placeId, int page, int size, OrderType orderType) {
 		Place place = placeService.findPlace(placeId);
-		Double scoreDouble = placeService.findPlaceScore(placeId);
+		Double scoreDouble = place.getPlaceScores().getScore();
 
 		DecimalFormat df = new DecimalFormat("#.##");
 		String score = df.format(scoreDouble);
@@ -177,6 +193,22 @@ public class ReviewService {
 
 		return response;
 	}
+
+	public ReviewsResponse fetchPlaceReviewsByNoOffset(int placeId, OrderType orderType, int lastReviewId, int lastScore,int size) {
+		Place place = placeService.findPlace(placeId);
+		Double scoreDouble = place.getPlaceScores().getScore();
+
+		DecimalFormat df = new DecimalFormat("#.##");
+		String score = df.format(scoreDouble);
+
+		List<Review> reviews = reviewRepository.findAllByPlace(place.getPlaceId(), orderType,lastReviewId<0?0:lastReviewId,lastScore<-1?-1:lastScore,size);
+		List<ReviewDto> reviewDtos = getReviewDtoByReviewByReview(reviews);
+		List<String> keywords = reviewKeywordsService.fetchBestReviewKeywordsTop3(placeId);
+		ReviewsResponse response = new ReviewsResponse(reviewDtos,0,0,reviews.size(),false,false,orderType,score,keywords.stream().map(keyword -> commonCodeService.getCommonCodeName(keyword)).collect(Collectors.toList()));
+
+		return response;
+	}
+
 
 	public ReviewsResponse fetchUserReviews(int userId,int page, int size) {
 		User user = userService.findUser(userId);
@@ -222,6 +254,40 @@ public class ReviewService {
 		}
 		return reviews;
 	}
+
+	private List<ReviewDto> getReviewDtoByReviewByReview(List<Review> reviews) {
+		List<ReviewDto> reviewDtos = new ArrayList<>();
+		for (Review review : reviews) {
+
+			LocalDate visitedAt = review.getVisitedAt();
+			LocalDateTime createdAt = review.getCreatedAt();
+			User user = review.getUser();
+
+			List<String> pets = review.getReviewPets().stream().map(pet -> pet.getPet().getName()).toList();
+			List<String> media = review.getReviewMedias().stream().map(ReviewMedia::getPath).toList();
+			List<String> keywords = review.getReviewKeywords().stream().map(keyword -> commonCodeService.getCommonCodeName(keyword.getId().getKeyword()) ).collect(Collectors.toList());
+
+			ReviewDto reviewDto = new ReviewDto(
+				user.getUserId(),
+				review.getPlace().getPlaceId(),
+				user.getNickname(),
+				review.getReviewPets().size()>0 ? review.getReviewPets().get(0).getPet().getImage() : null,
+				review.getReviewId(),
+				pets,
+				review.getContent(),
+				review.getScore(),
+				media,
+				keywords,
+				visitedAt,
+				createdAt,
+				review.getPlace().getName(),
+				commonCodeService.getCommonCodeName(review.getReviewtype())
+			);
+			reviewDtos.add(reviewDto);
+		}
+		return reviewDtos;
+	}
+
 
 	private static List<String> getStrings(String str) {
 		List<String> pets;

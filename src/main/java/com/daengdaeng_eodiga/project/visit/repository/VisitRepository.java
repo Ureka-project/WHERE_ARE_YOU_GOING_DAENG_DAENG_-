@@ -2,11 +2,13 @@ package com.daengdaeng_eodiga.project.visit.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.daengdaeng_eodiga.project.notification.entity.PushToken;
+import com.daengdaeng_eodiga.project.user.entity.User;
 import com.daengdaeng_eodiga.project.visit.dto.VisitInfo;
 import com.daengdaeng_eodiga.project.visit.entity.Visit;
 
@@ -35,4 +37,13 @@ public interface VisitRepository extends JpaRepository<Visit, Integer> {
 		"AND u.deletedAt IS NULL "
 	)
 	List<PushToken> findPushTokenByVisitId(int visitId,int userId);
+
+	/**
+	 * 동일한 시간에 방문 예정이 등록되어 있는지 조회
+	 *
+	 * @author 김가은
+	 * */
+
+	@Query("SELECT v FROM Visit v WHERE v.visitAt BETWEEN :startTime AND :endTime AND v.user = :user")
+	Optional<Visit> findByUserAndVisitAt( User user, LocalDateTime startTime, LocalDateTime endTime);
 }
