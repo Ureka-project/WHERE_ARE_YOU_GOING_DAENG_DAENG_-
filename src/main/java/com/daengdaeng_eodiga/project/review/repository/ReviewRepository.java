@@ -5,14 +5,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.daengdaeng_eodiga.project.place.entity.Place;
 import com.daengdaeng_eodiga.project.review.entity.Review;
+import com.daengdaeng_eodiga.project.user.entity.User;
+
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+public interface ReviewRepository extends JpaRepository<Review, Integer>, ReviewRepositoryCustom {
 
-public interface ReviewRepository extends JpaRepository<Review, Integer> {
+	@Query("SELECT r FROM Review r WHERE r.user = :user AND r.place = :place AND  r.createdAt BETWEEN :startOfDay AND :endOfDay")
+	Optional<Review> findByUserAndPlaceAndCreatedAt(User user, Place place, LocalDateTime startOfDay, LocalDateTime endOfDay);
 
 	@Query(value = "SELECT "
 		+ "         u.user_id AS userId, r.place_id, u.nickname, "
