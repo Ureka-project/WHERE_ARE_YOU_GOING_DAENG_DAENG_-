@@ -167,8 +167,26 @@ public class JWTUtil {
     public static String serialize(OAuth2AuthorizationRequest authorizationRequest) {
         return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(authorizationRequest));
     }
+    public static <T> T deserialize(Cookie cookie, Class<T> clazz) {
+        if (cookie == null || cookie.getValue() == null) {
+            throw new IllegalArgumentException("Cookie 또는 Cookie 값이 null입니다.");
+        }
 
-    public static <T> T deserialize(Cookie cookie, Class<T> cls) {
-        return cls.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
+        try {
+            // Base64 디코딩
+            byte[] decodedBytes = Base64.getUrlDecoder().decode(cookie.getValue());
+            // 역직렬화
+            Object deserializedObject = SerializationUtils.deserialize(decodedBytes);
+
+            // 객체 타입 검증
+            if (clazz.isInstance(deserializedObject)) {
+                return clazz.cast(deserializedObject);
+            } else {
+                throw new IllegalArgumentException("역직렬화된 객체가 예상 타입과 일치하지 않습니다: " + clazz);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("역직렬화 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
+
 }
