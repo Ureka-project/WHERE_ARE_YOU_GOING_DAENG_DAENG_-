@@ -51,6 +51,12 @@ public class ReviewController {
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
+	@GetMapping("/reviews/place/no-offset/{placeId}/{orderType}")
+	public ResponseEntity<ApiResponse<ReviewsResponse>> fetchPlaceReviews2(@PathVariable int placeId, @PathVariable OrderType orderType, @RequestParam int lastReviewId, @RequestParam int lastScore,@Min(1) @RequestParam int size) {
+		ReviewsResponse response = reviewService.fetchPlaceReviewsByNoOffset(placeId,orderType,lastReviewId,lastScore,size);
+		return ResponseEntity.ok(ApiResponse.success(response));
+	}
+
 	@GetMapping("/reviews/user")
 	public ResponseEntity<ApiResponse<ReviewsResponse>> fetchUserReviews(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @Min(0) @RequestParam int page, @Min(1)@RequestParam int size) {
 		int userId = customOAuth2User.getUserDTO().getUserid();

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-public interface ReviewRepository extends JpaRepository<Review, Integer> {
+public interface ReviewRepository extends JpaRepository<Review, Integer>, ReviewRepositoryCustom {
 
 	@Query(value = "SELECT "
 		+ "         u.user_id AS userId, r.place_id, u.nickname, "
