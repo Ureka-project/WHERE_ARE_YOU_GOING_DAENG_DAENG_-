@@ -1,8 +1,11 @@
 package com.daengdaeng_eodiga.project.review.service;
 
+import static com.daengdaeng_eodiga.project.Global.enums.ErrorCode.*;
+
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daengdaeng_eodiga.project.Global.enums.OrderType;
+import com.daengdaeng_eodiga.project.Global.exception.DuplicateReviewException;
 import com.daengdaeng_eodiga.project.Global.exception.PlaceNotFoundException;
 import com.daengdaeng_eodiga.project.common.service.CommonCodeService;
 import com.daengdaeng_eodiga.project.pet.entity.Pet;
@@ -62,6 +66,12 @@ public class ReviewService {
 		Place place = placeService.findPlace(request.placeId());
 		List<Pet> pets = petService.confirmUserPet(user, request.pets());
 
+		LocalDate today = LocalDate.now();
+		LocalDateTime startOfDay = today.atStartOfDay();
+		LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+		checkDuplicateReviewTodayForPlace(user, place, startOfDay, endOfDay);
+
 		Review review = createAndSaveReview(request, user, place);
 
 		List<ReviewPet> savedReviewPets = saveReviewPetsIfPresent(review, pets);
@@ -70,6 +80,12 @@ public class ReviewService {
 		addCountVisitRegion(user, place, review);
 		calculatePlaceReviewScore(place, review);
 		return createReviewDto(review, savedReviewPets, savedReviewKeywords, savedReviewMedia);
+	}
+
+	private void checkDuplicateReviewTodayForPlace(User user, Place place, LocalDateTime startOfDay, LocalDateTime endOfDay) {
+		reviewRepository.findByUserAndPlaceAndCreatedAt(user, place, startOfDay, endOfDay).ifPresent(review -> {
+			throw new DuplicateReviewException();
+		});
 	}
 
 	private void calculatePlaceReviewScore(Place place, Review review) {
