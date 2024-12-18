@@ -31,7 +31,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         String errorMessage = exception.getMessage();
         String email = null;
-        log.error(errorMessage);
+        log.error(errorMessage, exception);
         OauthProvider provider = null;
         if (errorMessage != null) {
             if (errorMessage.startsWith("REDIRECT_TO_SIGNUP:")) {
