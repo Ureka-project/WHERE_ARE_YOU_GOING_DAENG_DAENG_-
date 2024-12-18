@@ -14,6 +14,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,9 +34,11 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final Boolean testMode;
     private final OuathController ouathController;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
     RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode,
-        OuathController ouathController) {
+        OuathController ouathController,HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
@@ -44,8 +48,8 @@ public class SecurityConfig {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
         this.testMode = testMode;
-
         this.ouathController = ouathController;
+        this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
     }
     @Bean
     public CorsConfiguration corsConfiguration() {
@@ -84,11 +88,14 @@ public class SecurityConfig {
 
         http
                 .oauth2Login((oauth2) -> oauth2
+                        .authorizationEndpoint((authorization) -> authorization
+                                .authorizationRequestRepository(cookieOAuth2AuthorizationRequestRepository())) // Authorization Request Repository 설정
                         .userInfoEndpoint((userInfo) -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(customSuccessHandler)
-                        .failureHandler(new CustomAuthenticationFailureHandler(ouathController))
+                                .userService(customOAuth2UserService)) // 사용자 정보 서비스 설정
+                        .successHandler(customSuccessHandler) // 성공 핸들러
+                        .failureHandler(new CustomAuthenticationFailureHandler(ouathController)) // 실패 핸들러
                 );
+
 
 
         http
@@ -102,5 +109,8 @@ public class SecurityConfig {
 
         return http.build();
     }
-
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> cookieOAuth2AuthorizationRequestRepository() {
+        return httpCookieOAuth2AuthorizationRequestRepository;
+    }
 }
