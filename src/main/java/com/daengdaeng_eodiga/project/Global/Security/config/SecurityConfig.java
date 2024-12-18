@@ -35,11 +35,10 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final Boolean testMode;
     private final OuathController ouathController;
-    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler, JWTUtil jwtUtil,
     RedisTokenRepository redisTokenRepository,UserService userService,CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler,@Value("${frontend.test}") Boolean testMode,
-        OuathController ouathController,HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+        OuathController ouathController) {
 
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
@@ -50,7 +49,6 @@ public class SecurityConfig {
         this.accessDeniedHandler = accessDeniedHandler;
         this.testMode = testMode;
         this.ouathController = ouathController;
-        this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
     }
     @Bean
     public CorsConfiguration corsConfiguration() {
@@ -89,8 +87,6 @@ public class SecurityConfig {
 
         http
                 .oauth2Login((oauth2) -> oauth2
-                        .authorizationEndpoint((authorization) -> authorization
-                                .authorizationRequestRepository(authorizationRequestRepository()))
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler)
@@ -111,9 +107,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
-        return new HttpSessionOAuth2AuthorizationRequestRepository();
-    }
+
 
 }
