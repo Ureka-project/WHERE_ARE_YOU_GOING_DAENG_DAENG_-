@@ -1,5 +1,6 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
+import com.daengdaeng_eodiga.project.Global.Security.dto.OAuth2AuthorizationRequestDTO;
 import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
 import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 
@@ -16,10 +17,10 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SignatureException;
@@ -172,7 +173,15 @@ public class JWTUtil {
     }
 
     public static String serialize(Object object) {
-        return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize((Serializable) object));
+        if (object instanceof OAuth2AuthorizationRequest) {
+            OAuth2AuthorizationRequest authRequest = (OAuth2AuthorizationRequest) object;
+            OAuth2AuthorizationRequestDTO dto = new OAuth2AuthorizationRequestDTO(authRequest.getAuthorizationUri(), authRequest.getClientId());
+            return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(dto));
+        }
+        else
+        {
+            throw new IllegalArgumentException("Object must be Serializable");
+        }
     }
 
     public static <T> T deserialize(Cookie cookie, Class<T> cls) {
