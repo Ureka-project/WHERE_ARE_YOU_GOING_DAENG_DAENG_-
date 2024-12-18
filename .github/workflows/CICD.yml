@@ -127,7 +127,7 @@ jobs:
             echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}" >> .env
             echo "AWS_S3_URL=${{ secrets.AWS_S3_URL }}" >> .env
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-            echo "FRONTEND_URL_DEPLOY=${{ secrets.FRONTEND_URL_DEPLOY }}" >> .env
+            echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
             echo "EC2_DNS_ADDRESS=${{ secrets.EC2_DNS_ADDRESS }}" >> .env
             echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
             echo "EC2_DNS_PUBLICE_V2=${{ secrets.EC2_DNS_PUBLICE_V2 }}" >> .env
