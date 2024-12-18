@@ -16,33 +16,12 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
     private static final int cookieExpireSeconds = 180;
 
 
-
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
-        Logger logger = LoggerFactory.getLogger(getClass());
-
-        try {
-            OAuth2AuthorizationRequest oAuth2AuthorizationRequest = JWTUtil.getOauthCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
-                    .map(cookie -> {
-                        try {
-                            return JWTUtil.deserialize(cookie, OAuth2AuthorizationRequest.class);
-                        } catch (Exception e) {
-                            logger.error("역직렬화 중 오류 발생: ", e);
-                            return null; // 예외가 발생하면 null 반환
-                        }
-                    })
-                    .orElse(null);
-
-            if (oAuth2AuthorizationRequest == null) {
-                logger.warn("OAuth2AuthorizationRequest가 null입니다.");
-            }
-
-            return oAuth2AuthorizationRequest;
-
-        } catch (Exception e) {
-            logger.error("OAuth2AuthorizationRequest 로드 중 오류 발생: ", e);
-            return null; // 예외 발생 시 null 반환
-        }
+        OAuth2AuthorizationRequest oAuth2AuthorizationRequest =  JWTUtil.getOauthCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
+                .map(cookie -> JWTUtil.deserialize(cookie, OAuth2AuthorizationRequest.class))
+                .orElse(null);
+        return oAuth2AuthorizationRequest;
     }
 
     @Override
@@ -64,10 +43,5 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
         return null;
     }
 
-
-    public void removeAuthorizationRequestCookies(HttpServletRequest request, HttpServletResponse response) {
-        JWTUtil.deleteOauthCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-        JWTUtil.deleteOauthCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
-    }
 
 }
