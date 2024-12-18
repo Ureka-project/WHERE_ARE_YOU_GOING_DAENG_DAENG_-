@@ -90,7 +90,7 @@ public class SecurityConfig {
         http
                 .oauth2Login((oauth2) -> oauth2
                         .authorizationEndpoint((authorization) -> authorization
-                                .authorizationRequestRepository(cookieOAuth2AuthorizationRequestRepository()))
+                                .authorizationRequestRepository(authorizationRequestRepository()))
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler)
@@ -110,12 +110,10 @@ public class SecurityConfig {
 
         return http.build();
     }
-    @Bean
-    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> cookieOAuth2AuthorizationRequestRepository() {
-        return httpCookieOAuth2AuthorizationRequestRepository;
-    }
+
     @Bean
     public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
         return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
+
 }
