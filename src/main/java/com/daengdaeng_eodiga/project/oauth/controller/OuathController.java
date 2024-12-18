@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -68,6 +69,7 @@ public class OuathController {
             .domain(".daengdaeng-where.link")
             .build();
         response.addHeader("Set-Cookie", provideCookie.toString());
+        log.info("FRONT_ULR=  " + frontUrl);
         response.sendRedirect(frontUrl+"/user-register");
     }
 
