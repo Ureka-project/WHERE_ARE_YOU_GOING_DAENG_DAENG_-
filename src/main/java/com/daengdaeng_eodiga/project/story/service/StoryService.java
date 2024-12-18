@@ -95,6 +95,7 @@ public class StoryService {
                         .city((String) row[2])
                         .cityDetail((String) row[3])
                         .petImage((String) row[4])
+                        .storyType("unviewed")
                         .build())
                 .collect(Collectors.toList());
     }
