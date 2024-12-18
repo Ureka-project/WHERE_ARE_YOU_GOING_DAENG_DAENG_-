@@ -178,7 +178,7 @@ cloud:
     auto: false
 
 frontend:
-  url: https://pet.daengdaeng-where.link
+  url: ${FRONTEND_URL_DEPLOY}
   test : false
 
 jwt:
