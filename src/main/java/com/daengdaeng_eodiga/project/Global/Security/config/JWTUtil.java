@@ -1,6 +1,5 @@
 package com.daengdaeng_eodiga.project.Global.Security.config;
 
-import com.daengdaeng_eodiga.project.Global.Security.dto.OAuth2AuthorizationRequestDTO;
 import com.daengdaeng_eodiga.project.Global.enums.Jwtexception;
 import com.daengdaeng_eodiga.project.oauth.OauthProvider;
 
@@ -15,21 +14,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.security.SignatureException;
-import java.text.SimpleDateFormat;
 import java.time.*;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
-import java.util.TimeZone;
 
 @Slf4j
 @Component
@@ -172,19 +164,11 @@ public class JWTUtil {
         }
     }
 
-    public static String serialize(Object object) {
-        if (object instanceof OAuth2AuthorizationRequest) {
-            OAuth2AuthorizationRequest authRequest = (OAuth2AuthorizationRequest) object;
-            OAuth2AuthorizationRequestDTO dto = new OAuth2AuthorizationRequestDTO(authRequest.getAuthorizationUri(), authRequest.getClientId());
-            return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(dto));
-        }
-        else
-        {
-            throw new IllegalArgumentException("Object must be Serializable");
-        }
+    public static String serialize(OAuth2AuthorizationRequest authorizationRequest) {
+        return Base64.getUrlEncoder().encodeToString(SerializationUtils.serialize(authorizationRequest));
     }
 
-    public static <T> T deserialize(Cookie cookie, Class<T> cls) {
-        return cls.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
+    public static OAuth2AuthorizationRequest deserialize(Cookie cookie, Class<OAuth2AuthorizationRequest> oAuth2AuthorizationRequestClass) {
+        return (OAuth2AuthorizationRequest) SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue()));
     }
 }

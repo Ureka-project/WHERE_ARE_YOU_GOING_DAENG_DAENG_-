@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -89,10 +90,10 @@ public class SecurityConfig {
         http
                 .oauth2Login((oauth2) -> oauth2
                         .authorizationEndpoint((authorization) -> authorization
-                                .authorizationRequestRepository(cookieOAuth2AuthorizationRequestRepository())) // Authorization Request Repository 설정
+                                .authorizationRequestRepository(cookieOAuth2AuthorizationRequestRepository()))
                         .userInfoEndpoint((userInfo) -> userInfo
-                                .userService(customOAuth2UserService)) // 사용자 정보 서비스 설정
-                        .successHandler(customSuccessHandler) // 성공 핸들러
+                                .userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler)
                         .failureHandler(new CustomAuthenticationFailureHandler(ouathController)) // 실패 핸들러
                 );
 
@@ -112,5 +113,9 @@ public class SecurityConfig {
     @Bean
     public AuthorizationRequestRepository<OAuth2AuthorizationRequest> cookieOAuth2AuthorizationRequestRepository() {
         return httpCookieOAuth2AuthorizationRequestRepository;
+    }
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
 }
