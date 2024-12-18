@@ -30,11 +30,11 @@ public class StoryController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<GroupedUserStoriesDto>>> fetchGroupedUserStories(
+    public ResponseEntity<ApiResponse<List<?>>> fetchGroupedUserStories(
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         Integer userId = customOAuth2User == null ? null : customOAuth2User.getUserDTO().getUserid();
-        List<GroupedUserStoriesDto> response;
+        List<?> response;
         response = (userId == null) ? storyService.fetchGroupedUserStoriesForNotUser() : storyService.fetchGroupedUserStories(userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
@@ -51,8 +51,8 @@ public class StoryController {
     @GetMapping("/detail/{landOwnerId}")
     public ResponseEntity<ApiResponse<IndividualUserStoriesDto>> fetchIndividualUserStories(
             @PathVariable int landOwnerId,
-            @RequestParam String city,
-            @RequestParam String cityDetail
+            @RequestParam("city") String city,
+            @RequestParam("cityDetail") String cityDetail
     ){
         IndividualUserStoriesDto response = storyService.fetchIndividualUserStories(landOwnerId, city, cityDetail);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -60,7 +60,7 @@ public class StoryController {
 
     @PutMapping("/{storyId}/viewed")
     public ResponseEntity<ApiResponse<String>> viewStory(
-            @Min (1) @PathVariable int storyId,
+            @Min (1) @PathVariable("storyId") int storyId,
             @AuthenticationPrincipal CustomOAuth2User customOAuth2User
     ){
         int userId = customOAuth2User.getUserDTO().getUserid();
@@ -70,7 +70,7 @@ public class StoryController {
 
     @DeleteMapping("/{storyId}")
     public ResponseEntity<ApiResponse<String>> deleteStory(
-            @Min (1) @PathVariable int storyId
+            @Min (1) @PathVariable("storyId") int storyId
     ){
         storyService.deleteStory(storyId);
         return ResponseEntity.ok(ApiResponse.success("story deleted successfully"));
