@@ -4,6 +4,7 @@ spring:
   jpa:
     properties:
       hibernate:
+        default_batch_fetch_size: 1000
         jdbc:
           time_zone: UTC
     hibernate:
@@ -67,6 +68,11 @@ spring:
       initialize-schema: always
     job:
       enabled: false
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 kakao:
   api:

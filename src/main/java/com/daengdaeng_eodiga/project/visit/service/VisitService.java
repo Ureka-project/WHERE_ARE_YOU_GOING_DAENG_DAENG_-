@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.daengdaeng_eodiga.project.Global.exception.DuplicatePetException;
+import com.daengdaeng_eodiga.project.Global.exception.DuplicateVisitException;
 import com.daengdaeng_eodiga.project.Global.exception.InvalidRequestException;
 import com.daengdaeng_eodiga.project.Global.exception.NotFoundException;
 import com.daengdaeng_eodiga.project.notification.controller.Publisher;
@@ -55,9 +56,24 @@ public class VisitService {
 	private final Publisher publisher;
 	private final NotificationService notificationService;
 
+
+	/**
+	 * 방문 예정 등록
+	 *
+	 * @throws DuplicateVisitException : 방문 예정이 겹친 경우
+	 * @throws NotFoundException : 유저의 펫이 아닌 경우
+	 * @author 김가은
+	 * */
+
 	public PetsAtVisitTime registerVisit(int userId, int placeId, List<Integer> petIds, LocalDateTime visitAt) {
 		Place place = placeService.findPlace(placeId);
 		User user = userService.findUser(userId);
+		if(visitAt.getMinute()<30){
+			visitAt = visitAt.withMinute(0);
+		} else {
+			visitAt = visitAt.withMinute(30);
+		}
+		checkDuplicateVisitAt(placeId, visitAt, user);
 		List<Integer> userPets = user.getPets().stream().map(pet -> {
 			return pet.getPetId();
 		}).toList();
@@ -110,6 +126,21 @@ public class VisitService {
 				})
 				.toList(), placeId, visit.getId(),place.getName());
 
+	}
+
+	/**
+	 * 방문 예정 일정이 중복되는지 조회
+	 *
+	 * @throws DuplicateVisitException : 방문 예정이 겹친 경우
+	 * @author 김가은
+	 * */
+
+	private void checkDuplicateVisitAt(int placeId, LocalDateTime visitAt, User user) {
+		visitRepository.findByUserAndVisitAt(user, visitAt, visitAt.plusMinutes(29)).ifPresent(visit -> {
+			if(visit.getPlace().getPlaceId() != placeId){
+				throw new DuplicateVisitException();
+			}
+		});
 	}
 
 	public void cancelVisit(int userId, int visitId) {
