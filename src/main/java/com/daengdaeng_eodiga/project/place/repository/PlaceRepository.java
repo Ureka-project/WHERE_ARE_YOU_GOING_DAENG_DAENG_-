@@ -21,14 +21,16 @@ SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.long
        CAST(o.end_time AS CHAR) AS end_time,
        (SELECT COUNT(*) FROM favorite f WHERE f.place_id = p.place_id) AS favorite_count,
        ps.score AS place_score,
-       p.thumb_img_path AS imageurl
+       pm.path AS imageurl
 FROM place p
 LEFT JOIN common_code c ON p.place_type = c.code_id
 LEFT JOIN opening_date o ON o.place_id = p.place_id
-LEFT JOIN place_score ps ON p.place_id = ps.place_id
+LEFT JOIN place_score ps ON ps.place_id = p.place_id
+LEFT JOIN place_media pm ON pm.place_id = p.place_id
 WHERE p.place_id = :placeId;
 """, nativeQuery = true)
     List<Object[]> findPlaceDetailsById(@Param("placeId") int placeId);
+
 
 
 
@@ -176,15 +178,19 @@ SELECT p.place_id, p.name, p.city, p.city_detail, p.township, p.latitude, p.long
        CAST(o.end_time AS CHAR) AS end_time,
        (SELECT COUNT(f2.favorite_id) FROM favorite f2 WHERE f2.place_id = p.place_id) AS favorite_count,
        ps.score AS place_score,
-       p.thumb_img_path AS imageurl
+       p.thumb_img_path AS imageurl,
+       CASE 
+           WHEN p.name = :keyword THEN 1  
+           ELSE 2                          
+       END AS relevance
 FROM place p
 LEFT JOIN common_code c ON p.place_type = c.code_id
 LEFT JOIN favorite f ON p.place_id = f.place_id AND f.user_id = :userId
 LEFT JOIN opening_date o ON o.place_id = p.place_id
 LEFT JOIN place_score ps ON ps.place_id = p.place_id
 WHERE MATCH(p.name) AGAINST(:formattedKeyword IN BOOLEAN MODE)
-   OR p.name LIKE CONCAT('%', :keyword, '%')
-ORDER BY distance ASC
+   OR p.name = :keyword
+ORDER BY relevance ASC, distance ASC
 LIMIT 30;
 """, nativeQuery = true)
     List<Object[]> findByKeywordAndLocation(
@@ -194,8 +200,6 @@ LIMIT 30;
             @Param("longitude") Double longitude,
             @Param("userId") Integer userId
     );
-
-
 
 
 

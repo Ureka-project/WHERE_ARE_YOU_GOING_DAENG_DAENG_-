@@ -70,8 +70,8 @@ public class PlaceService {
         String formattedKeyword = Arrays.stream(keyword.split("\\s+"))
                 .map(word -> word + "*")
                 .collect(Collectors.joining(" "));
-        String likeKeyword = "%" + keyword.replace(" ", "%") + "%";
-        List<Object[]> results = placeRepository.findByKeywordAndLocation(likeKeyword, formattedKeyword, latitude, longitude, effectiveUserId);
+
+        List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, formattedKeyword, latitude, longitude, effectiveUserId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
 
