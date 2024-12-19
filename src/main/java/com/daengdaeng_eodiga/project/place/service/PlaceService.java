@@ -62,6 +62,11 @@ public class PlaceService {
     public List<PlaceDto> searchPlaces(String keyword, Double latitude, Double longitude, Integer userId) {
         Integer effectiveUserId = userId != null ? userId : -1;
 
+        if (latitude == 0.0 && longitude == 0.0) {
+            latitude = 37.5664056;
+            longitude = 126.9778222;
+        }
+
         String formattedKeyword = Arrays.stream(keyword.split("\\s+"))
                 .map(word -> word + "*")
                 .collect(Collectors.joining(" "));
@@ -69,6 +74,7 @@ public class PlaceService {
         List<Object[]> results = placeRepository.findByKeywordAndLocation(keyword, formattedKeyword, latitude, longitude, effectiveUserId);
         return results.stream().map(PlaceDtoMapper::convertToPlaceDto).collect(Collectors.toList());
     }
+
 
 
     private boolean checkIfUserFavoritedPlace(int placeId, Integer userId) {
