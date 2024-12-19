@@ -115,6 +115,7 @@ public class FavoriteService {
         String startTime = openingDate != null ? openingDate.getStartTime() : OpenHoursType.NO_INFO.getDescription();
         String endTime = openingDate != null ? openingDate.getEndTime() : OpenHoursType.NO_INFO.getDescription();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String updatedAt = favorite.getUpdatedAt() != null ? favorite.getUpdatedAt().format(formatter) : "N/A";
 
         return FavoriteResponseDto.builder()
                 .favoriteId(favorite.getFavoriteId())
@@ -127,7 +128,7 @@ public class FavoriteService {
                 .longitude(place.getLongitude())
                 .startTime(startTime)
                 .endTime(endTime)
-                .updatedAt((favorite.getUpdatedAt()).format(formatter))
+                .updatedAt(updatedAt)
                 .build();
     }
 }

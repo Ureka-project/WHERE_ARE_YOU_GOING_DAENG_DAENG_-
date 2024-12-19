@@ -3,6 +3,7 @@ package com.daengdaeng_eodiga.project.pet.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -27,4 +28,16 @@ public class PetRegisterDto {
 
     @NotNull(message = "중성화 여부가 필요함")
     private Boolean neutering;
+
+    @Builder
+    public PetRegisterDto(String name, String image, String species, String birthday, String gender, String size, Boolean neutering) {
+        this.name = name;
+        this.image = image;
+        this.species = species;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.size = size;
+        this.neutering = neutering;
+    }
+    public PetRegisterDto() {}
 }

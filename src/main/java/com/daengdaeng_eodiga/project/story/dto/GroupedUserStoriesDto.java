@@ -30,4 +30,6 @@ public class GroupedUserStoriesDto {
         this.cityDetail = cityDetail;
         this.petImage = petImage;
     }
+
+    public GroupedUserStoriesDto(){}
 }

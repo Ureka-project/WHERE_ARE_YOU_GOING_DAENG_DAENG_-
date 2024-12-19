@@ -2,6 +2,7 @@ package com.daengdaeng_eodiga.project.Global.entity;
 
 import java.time.LocalDateTime;
 
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,6 +14,7 @@ import lombok.Getter;
 
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@Setter
 @MappedSuperclass
 public class BaseEntity {
 
