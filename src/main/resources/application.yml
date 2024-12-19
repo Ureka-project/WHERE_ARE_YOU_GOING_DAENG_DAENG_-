@@ -96,7 +96,7 @@ spring:
     show-sql: true
 
   datasource:
-    url: jdbc:mysql://${EC2_DNS_PUBLICE_V2}:6033/lixxce?&rewriteBatchedStatements=true
+    url: jdbc:mysql://${MYSQL_DOMAIN_V2}:3306/lixxce?&rewriteBatchedStatements=true
     username: root
     password: ${MYSQL_PWD_V2}
     driver-class-name: com.mysql.cj.jdbc.Driver
