@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.common.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 @Entity
@@ -17,5 +18,11 @@ public class CommonCode {
 
     private String name;
 
-
+    @Builder
+    public CommonCode(String codeId, GroupCode groupCode, String name) {
+        this.codeId = codeId;
+        this.groupCode = groupCode;
+        this.name = name;
+    }
+    public CommonCode() {}
 }

@@ -6,9 +6,11 @@ import com.daengdaeng_eodiga.project.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "Favorite")
 public class Favorite extends BaseEntity {
     @Id

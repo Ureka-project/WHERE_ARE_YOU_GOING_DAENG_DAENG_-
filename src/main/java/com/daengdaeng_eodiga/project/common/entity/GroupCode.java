@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.common.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -19,4 +20,10 @@ public class GroupCode {
     @OneToMany(mappedBy = "groupCode", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommonCode> commonCodes = new ArrayList<>();
 
+    @Builder
+    public GroupCode(String groupId, String name) {
+        this.groupId = groupId;
+        this.name = name;
+    }
+    public GroupCode() {}
 }

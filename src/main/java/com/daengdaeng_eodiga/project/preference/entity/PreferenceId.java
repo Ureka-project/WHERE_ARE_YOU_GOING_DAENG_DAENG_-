@@ -1,6 +1,7 @@
 package com.daengdaeng_eodiga.project.preference.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,4 +35,10 @@ public class PreferenceId implements Serializable {
         return result;
     }
 
+    @Builder
+    public PreferenceId(String preferenceInfo, int userId) {
+        this.preferenceInfo = preferenceInfo;
+        this.userId = userId;
+    }
+    public PreferenceId(){}
 }

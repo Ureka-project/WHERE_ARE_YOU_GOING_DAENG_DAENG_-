@@ -1,4 +1,4 @@
-package com.daengdaeng_eodiga.project;
+package com.daengdaeng_eodiga.project.place;
 
 
 import com.daengdaeng_eodiga.project.Global.Redis.Repository.RedisLocationRepository;

@@ -88,4 +88,17 @@ public class User extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<RegionVisitTotal> regionVisitTotals = new ArrayList<>();
 
+    @Builder
+    public User (int userId, String nickname, String gender, String email, String city, String cityDetail, String oauthProvider, LocalDateTime deletedAt ) {
+        this.userId = userId;
+        this.nickname = nickname;
+        this.gender = gender;
+        this.email = email;
+        this.city = city;
+        this.cityDetail = cityDetail;
+        this.oauthProvider = OauthProvider.valueOf(oauthProvider);
+        this.deletedAt = deletedAt;
+    }
+    public User(){}
+
 }
